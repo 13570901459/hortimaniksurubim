@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HORTIMANIK - Delivery Hortifrúti</title>
-   <link rel="icon" href="logot.png" type="image/png">
+  <title>HORTIMANIK - Delivery Hortifruti</title>
+  <link rel="icon" href="logo.png" type="image/png">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
@@ -35,6 +35,7 @@
         <button onclick="filterCategory('verduras')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Verduras/Legumes</button>
         <button onclick="filterCategory('raizes')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Raízes</button>
         <button onclick="filterCategory('folhagens')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Folhagens</button>
+        <button onclick="filterCategory('oferta')" class="px-3 py-1 rounded bg-red-100 hover:bg-red-200">Ofertas</button>
       </nav>
     </div>
     <div class="flex flex-col sm:flex-row items-stretch gap-2 w-full md:w-auto">
@@ -49,7 +50,7 @@
 <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
     <img src="imagens/maca.jpg.png" alt="Maçã" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Maçã Bandejado</h2>
-    <p class="text-sm text-gray-500">Fresca, lavada e embalada.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Maçã Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -63,9 +64,9 @@
   
   <!-- Produto: Goiaba Bandejado -->
   <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/goiaba.jpg" alt="Goiaba" class="w-full h-40 object-contain rounded">
+    <img src="imagens/goiababdj.jpg" alt="Goiaba" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Goiaba Bandejado</h2>
-    <p class="text-sm text-gray-500">Doce, firme e embalada com cuidado.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Goiaba Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -79,9 +80,9 @@
   
   <!-- Produto: Laranja Pera Bandejado -->
   <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/laranja.jpg" alt="Laranja Pera" class="w-full h-40 object-contain rounded">
+    <img src="imagens/laranjabdj.jpg" alt="Laranja Pera" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Laranja Pera Bandejado</h2>
-    <p class="text-sm text-gray-500">Ideal para suco, doce e suculenta.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Laranja Pera Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -95,9 +96,9 @@
   
   <!-- Produto: Limão Taiti Bandejado -->
   <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/limao.jpg" alt="Limão Taiti" class="w-full h-40 object-contain rounded">
+    <img src="imagens/limaobdj.jpg" alt="Limão Taiti" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Limão Taiti Bandejado</h2>
-    <p class="text-sm text-gray-500">Sabor cítrico, ideal para temperos e sucos.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Limão Taiti Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -111,9 +112,9 @@
   
   <!-- Produto: Manga Espada Bandejado -->
   <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/manga_espada.jpg" alt="Manga Espada" class="w-full h-40 object-contain rounded">
+    <img src="imagens/mangaespadabdj.jpg" alt="Manga Espada" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Manga Espada Bandejado</h2>
-    <p class="text-sm text-gray-500">Polpa firme, doce e com pouca fibra.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Manga Espada Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -127,9 +128,9 @@
   
   <!-- Produto: Manga Tommy Bandejado -->
   <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/manga_tommy.jpg" alt="Manga Tommy" class="w-full h-40 object-contain rounded">
+    <img src="imagens/mangatommybdj.jpg" alt="Manga Tommy" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Manga Tommy Bandejado</h2>
-    <p class="text-sm text-gray-500">Grande, suculenta e com polpa macia.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Manga Tommy Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -143,9 +144,9 @@
   
   <!-- Produto: Maracujá Bandejado -->
   <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/maracuja.jpg" alt="Maracujá" class="w-full h-40 object-contain rounded">
+    <img src="imagens/maracujabdj.jpg" alt="Maracujá" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Maracujá Bandejado</h2>
-    <p class="text-sm text-gray-500">Aromático, ideal para sucos e sobremesas.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Maracujá Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -158,9 +159,9 @@
   </div>
 <!-- Produto: Tomate Bandejado -->
 <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/tomate.jpg" alt="Tomate" class="w-full h-40 object-contain rounded">
+    <img src="imagens/tomatebdj.jpg" alt="Tomate" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Tomate Bandejado</h2>
-    <p class="text-sm text-gray-500">Vermelho, maduro e pronto para consumo.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Tomate Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -174,9 +175,9 @@
   
   <!-- Produto: Uva Itália Bandejado -->
   <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/uva.jpg" alt="Uva Itália" class="w-full h-40 object-contain rounded">
+    <img src="imagens/uvaitaliabdj.jpg" alt="Uva Itália" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Uva Itália Bandejado</h2>
-    <p class="text-sm text-gray-500">Doce, crocante e sem sementes.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Uva Itália Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -190,9 +191,9 @@
   
   <!-- Produto: Alho Bandejado -->
   <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/alho.jpg" alt="Alho" class="w-full h-40 object-contain rounded">
+    <img src="imagens/alhobdj.jpg" alt="Alho" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Alho Bandejado</h2>
-    <p class="text-sm text-gray-500">Dentes selecionados e embalados.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Alho Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -206,9 +207,9 @@
   
   <!-- Produto: Batata Inglesa Bandejado -->
   <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/batata.jpg" alt="Batata Inglesa" class="w-full h-40 object-contain rounded">
+    <img src="imagens/batatabdj.jpg" alt="Batata Inglesa" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Batata Inglesa Bandejado</h2>
-    <p class="text-sm text-gray-500">Firme, lavada e prática para o dia a dia.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Batata Inglesa Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -222,9 +223,9 @@
   
   <!-- Produto: Cebola Branca Bandejado -->
   <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/cebola.jpg" alt="Cebola Branca" class="w-full h-40 object-contain rounded">
+    <img src="imagens/cebolabdj.jpg" alt="Cebola Branca" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Cebola Branca Bandejado</h2>
-    <p class="text-sm text-gray-500">Crocante, aromática e embalada.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Cebola Branca Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -238,9 +239,9 @@
   
   <!-- Produto: Cenoura Bandejado -->
   <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/cenoura.jpg" alt="Cenoura" class="w-full h-40 object-contain rounded">
+    <img src="imagens/cenourabdj.jpg" alt="Cenoura" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Cenoura Bandejado</h2>
-    <p class="text-sm text-gray-500">Crocrante, doce e pronta para uso.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Cenoura Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -254,9 +255,9 @@
   
   <!-- Produto: Chuchu Bandejado -->
   <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/chuchu.jpg" alt="Chuchu" class="w-full h-40 object-contain rounded">
+    <img src="imagens/chuchubdj.jpg" alt="Chuchu" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Chuchu Bandejado</h2>
-    <p class="text-sm text-gray-500">Leve, fresco e embalado com cuidado.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Chuchu Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -270,9 +271,9 @@
   
   <!-- Produto: Chuchu + Pimentão Bandejado -->
   <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/chuchu_pimentao.jpg" alt="Chuchu e Pimentão" class="w-full h-40 object-contain rounded">
+    <img src="imagens/chuchupimentaobdj.jpg" alt="Chuchu e Pimentão" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Chuchu + Pimentão Bandejado</h2>
-    <p class="text-sm text-gray-500">Combinação pronta para refogado.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Chuchu + Pimentão Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -286,9 +287,9 @@
   
   <!-- Produto: Pimentão Verde Bandejado -->
   <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/pimentao.jpg" alt="Pimentão Verde" class="w-full h-40 object-contain rounded">
+    <img src="imagens/pimentaobdj.jpg" alt="Pimentão Verde" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Pimentão Verde Bandejado</h2>
-    <p class="text-sm text-gray-500">Crocante e ideal para refogados.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Pimentão Verde Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -301,9 +302,9 @@
   </div>
     <!-- Produto: Cebola Branca Bandejado -->
 <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/cebola_branca.jpg" alt="Cebola Branca" class="w-full h-40 object-contain rounded">
+    <img src="imagens/cebolabrancabdj.jpg" alt="Cebola Branca" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Cebola Branca Bandejado</h2>
-    <p class="text-sm text-gray-500">Cebolas selecionadas, frescas e embaladas.</p>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 3,99</p>
     <form onsubmit="addToCart(event, 'Cebola Branca Bandejado',3.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -336,8 +337,7 @@
     </form>
   </div>
   
-  
-  <!-- Produto:Abacaxi un -->
+<!-- Produto:Abacaxi un -->
 <div class="bg-white p-4 rounded shadow relative categoria-frutas">
     <img src="imagens/abacaxi.jpg" alt="abacaxi" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Abacaxi UN</h2>
@@ -352,22 +352,6 @@
       <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
     </form>
   </div>
-  <!-- Produto:Coco Seco un -->
-  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
-      <img src="imagens/cocoseco.jpg" alt="cocoseco" class="w-full h-40 object-contain rounded">
-      <h2 class="text-lg font-bold mt-2">Coco Seco UN</h2>
-      <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade..</p>
-      <p class="text-green-700 font-bold">R$ 4.49</p>
-      <form onsubmit="addToCart(event, 'Coco Verde UN', 4.49)" class="mt-2 space-y-2">
-        <select class="w-full border rounded p-1" name="peso">
-          <option value="1">1 un</option>
-        </select>
-        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
-        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
-        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
-      </form>
-    </div>
-
   
   <!-- Produto: Ameixa kg -->
   <div class="bg-white p-4 rounded shadow relative categoria-frutas">
@@ -422,9 +406,56 @@
     </form>
   </div>
   
-  
-  <!-- Produto: Caju kg -->
+  <!-- Produto:Coco verde un -->
   <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+      <img src="imagens/cocoverde.jpg" alt="cocoverde" class="w-full h-40 object-contain rounded">
+      <h2 class="text-lg font-bold mt-2">Coco Verde UN</h2>
+      <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade..</p>
+      <p class="text-green-700 font-bold">R$ 3.49</p>
+      <form onsubmit="addToCart(event, 'Coco Verde UN', 3.49)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+          <option value="1">1 un</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+      </form>
+    </div>
+
+    <!-- Produto:Coco Seco un -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+      <img src="imagens/cocoseco.jpg" alt="cocoseco" class="w-full h-40 object-contain rounded">
+      <h2 class="text-lg font-bold mt-2">Coco Seco UN</h2>
+      <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade..</p>
+      <p class="text-green-700 font-bold">R$ 4.49</p>
+      <form onsubmit="addToCart(event, 'Coco Verde UN', 4.49)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+          <option value="1">1 un</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+      </form>
+    </div>
+
+    <!-- Produto: Caju un -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/caju.jpg" alt="Caju" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Caju UN</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade..</p>
+    <p class="text-green-700 font-bold">R$ 4.49</p>
+    <form onsubmit="addToCart(event, 'Coco Caju UN', 4.49)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+
+  <!-- Produto: Caju kg -->
+  <!-- <div class="bg-white p-4 rounded shadow relative categoria-frutas">
     <img src="imagens/caju.jpg" alt="Caju" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Caju KG</h2>
     <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
@@ -438,7 +469,7 @@
       <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
       <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
     </form>
-  </div>
+  </div> -->
   
   
   <!-- Produto: Goiaba kg -->
@@ -604,7 +635,7 @@
   
   
   <!-- Produto: Manga Tommy kg -->
-  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
     <img src="imagens/manga_tommy.jpg" alt="Manga Tommy" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Manga Tommy KG</h2>
     <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
@@ -658,7 +689,7 @@
   
   
   <!-- Produto: Melancia kg -->
-  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+   <!--<div class="bg-white p-4 rounded shadow relative categoria-frutas">
     <img src="imagens/melancia.jpg" alt="Melancia" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Melancia KG</h2>
     <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
@@ -672,9 +703,23 @@
       <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
       <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
     </form>
+  </div> -->
+  
+  <!-- Produto: Melancia un -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
+    <img src="imagens/melancia.jpg" alt="melancia" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Melancia 1/4 UN</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 4.29</p>
+    <form onsubmit="addToCart(event, 'Melanciaro', 4.29)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
   </div>
-  
-  
   <!-- Produto: Melão kg -->
   <div class="bg-white p-4 rounded shadow relative categoria-frutas">
     <img src="imagens/melao.jpg" alt="Melão" class="w-full h-40 object-contain rounded">
@@ -958,7 +1003,7 @@
 </div>
 
 <!-- Produto:Tomate kg -->
-<div class="bg-white p-4 rounded shadow relative categoria-verduras">
+<div class="bg-white p-4 rounded shadow relative categoria-verduras oferta">
     <img src="imagens/tomate.jpg" alt="Tomate" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Tomate KG</h2>
     <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
@@ -1043,7 +1088,7 @@
 </div>
 
 <!-- Produto:Cebola Branca kg -->
-<div class="bg-white p-4 rounded shadow relative categoria-verduras">
+<div class="bg-white p-4 rounded shadow relative categoria-verduras oferta">
     <img src="imagens/cebola_branca.jpg" alt="Cebola Branca" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Cebola Branca KG</h2>
     <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
@@ -1169,7 +1214,7 @@
   <div class="bg-white p-4 rounded shadow relative categoria-folhagens">
     <img src="imagens/alface.jpg" alt="Alface" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Alface</h2>
-    <p class="text-sm text-gray-500">Fresca, lavada e embalada.</p>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
     <p class="text-green-700 font-bold">R$ 5.36</p>
     <form onsubmit="addToCart(event, 'Alface', 5.36)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -1185,7 +1230,7 @@
   <div class="bg-white p-4 rounded shadow relative categoria-folhagens">
     <img src="imagens/brócolis.jpg" alt="Brócolis" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Brócolis</h2>
-    <p class="text-sm text-gray-500">Fresca, lavada e embalada.</p>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
     <p class="text-green-700 font-bold">R$ 5.61</p>
     <form onsubmit="addToCart(event, 'Brócolis', 5.61)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -1201,7 +1246,7 @@
   <div class="bg-white p-4 rounded shadow relative categoria-folhagens">
     <img src="imagens/couve.jpg" alt="Couve" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Couve</h2>
-    <p class="text-sm text-gray-500">Fresca, lavada e embalada.</p>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
     <p class="text-green-700 font-bold">R$ 6.44</p>
     <form onsubmit="addToCart(event, 'Couve', 6.44)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -1217,7 +1262,7 @@
     <!-- <div class="bg-white p-4 rounded shadow relative categoria-folhagens">
     <img src="imagens/espinafre.jpg" alt="Espinafre" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Espinafre</h2>
-    <p class="text-sm text-gray-500">Fresca, lavada e embalada.</p>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
     <p class="text-green-700 font-bold">R$ 6.19</p>
     <form onsubmit="addToCart(event, 'Espinafre', 6.19)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -1230,10 +1275,10 @@
   </div> -->
   
   <!-- Produto:Coentro -->
-  <div class="bg-white p-4 rounded shadow relative categoria-folhagens">
+  <div class="bg-white p-4 rounded shadow relative categoria-folhagens oferta">
     <img src="imagens/coentro.jpg" alt="Coentro" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Coentro</h2>
-    <p class="text-sm text-gray-500">Fresca, lavada e embalada.</p>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
     <p class="text-green-700 font-bold">R$ 4.29</p>
     <form onsubmit="addToCart(event, 'Coentro', 4.29)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -1249,7 +1294,7 @@
     <!--<div class="bg-white p-4 rounded shadow relative categoria-folhagens">
     <img src="imagens/rúcula.jpg" alt="Rúcula" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Rúcula</h2>
-    <p class="text-sm text-gray-500">Fresca, lavada e embalada.</p>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
     <p class="text-green-700 font-bold">R$ 8.25</p>
     <form onsubmit="addToCart(event, 'Rúcula', 8.25)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
@@ -1386,6 +1431,17 @@
         card.classList.toggle('hidden', !title.includes(input));
       });
     }
+    function filterCategory(cat) {
+            document.querySelectorAll('[class*=categoria-]').forEach(el => {
+                if (cat === 'oferta') {
+                    el.classList.toggle('hidden', !el.classList.contains('oferta'));
+                } else if (cat === 'todos') {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.toggle('hidden', !el.classList.contains(`categoria-${cat}`));
+                }
+            });
+        }
   </script>
 </body>
 </html>
