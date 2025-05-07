@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HORTIMANIK - Delivery Hortifrúti</title>
+  <title>HORTIMANIK - Delivery Hortifruti</title>
   <link rel="icon" href="logo.png" type="image/png">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -325,8 +325,8 @@
     <img src="imagens/abacate.jpg" alt="Abacate" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Abacate KG</h2>
     <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
-    <p class="text-green-700 font-bold">R$ 6.60</p>
-    <form onsubmit="addToCart(event, 'Abacate KG', 6.60)" class="mt-2 space-y-2">
+    <p class="text-green-700 font-bold">R$ 7.99</p>
+    <form onsubmit="addToCart(event, 'Abacate KG', 7.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
         <option value="1">1kg</option>
         <option value="0.5">500g</option>
@@ -336,7 +336,21 @@
       <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
     </form>
   </div>
-  
+  <!-- Produto:Abacate un -->
+<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+  <img src="imagens/abacate.jpg" alt="abacate" class="w-full h-40 object-contain rounded">
+  <h2 class="text-lg font-bold mt-2">Abacate UN</h2>
+  <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade..</p>
+  <p class="text-green-700 font-bold">R$ 5.29</p>
+  <form onsubmit="addToCart(event, 'Abacate UN', 5.29)" class="mt-2 space-y-2">
+    <select class="w-full border rounded p-1" name="peso">
+      <option value="1">1 un</option>
+    </select>
+    <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+    <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+    <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+  </form>
+</div>
 <!-- Produto:Abacaxi un -->
 <div class="bg-white p-4 rounded shadow relative categoria-frutas">
     <img src="imagens/abacaxi.jpg" alt="abacaxi" class="w-full h-40 object-contain rounded">
@@ -1414,7 +1428,7 @@
         `Total final: R$ ${totalComDesconto.toFixed(2)}\n` +
         `Forma de pagamento: ${pagamento}`;
 
-      const url = `https://wa.me/5581991152441?text=${encodeURIComponent(mensagem)}`;
+      const url = `https://wa.me/5581994036146?text=${encodeURIComponent(mensagem)}`;
       window.open(url, '_blank');
     }
 
