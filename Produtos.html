@@ -618,7 +618,23 @@
       <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
     </form>
   </div>
-  
+
+<!-- Produto: Laranja Pokam un -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
+    <img src="imagens/pokam.jpg" alt="melancia" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">8 Laranja Pokam por R$ 9,99</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 9,99</p>
+    <form onsubmit="addToCart(event, '8 Laranja Pokam por R$ 9,99', 9.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+    
   <!-- Produto: Limão kg -->
   <!-- <div class="bg-white p-4 rounded shadow relative categoria-frutas">
     <img src="imagens/limao.jpg" alt="Limão" class="w-full h-40 object-contain rounded">
