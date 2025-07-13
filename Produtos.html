@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HORTIMANIK - Delivery Hortifruti</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+  <style>
+    .oferta::after {
+      content: 'Oferta';
+      background: red;
+      color: white;
+      padding: 2px 6px;
+      font-size: 0.75rem;
+      border-radius: 4px;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+  </style>
+</head>
+<body class="bg-green-50">
+  <header x-data="{ open: false }" class="bg-white shadow p-4 sticky top-0 z-50">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+
+      <!-- LOGO + MENU HAMBURGUER -->
+      <div class="flex justify-between items-center w-full md:w-auto">
+        <div class="flex items-center space-x-2">
+          <img src="logo.png" alt="Logo" class="w-12 h-12">
+          <span class="font-bold text-green-700 text-xl">HORTIMANIK</span>
+        </div>
+        <!-- Botão menu mobile -->
+        <button @click="open = !open" class="md:hidden text-green-700 focus:outline-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- MENU CATEGORIAS -->
+      <nav :class="{'block': open, 'hidden': !open}" class="flex-wrap gap-2 mt-4 md:mt-0 md:flex md:flex-row hidden">
+        <button onclick="filterCategory('todos')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Todos</button>
+        <button onclick="filterCategory('bandejado')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Bandejado</button>
+        <button onclick="filterCategory('Polpas')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Polpas</button>
+        <button onclick="filterCategory('frutas')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Frutas</button>
+        <button onclick="filterCategory('folhagens')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Folhagens</button>
+        <button onclick="filterCategory('verduras')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Verduras/Legumes</button>
+        <button onclick="filterCategory('raizes')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Raízes</button>
+        <button onclick="filterCategory('oferta')" class="px-3 py-1 rounded bg-red-100 hover:bg-red-200">Ofertas</button>
+      </nav>
+
+      <!-- BUSCA + CARRINHO -->
+      <div class="flex flex-col sm:flex-row items-stretch gap-2 w-full md:w-auto mt-4 md:mt-0">
+        <input type="text" id="search" onkeyup="searchProduct()" placeholder="Buscar produto..."
+          class="p-2 border rounded w-full sm:w-auto">
+        <button onclick="toggleCart()" class="bg-green-600 text-white px-4 py-2 rounded">Ver meu carrinho</button>
+      </div>
+    </div>
+  </header>
+
+
+  <main class="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="productList">
+
+    <!-- Produtos serão carregados aqui via JavaScript -->
+    <!-- POLPAS: -->
+
+    <!-- POLPAS de Maracujá UN-->
+    <div class="bg-white p-4 rounded shadow relative categoria-Polpas">
+      <img src="imagens/polpamaracuja.jpg" alt="Polpa de Maracujá 300g UN" class="w-full h-40 object-contain rounded">
+      <h2 class="text-lg font-bold mt-2">Polpa de Maracujá 300g UN</h2>
+      <p class="text-sm text-gray-500">Descrição do produto.</p>
+      <p class="text-green-700 font-bold">R$ 6,99</p>
+      <form onsubmit="addToCart(event, 'Polpa de Maracujá UN', 6.99)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+         <option value="1">1 un</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+      </form>
+    </div>
+<!-- Embadejado-->
+<!--Produto: Maçã Bandejado -->
+<div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/maca.jpg.png" alt="Maçã" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Maçã Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 4,99</p>
+    <form onsubmit="addToCart(event, 'Maçã Bandejado',4.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> 
+  
+  <!-- Produto: Goiaba Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/goiababdj.jpg" alt="Goiaba" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Goiaba Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Goiaba Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Laranja Pera Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/laranjabdj.jpg" alt="Laranja Pera" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Laranja Pera Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Laranja Pera Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Limão Taiti Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/limaobdj.jpg" alt="Limão Taiti" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Limão Taiti Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Limão Taiti Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Manga Espada Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/mangaespadabdj.jpg" alt="Manga Espada" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Manga Espada Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Manga Espada Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Manga Tommy Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/mangatommybdj.jpg" alt="Manga Tommy" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Manga Tommy Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Manga Tommy Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Maracujá Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/maracujabdj.jpg" alt="Maracujá" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Maracujá Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Maracujá Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+ Produto: Tomate Bandejado 
+<div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/tomatebdj.jpg" alt="Tomate" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Tomate Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Tomate Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Uva Itália Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/uvaitaliabdj.jpg" alt="Uva Itália" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Uva Itália Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Uva Itália Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Alho Bandejado -->
+  <!-- <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/alhobdj.jpg" alt="Alho" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Alho Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Alho Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+  
+  <!-- Produto: Batata Inglesa Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/batatabdj.jpg" alt="Batata Inglesa" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Batata Inglesa Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Batata Inglesa Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Cebola Branca Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/cebolabdj.jpg" alt="Cebola Branca" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Cebola Branca Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Cebola Branca Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  Produto: Cenoura Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/cenourabdj.jpg" alt="Cenoura" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Cenoura Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Cenoura Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Chuchu Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/chuchubdj.jpg" alt="Chuchu" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Chuchu Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Chuchu Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Chuchu + Pimentão Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/chuchupimentaobdj.jpg" alt="Chuchu e Pimentão" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Chuchu + Pimentão Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Chuchu + Pimentão Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  Produto: Pimentão Verde Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/pimentaobdj.jpg" alt="Pimentão Verde" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Pimentão Verde Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Pimentão Verde Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+    Produto: Cebola Branca Bandejado -->
+<!-- <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/cebolabrancabdj.jpg" alt="Cebola Branca" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Cebola Branca Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Cebola Branca Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+  
+
+<!-- Embadejado -->
+
+<!-- Frutas -->
+ <!-- Produto: Abacate kg -->
+<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/abacate.jpg" alt="Abacate" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Abacate KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 7,99</p>
+    <form onsubmit="addToCart(event, 'Abacate KG', 7.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  <!-- Produto:Abacate un -->
+ <!--<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+  <img src="imagens/abacate.jpg" alt="abacate" class="w-full h-40 object-contain rounded">
+  <h2 class="text-lg font-bold mt-2">Abacate UN</h2>
+  <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade..</p>
+  <p class="text-green-700 font-bold">R$ 5.29</p>
+  <form onsubmit="addToCart(event, 'Abacate UN', 5.29)" class="mt-2 space-y-2">
+    <select class="w-full border rounded p-1" name="peso">
+      <option value="1">1 un</option>
+    </select>
+    <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+    <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+    <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+  </form>
+</div>-->
+<!-- Produto:Abacaxi un -->
+<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/abacaxi.jpg" alt="abacaxi un" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Abacaxi UN</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade..</p>
+    <p class="text-green-700 font-bold">R$ 6,99</p>
+    <form onsubmit="addToCart(event, 'Abacaxi UN', 6.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  <!-- Produto: Ameixa kg -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/ameixa.jpg" alt="ameixa" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Ameixa KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 19,99</p>
+    <form onsubmit="addToCart(event, 'Ameixa KG', 19.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  
+  <!-- Produto: Banana Pakovan kg -->
+  <!-- <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/bananapakovan.jpg" alt="Banana Pakovan" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Banana Pakovan KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 8.25</p>
+    <form onsubmit="addToCart(event, 'Banana Pakovan KG', 8.25)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+  <!-- Produto:Banana Pakovan Palma -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/bananapakovan.jpg" alt="bananapakovan" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Banana Pakovan Palma</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade..</p>
+    <p class="text-green-700 font-bold">R$ 5,99</p>
+    <form onsubmit="addToCart(event, 'Banana Pakovan Palma', 5.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  
+  <!-- Produto: Banana Comprida kg -->
+<!--<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/banana_comprida.jpg" alt="Banana Comprida" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Banana Comprida KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 8.25</p>
+    <form onsubmit="addToCart(event, 'Banana Comprida KG', 8.25)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>-->
+  <!-- Produto:Banana Comprida UN -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/banana_comprida.jpg" alt="banana_comprida" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Banana Comprida UN</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade..</p>
+    <p class="text-green-700 font-bold">R$ 1,99</p>
+    <form onsubmit="addToCart(event, 'Banana Comprida UN', 1.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  <!-- Produto:Coco verde un -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+      <img src="imagens/cocoverde.jpg" alt="cocoverde" class="w-full h-40 object-contain rounded">
+      <h2 class="text-lg font-bold mt-2">Coco Verde UN</h2>
+      <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade..</p>
+      <p class="text-green-700 font-bold">R$ 2,99</p>
+      <form onsubmit="addToCart(event, 'Coco Verde UN', 2.99)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+          <option value="1">1 un</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+      </form>
+    </div>
+
+    <!-- Produto:Coco Seco un -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+      <img src="imagens/cocoseco.jpg" alt="cocoseco" class="w-full h-40 object-contain rounded">
+      <h2 class="text-lg font-bold mt-2">Coco Seco UN</h2>
+      <p class="text-sm text-gray-500">Se desejar coco ralado nós ralamos seu coco na hora!</p>
+      <p class="text-green-700 font-bold">R$ 4,99</p>
+      <form onsubmit="addToCart(event, 'Coco Seco UN', 4.99)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+          <option value="1">1 un</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+      </form>
+    </div>
+
+    <!-- Produto: Caju un -->
+  <!--<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/caju.jpg" alt="Caju" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Caju UN</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade..</p>
+    <p class="text-green-700 font-bold">R$ 4.49</p>
+    <form onsubmit="addToCart(event, 'Coco Caju UN', 4.49)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>-->
+
+  <!-- Produto: Caju kg -->
+  <!-- <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/caju.jpg" alt="Caju" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Caju KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 6.60</p>
+    <form onsubmit="addToCart(event, 'Caju KG', 6.60)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+  
+  
+  <!-- Produto: Goiaba kg -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/goiaba.jpg" alt="Goiaba" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Goiaba KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 4,99</p>
+    <form onsubmit="addToCart(event, 'Goiaba KG', 4.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  
+  <!-- Produto: Laranja Mimo kg -->
+<!--<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/laranja_mimo.jpg" alt="Laranja Mimo" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Laranja Mimo KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 8.25</p>
+    <form onsubmit="addToCart(event, 'Laranja Mimo KG', 8.25)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>-->
+  <!-- Produto: Laranja Mimo UN -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/laranja_mimo.jpg" alt="Laranja Mimo" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Laranja Mimo UN</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 1,25</p>
+    <form onsubmit="addToCart(event, 'Laranja Mimo UN', 1.25)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+
+  <!-- Produto: Laranja Pera kg -->
+<!--<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/laranja_pera.jpg" alt="Laranja Pera" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Laranja Pera KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 8.25</p>
+    <form onsubmit="addToCart(event, 'Laranja Pera KG', 8.25)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+  
+   <!-- Produto: Laranja Pera UN -->
+   <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/laranja_pera.jpg" alt="Laranja Pera" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Laranja Pera UN</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 0,99</p>
+    <form onsubmit="addToCart(event, 'Laranja Pera UN', 0.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+
+<!-- Produto: Laranja Pokam un -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
+    <img src="imagens/pokam.JPG" alt="melancia" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">8 Laranja Pokam por R$ 9,99</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 9,99</p>
+    <form onsubmit="addToCart(event, '8 Laranja Pokam por R$ 9,99', 9.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+    
+  <!-- Produto: Limão kg -->
+  <!-- <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/limao.jpg" alt="Limão" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Limão KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 8.25</p>
+    <form onsubmit="addToCart(event, 'Limão KG', 8.25)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+  
+  <!-- Produto: Limão  6 UN -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/limao.jpg" alt="limao" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Limão 6 unidade por R$ 1,99</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 1,99</p>
+    <form onsubmit="addToCart(event, 'Limão 6 unidade por R$ 1,99', 1.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  <!-- Produto: Maçã Cat1 kg -->
+<!--<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/macacat.png" alt="Maçã Cat1" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Maçã Cat1 KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 8.25</p>
+    <form onsubmit="addToCart(event, 'Maçã Cat1 KG', 8.25)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>-->
+<!-- Produto: Maça Fuji UN -->
+<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+  <img src="imagens/macacat.png" alt="macacat" class="w-full h-40 object-contain rounded">
+  <h2 class="text-lg font-bold mt-2">Maça Fuji UN</h2>
+  <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+  <p class="text-green-700 font-bold">R$ 1,25</p>
+  <form onsubmit="addToCart(event, 'Maça Fuji UN', 1.25)" class="mt-2 space-y-2">
+    <select class="w-full border rounded p-1" name="peso">
+      <option value="1">1 un</option>
+    </select>
+    <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+    <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+    <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+  </form>
+</div>
+   <!-- Produto: Maça Nacional UN -->
+   <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/maca_agranel.jpg" alt="maca_agranel" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Maça Nacional UN</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 1,25</p>
+    <form onsubmit="addToCart(event, 'Maça Nacional UN', 1.25)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+
+  <!-- Produto: Maçã Agranel kg -->
+ <!-- <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/maca_agranel.jpg" alt="Maçã Agranel" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Maçã Agranel KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 8.25</p>
+    <form onsubmit="addToCart(event, 'Maçã Agranel KG', 8.25)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+  
+  
+  <!-- Produto: Mamão Formosa kg -->
+  <!--<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/mamao_formosa.jpg" alt="Mamão Formosa" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Mamão Formosa KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 6.60</p>
+    <form onsubmit="addToCart(event, 'Mamão Formosa KG', 6.60)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>-->
+  
+  <!-- Produto: Mamão Formosa UN -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/mamao_formosa.jpg" alt="mamao_formosa" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Mamão Formosa UN</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 6,99</p>
+    <form onsubmit="addToCart(event, 'Mamão Formosa UN', 6.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  <!-- Produto: Mamão Havaí kg -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/mamao_havai.jpg" alt="mamao_havai" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Mamão Havaí KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 6,99</p>
+    <form onsubmit="addToCart(event, 'Mamão Havaí KG', 6.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  
+  <!-- Produto: Manga Espada kg -->
+  <!--<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/manga_espada.jpg" alt="Manga Espada" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Manga Espada KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 4.13</p>
+    <form onsubmit="addToCart(event, 'Manga Espada KG', 4.13)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>-->
+  
+  
+  <!-- Produto: Manga Tommy kg -->
+  <!--<div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
+    <img src="imagens/manga_tommy.jpg" alt="Manga Tommy" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Manga Tommy KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 3.30</p>
+    <form onsubmit="addToCart(event, 'Manga Tommy KG', 3.30)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+  
+  <!-- Produto: Manga Tommy UN -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/manga_tommy.jpg" alt="manga_tommy" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Manga Tommy UN</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 2,49</p>
+    <form onsubmit="addToCart(event, 'Manga Tommy UN', 2.49)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  <!-- Produto: Manga Rosa kg -->
+ <!-- <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/manga_rosa.jpg" alt="manga_rosa" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Manga Rosa KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 4.13</p>
+    <form onsubmit="addToCart(event, 'Manga Rosa KG', 4.13)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+  
+  <!-- Produto: Manga Rosa UN -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/manga_rosa.jpg" alt="manga_rosa" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Manga Rosa UN</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 2,49</p>
+    <form onsubmit="addToCart(event, 'Manga Rosa UN', 2.49)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  <!-- Produto: Maracujá kg -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/maracuja.jpg" alt="maracuja" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Maracujá KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 9,99</p>
+    <form onsubmit="addToCart(event, 'Maracujá KG', 9.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  
+  <!-- Produto: Melancia kg -->
+   <!--<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/melancia.jpg" alt="Melancia" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Melancia KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 8.25</p>
+    <form onsubmit="addToCart(event, 'Melancia KG', 8.25)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+  
+  <!-- Produto: Melancia un -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
+    <img src="imagens/melancia.jpg" alt="melancia" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Melancia 1/4 fatia</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 1,99</p>
+    <form onsubmit="addToCart(event, 'Melancia 1/4 fatia', 1.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  <!-- Produto: Melão kg -->
+  <!--<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/melao.jpg" alt="melao" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Melão KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 4,99</p>
+    <form onsubmit="addToCart(event, 'Melão KG', 4.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+<!-- Produto:Melão Médio  un -->
+<div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
+  <img src="imagens/melao.jpg" alt="melao" class="w-full h-40 object-contain rounded">
+  <h2 class="text-lg font-bold mt-2">Melão Médio UN</h2>
+  <p class="text-sm text-gray-500">Tamanho médio.</p>
+  <p class="text-green-700 font-bold">R$ 4,99</p>
+  <form onsubmit="addToCart(event, 'Melão UN', 4.99)" class="mt-2 space-y-2">
+    <select class="w-full border rounded p-1" name="peso">
+      <option value="1">1 un</option>
+    </select>
+    <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+    <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+    <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+  </form>
+</div>
+
+<!-- Produto:Melão Pequeno  un -->
+<div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
+  <img src="imagens/melao.jpg" alt="melao" class="w-full h-40 object-contain rounded">
+  <h2 class="text-lg font-bold mt-2">Melão Pequeno UN</h2>
+  <p class="text-sm text-gray-500">Tamanho Pequeno.</p>
+  <p class="text-green-700 font-bold">R$ 2,99</p>
+  <form onsubmit="addToCart(event, 'Melão Pequeno UN', 2.99)" class="mt-2 space-y-2">
+    <select class="w-full border rounded p-1" name="peso">
+      <option value="1">1 un</option>
+    </select>
+    <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+    <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+    <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+  </form>
+</div>
+  
+  <!-- Produto: Morango kg -->
+  <!--<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/morango.jpg" alt="Morango" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Morango KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 8.25</p>
+    <form onsubmit="addToCart(event, 'Morango KG', 8.25)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>-->
+  <!-- Produto: Morango UN -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/morango.jpg" alt="morango" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Morango UN</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 11,99</p>
+    <form onsubmit="addToCart(event, 'Morango UN', 11.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  <!-- Produto: Pera Iportada UN -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/pera.jpg" alt="pera" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Pera Iportada UN</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 2,49</p>
+    <form onsubmit="addToCart(event, 'Pera Iportada UN', 2.49)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  <!-- Produto: Pêssego kg -->
+
+  <!-- Produto: Tangerina Importda kg -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/tangerina.jpg" alt="tangerina" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Tangerina Importda KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 17,99</p>
+    <form onsubmit="addToCart(event, 'Tangerina Importda KG', 17.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  
+  <!-- Produto: Uva Italia kg -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/uva_italia.jpg" alt="uva_italia" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Uva Italia KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 14,99</p>
+    <form onsubmit="addToCart(event, 'Uva Italia KG', 14.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  
+  <!-- Produto: Uva Roxa kg -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/uva_roxa.jpg" alt="Uva Roxa" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Uva Roxa KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 8,25</p>
+    <form onsubmit="addToCart(event, 'Uva Roxa KG', 8.25)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> 
+  
+  
+  <!-- Produto: Uva Thompson sem semente Bandeja -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/uva_thompson.jpg" alt="Uva Thompson sem semente Bandeja" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2"> Uva Thompson sem semente Bandeja</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 10,99</p>
+    <form onsubmit="addToCart(event, 'Uva Thompson sem semente Bandeja', 10.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+
+  
+  
+  <!-- Produto: Uva Vitória  sem Semente Bandeja -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
+    <img src="imagens/uva_vitória.jpg" alt="Uva Vitória  sem Semente Bandeja" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2"> Uva Vitória  sem Semente Bandeja</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 4,99</p>
+    <form onsubmit="addToCart(event, 'Uva Vitória  sem Semente Bandeja', 4.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+
+<!-- Frutas -->
+
+<!-- Verduras -->
+   <!-- Produto:Jerimum kg -->
+<div class="bg-white p-4 rounded shadow relative categoria-verduras oferta">
+    <img src="imagens/jerimum.jpg" alt="jerimum" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Jerimum KG</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 2,99</p>
+    <form onsubmit="addToCart(event, 'Jerimum KG', 2.99)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+            <option value="1">1kg</option>
+            <option value="0.5">500g</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+</div>
+
+<!-- Produto:Abobrinha kg -->
+<div class="bg-white p-4 rounded shadow relative categoria-verduras">
+    <img src="imagens/abobrinha.jpg" alt="Abobrinha" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Abobrinha KG</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Abobrinha KG', 3.99)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+            <option value="1">1kg</option>
+            <option value="0.5">500g</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+</div>
+
+<!-- Produto:Berinjela kg -->
+<div class="bg-white p-4 rounded shadow relative categoria-verduras">
+    <img src="imagens/berinjela.jpg" alt="Berinjela" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Berinjela KG</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 7,29</p>
+    <form onsubmit="addToCart(event, 'Berinjela KG', 7.29)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+            <option value="1">1kg</option>
+            <option value="0.5">500g</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+</div>
+
+<!-- Produto:Chuchu kg -->
+<!--<div class="bg-white p-4 rounded shadow relative categoria-verduras">
+    <img src="imagens/chuchu.jpg" alt="Chuchu" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Chuchu KG</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 7.01</p>
+    <form onsubmit="addToCart(event, 'Chuchu KG', 7.01)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+            <option value="1">1kg</option>
+            <option value="0.5">500g</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+</div> -->
+
+<!-- Produto:Chuchu un -->
+<div class="bg-white p-4 rounded shadow relative categoria-frutas">
+  <img src="imagens/chuchu.jpg" alt="chuchu" class="w-full h-40 object-contain rounded">
+  <h2 class="text-lg font-bold mt-2">Chuchu UN</h2>
+  <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade..</p>
+  <p class="text-green-700 font-bold">R$ 1,99</p>
+  <form onsubmit="addToCart(event, 'Chuchu UN', 1.99)" class="mt-2 space-y-2">
+    <select class="w-full border rounded p-1" name="peso">
+      <option value="1">1 un</option>
+    </select>
+    <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+    <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+    <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+  </form>
+</div>
+<!-- Produto:Ervilha kg -->
+<!-- <div class="bg-white p-4 rounded shadow relative categoria-verduras">
+    <img src="imagens/ervilha" alt="Ervilha" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Ervilha KG</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 7.01</p>
+    <form onsubmit="addToCart(event, 'Ervilha KG', 7.01)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+            <option value="1">1kg</option>
+            <option value="0.5">500g</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+</div> -->
+
+<!-- Produto:Pepino kg -->
+<div class="bg-white p-4 rounded shadow relative categoria-verduras">
+    <img src="imagens/pepino.jpg" alt="Pepino" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Pepino KG</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 4,29</p>
+    <form onsubmit="addToCart(event, 'Pepino KG', 4.29)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+            <option value="1">1kg</option>
+            <option value="0.5">500g</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+</div>
+
+<!-- Produto:Pimentão kg -->
+<div class="bg-white p-4 rounded shadow relative categoria-verduras">
+    <img src="imagens/pimentao.jpg" alt="Pimentão" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Pimentão KG</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 6,59</p>
+    <form onsubmit="addToCart(event, 'Pimentão KG', 6.59)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+            <option value="1">1kg</option>
+            <option value="0.5">500g</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+</div>
+
+<!-- Produto:Quiabo kg -->
+<div class="bg-white p-4 rounded shadow relative categoria-verduras">
+    <img src="imagens/quiabo.jpg" alt="Quiabo" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Quiabo KG</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 11,49</p>
+    <form onsubmit="addToCart(event, 'Quiabo KG', 11.49)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+            <option value="1">1kg</option>
+            <option value="0.5">500g</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+</div>
+
+<!-- Produto:Tomate kg -->
+<div class="bg-white p-4 rounded shadow relative categoria-verduras oferta">
+    <img src="imagens/tomate.jpg" alt="Tomate" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Tomate KG</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 5,99</p>
+    <form onsubmit="addToCart(event, 'Tomate KG', 5.99)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+            <option value="1">1kg</option>
+            <option value="0.5">500g</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+</div>
+
+<!-- Produto:Batata-inglesa kg -->
+<div class="bg-white p-4 rounded shadow relative categoria-verduras oferta">
+    <img src="imagens/batatainglesa.jpg" alt="Batata-inglesa" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Batata-inglesa KG</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 5,99</p>
+    <form onsubmit="addToCart(event, 'Batata-inglesa KG', 5.99)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+            <option value="1">1kg</option>
+            <option value="0.5">500g</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+</div>
+
+<!-- Produto:Beterraba kg -->
+<div class="bg-white p-4 rounded shadow relative categoria-verduras">
+    <img src="imagens/beterraba.jpg" alt="Beterraba" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Beterraba KG</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 5,75</p>
+    <form onsubmit="addToCart(event, 'Beterraba KG', 5.75)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+            <option value="1">1kg</option>
+            <option value="0.5">500g</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+</div>
+
+<!-- Produto:Cenoura kg -->
+<div class="bg-white p-4 rounded shadow relative categoria-verduras oferta">
+    <img src="imagens/cenoura.jpg" alt="Cenoura" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Cenoura KG</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 4,49</p>
+    <form onsubmit="addToCart(event, 'Cenoura KG', 4.49)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+            <option value="1">1kg</option>
+            <option value="0.5">500g</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+</div>
+
+<!-- Produto:Cebola Roxa kg -->
+<div class="bg-white p-4 rounded shadow relative categoria-verduras">
+    <img src="imagens/cebola_roxa.jpg" alt="Cebola Roxa" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Cebola Roxa KG</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 7,49</p>
+    <form onsubmit="addToCart(event, 'Cebola Roxa KG', 7.49)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+            <option value="1">1kg</option>
+            <option value="0.5">500g</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+</div>
+
+<!-- Produto:Cebola Branca kg -->
+<div class="bg-white p-4 rounded shadow relative categoria-verduras oferta">
+    <img src="imagens/cebola_branca.jpg" alt="Cebola Branca" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Cebola Branca KG</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 4,99</p>
+    <form onsubmit="addToCart(event, 'Cebola Branca KG', 4.99)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+            <option value="1">1kg</option>
+            <option value="0.5">500g</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+</div>
+<!-- Verduras -->
+
+<!-- Raizes -->
+<!-- Produto:Macaxeira KG -->
+<div class="bg-white p-4 rounded shadow relative categoria-raizes">
+    <img src="imagens/aipim.jpg" alt="Macaxeira KG" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Macaxeira KG</h2>
+    <p class="text-sm text-gray-500">Rico em amido, ideal para cozidos.</p>
+    <p class="text-green-700 font-bold">R$ 4,49</p>
+    <form onsubmit="addToCart(event, 'Macaxeira KG', 4.49)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  
+  <!-- Produto:Batata-doce KG -->
+  <div class="bg-white p-4 rounded shadow relative categoria-raizes oferta">
+    <img src="imagens/batata-doce.jpg" alt="Batata-doce" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Batata-doce KG</h2>
+    <p class="text-sm text-gray-500">Rica em fibras e sabor natural.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Batata-doce KG', 4.49)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  
+  <!-- Produto:Cará KG -->
+  <div class="bg-white p-4 rounded shadow relative categoria-raizes">
+    <img src="imagens/cara.jpg" alt="Cará" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Cará KG</h2>
+    <p class="text-sm text-gray-500">Ótimo para sopas e ensopados.</p>
+    <p class="text-green-700 font-bold">R$ 5,99</p>
+    <form onsubmit="addToCart(event, 'Cará KG', 5.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  <!-- Produto:Inhame KG -->
+  <div class="bg-white p-4 rounded shadow relative categoria-raizes">
+    <img src="imagens/inhame.jpg" alt="Inhame" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Inhame KG</h2>
+    <p class="text-sm text-gray-500">Fonte de energia e muito nutritivo.</p>
+    <p class="text-green-700 font-bold">R$ 8,79</p>
+    <form onsubmit="addToCart(event, 'Inhame KG', 8.79)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  <!-- Raizes -->
+
+<!-- folhagens -->
+<!-- Produto:Acelga KG -->
+<div class="bg-white p-4 rounded shadow relative categoria-folhagens">
+  <img src="acelga.jpg" alt="acelga" class="w-full h-40 object-contain rounded">
+  <h2 class="text-lg font-bold mt-2">Acelga KG</h2>
+  <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+  <p class="text-green-700 font-bold">R$ 8,59</p>
+  <form onsubmit="addToCart(event, 'Acelga KG', 8.59)" class="mt-2 space-y-2">
+    <select class="w-full border rounded p-1" name="peso">
+      <option value="1">1kg</option>
+      <option value="0.5">500g</option>
+    </select>
+    <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+    <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+    <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+  </form>
+</div>
+  
+  <!-- Produto:Agrião -->
+   <!--<div class="bg-white p-4 rounded shadow relative categoria-folhagens">
+    <img src="imagens/agrião.jpg" alt="Agrião" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Agrião</h2>
+    <p class="text-sm text-gray-500">Fresca, lavada e embalada.</p>
+    <p class="text-green-700 font-bold">R$ 6.11</p>
+    <form onsubmit="addToCart(event, 'Agrião', 6.11)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+  
+  <!-- Produto:Alface -->
+  <div class="bg-white p-4 rounded shadow relative categoria-folhagens">
+    <img src="imagens/alface.jpg" alt="Alface" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Alface Crespa UN</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 2,49</p>
+    <form onsubmit="addToCart(event, 'Alface Crespa UN', 2.49)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  <!-- Produto:Brócolis -->
+  <!-- <div class="bg-white p-4 rounded shadow relative categoria-folhagens">
+    <img src="imagens/brócolis.jpg" alt="Brócolis" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Brócolis</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 5.61</p>
+    <form onsubmit="addToCart(event, 'Brócolis', 5.61)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+  
+  <!-- Produto:Couve Folha UN -->
+  <div class="bg-white p-4 rounded shadow relative categoria-folhagens">
+    <img src="imagens/couve.jpg" alt="Couve" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Couve Folha UN</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 1,99</p>
+    <form onsubmit="addToCart(event, 'Couve Folha UN', 1.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  <!-- Produto:Espinafre -->
+    <!-- <div class="bg-white p-4 rounded shadow relative categoria-folhagens">
+    <img src="imagens/espinafre.jpg" alt="Espinafre" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Espinafre</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 6.19</p>
+    <form onsubmit="addToCart(event, 'Espinafre', 6.19)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+  
+  <!-- Produto:Coentro -->
+  <div class="bg-white p-4 rounded shadow relative categoria-folhagens oferta">
+    <img src="imagens/coentro.jpg" alt="Coentro" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Coentro</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 2,99</p>
+    <form onsubmit="addToCart(event, 'Coentro', 2.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  <!-- Produto:Rúcula -->
+    <!--<div class="bg-white p-4 rounded shadow relative categoria-folhagens">
+    <img src="imagens/rúcula.jpg" alt="Rúcula" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Rúcula</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 8.25</p>
+    <form onsubmit="addToCart(event, 'Rúcula', 8.25)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+  
+<!-- folhagens -->
+
+  </main>
+
+  <aside id="cart" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="absolute right-0 top-0 bg-white w-full max-w-md h-full p-4 overflow-y-auto">
+      <h2 class="text-xl font-bold mb-4">Carrinho</h2>
+      <ul id="cartItems" class="space-y-4"></ul>
+      <p class="mt-4 font-bold">Total: R$ <span id="total">0.00</span></p>
+      <select id="pagamento" class="w-full mt-2 border p-2 rounded">
+        <option value="Pix">Pix</option>
+        <option value="Cartão">Cartão</option>
+        <option value="Dinheiro">Dinheiro</option>
+      </select>
+      <input type="text" id="cupom" placeholder="Cupom de desconto" class="w-full mt-2 border p-2 rounded">
+      <input type="text" id="nomeCliente" placeholder="Seu nome" class="w-full mt-2 border p-2 rounded" required>
+      <input type="text" id="enderecoCliente" placeholder="Rua,número,bairro e ponto de referência." class="w-full mt-2 border p-2 rounded" required>
+      <button onclick="finalizarPedido()" class="bg-green-600 text-white px-4 py-2 rounded w-full mt-4">Finalizar Pedido</button>
+      <button onclick="limparCarrinho()" class="bg-red-500 text-white px-4 py-2 rounded w-full mt-2">Limpar Carrinho</button>
+      <button onclick="toggleCart()" class="mt-2 text-blue-500 underline w-full">Fechar</button>
+    </div>
+  </aside>
+
+  <script>
+    const cart = [];
+
+    function toggleCart() {
+      document.getElementById('cart').classList.toggle('hidden');
+    }
+
+    function addToCart(event, name, price) {
+      event.preventDefault();
+      const form = event.target;
+      const peso = parseFloat(form.peso.value);
+      const quantidade = parseInt(form.quantidade.value);
+      const comentario = form.comentario.value;
+
+      cart.push({ name, peso, quantidade, comentario, price });
+      Swal.fire('Adicionado!', `${quantidade}x ${peso}kg/un de ${name}`, 'success');
+      renderCart();
+    }
+
+    function renderCart() {
+      const cartItems = document.getElementById('cartItems');
+      cartItems.innerHTML = '';
+      let total = 0;
+      cart.forEach((item, index) => {
+        const itemTotal = item.price * item.peso * item.quantidade;
+        total += itemTotal;
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <div class="border p-2 rounded">
+            <p class="font-bold">${item.name}</p>
+            <p>${item.quantidade}x ${item.peso}kg/un</p>
+            <p>Comentário: ${item.comentario || '-'}</p>
+            <p class="text-green-600 font-bold">R$ ${itemTotal.toFixed(2)}</p>
+            <button onclick="removerItem(${index})" class="text-red-500 underline text-sm">Remover</button>
+          </div>
+        `;
+        cartItems.appendChild(li);
+      });
+      document.getElementById('total').textContent = total.toFixed(2);
+    }
+
+    function removerItem(index) {
+      cart.splice(index, 1);
+      renderCart();
+    }
+
+    function limparCarrinho() {
+      cart.length = 0;
+      renderCart();
+    }
+
+    function finalizarPedido() {
+      const nome = document.getElementById('nomeCliente').value.trim();
+      const endereco = document.getElementById('enderecoCliente').value.trim();
+      const pagamento = document.getElementById('pagamento').value;
+      const cupom = document.getElementById('cupom').value.trim();
+
+      if (!nome || !endereco) {
+        alert('Por favor, preencha nome e endereço.');
+        return;
+      }
+
+      let totalSemDesconto = 0;
+      let textoItens = '';
+
+      cart.forEach(item => {
+  const itemTotal = item.price * item.peso * item.quantidade;
+  totalSemDesconto += itemTotal;
+  textoItens += `${item.quantidade}x ${item.peso}kg/un de ${item.name} - R$ ${itemTotal.toFixed(2)}\n`;
+  if (item.comentario) {
+    textoItens += `  Comentário: ${item.comentario}\n`;
+  }
+});
+
+
+      let totalComDesconto = totalSemDesconto;
+      if (cupom === 'HORTI10') {
+        totalComDesconto *= 0.9;
+      }
+
+      const mensagem = 
+        `Olá! Meu nome é ${nome}.\n` +
+        `Gostaria de fazer um pedido para entrega em: ${endereco}.\n\n` +
+        `Itens:\n${textoItens}\n` +
+        `Total sem desconto: R$ ${totalSemDesconto.toFixed(2)}\n` +
+        (cupom === 'HORTI10' ? `Desconto aplicado (HORTI10): 10%\n` : '') +
+        `Total final: R$ ${totalComDesconto.toFixed(2)}\n` +
+        `Forma de pagamento: ${pagamento}`;
+
+      const url = `https://wa.me/5581994036146?text=${encodeURIComponent(mensagem)}`;
+      window.open(url, '_blank');
+    }
+
+    function filterCategory(cat) {
+      document.querySelectorAll('[class*=categoria-]').forEach(el => {
+        el.classList.toggle('hidden', cat !== 'todos' && !el.classList.contains(`categoria-${cat}`));
+      });
+    }
+
+    function searchProduct() {
+      const input = document.getElementById('search').value.toLowerCase();
+      document.querySelectorAll('#productList > div').forEach(card => {
+        const title = card.querySelector('h2').textContent.toLowerCase();
+        card.classList.toggle('hidden', !title.includes(input));
+      });
+    }
+    function filterCategory(cat) {
+            document.querySelectorAll('[class*=categoria-]').forEach(el => {
+                if (cat === 'oferta') {
+                    el.classList.toggle('hidden', !el.classList.contains('oferta'));
+                } else if (cat === 'todos') {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.toggle('hidden', !el.classList.contains(`categoria-${cat}`));
+                }
+            });
+        }
+  </script>
+</body>
+</html>

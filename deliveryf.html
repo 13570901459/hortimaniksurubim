@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Delivery Fechado</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-red-50 flex items-center justify-center min-h-screen">
+
+  <section class="hero container text-center p-6 bg-white shadow-xl rounded-xl max-w-4xl w-full mx-auto">
+  <div class="hero__content">
+    <div class="hero__slide-text">
+      <h1 class="text-3xl font-bold text-red-600 flex items-center justify-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 fill-red-600">
+          <path d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7Z"/>
+        </svg>
+        FECHADO
+      </h1>
+      <div class="mt-4 mb-2">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-10 h-10 mx-auto fill-red-600 animate-pulse">
+          <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+        </svg>
+      </div>
+      <p class="text-gray-700 text-base mt-4">
+        Realização de Pedidos <strong>TERÇA-FEIRA</strong><br>
+        Entregas <strong>QUARTA-FEIRA</strong>
+      </p>
+
+      <!-- COMO FUNCIONA - SEÇÃO DESTACADA E RESPONSIVA -->
+      <section class="bg-white rounded-2xl shadow-lg px-6 py-8 md:px-12 md:py-10 max-w-3xl w-full mx-auto mt-10 border border-gray-200">
+        <div class="text-center mb-6">
+          <h2 class="text-3xl font-extrabold text-green-700 flex items-center justify-center gap-2">
+             <span> Como Funciona Nosso Delivery</span>
+          </h2>
+          <p class="mt-3 text-lg text-gray-600">Direto da roça pra sua mesa, com frescor e qualidade de verdade!</p>
+        </div>
+
+        <div class="space-y-5 text-gray-800 text-base leading-relaxed">
+          <p class="text-center">
+            No <strong class="text-green-700">HORTIMANIK Delivery</strong>, a gente faz diferente pra você receber o melhor!
+          </p>
+
+          <ul class="list-none space-y-2">
+            <li class="flex items-start gap-2"><span>✅</span> <span><strong>Os pedidos são feitos toda TERÇA-FEIRA</strong></span></li>
+            <li class="flex items-start gap-2"><span>📦</span> <span><strong>As entregas acontecem na QUARTA-FEIRA</strong></span></li>
+          </ul>
+
+          <p>
+            Trabalhamos apenas com <strong>mercadoria fresquinha, novinha e selecionada</strong>. Nada de produto velho ou de estoque — é direto do campo pra sua mesa!
+          </p>
+
+          <p>
+            Resultado? <strong>Mais qualidade, sabor e durabilidade</strong> pra você e sua família.
+          </p>
+
+          <p class="text-center text-green-600 font-bold text-lg">
+             Frescor de verdade, como se fosse você mesmo colhendo!
+          </p>
+        </div>
+      </section>
+
+      <!-- INSPIRATION -->
+      <section class="bg-white border-2 border-red-600 rounded-lg p-6 text-center max-w-2xl w-full mx-auto my-10">
+        <!-- Botão de Pedido -->
+        <h1 class="mb-6">
+          <button
+            class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full transition duration-300"
+            onclick="window.location.href = 'index.html';">
+            Faça seu pedido
+          </button>
+        </h1> 
+
+        <!-- Título -->
+        <h2 class="text-2xl font-bold text-gray-800">
+          Siga <span class="text-red-600">Horti<span class="font-extrabold">MANIK</span></span> no
+        </h2>
+        <h3 class="text-xl font-semibold text-red-600 mt-2">Instagram</h3>
+
+        <!-- Ícone do Instagram -->
+        <div class="flex justify-center my-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#f70909" viewBox="0 0 24 24">
+            <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm4.75-.75a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5z"/>
+          </svg>
+        </div>
+
+        <!-- Texto Descritivo -->
+        <p class="text-gray-700 mb-6">Fique por dentro das novidades, ofertas e muito mais</p>
+
+        <!-- Botão de Seguir -->
+        <a href="https://www.instagram.com/hortimanik/profilecard/?igsh=MWRoMWI1dnpha3M1Yw==" target="_blank"
+           class="inline-block border border-red-600 text-red-600 font-bold py-2 px-10 rounded hover:bg-red-600 hover:text-white transition duration-300">
+          SEGUIR
+        </a>
+      </section>
+    </div>
+  </div>
+</section>
+
+  
+
+</body>
+</html>
