@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HORTIMANIK - Delivery Hortifruti</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script src="https://unpkg.com/alpinejs" defer></script>
+  
+    <!-- ALPINE -->
+<script src="https://unpkg.com/alpinejs" defer></script>
+
+  <style>
+    .oferta::after {
+      content: 'Oferta';
+      background: red;
+      color: white;
+      padding: 2px 6px;
+      font-size: 0.75rem;
+      border-radius: 4px;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+  </style>
+</head>
+<body class="bg-green-50"> 
+<header class="bg-white shadow p-4" x-data="{ open: false }">
+<div class="container">
+  <header class="top-bar">
+  <!-- TOPO: MENU + LOGO + LOGIN/CARRINHO -->
+  <div class="flex items-center justify-between">
+
+    <!-- Botão Menu Hamburguer -->
+    <button @click="open = true" class="md:hidden text-green-700">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+
+    <!-- LOGO Central -->
+    
+        <div class="w-full flex justify-center items-center py-4">
+  <img src="logo.png" alt="Logo" class="h-10 mr-2">
+  <span class="font-bold text-green-700 text-xl">HORTIMANIK</span>
+</div>
+
+ 
+
+ <!-- Carrinho -->
+<button onclick="toggleCart()" class="text-green-700 relative">
+  🛒
+  <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+    0
+  </span>
+</button>
+</div>
+      <!-- BUSCA + CARRINHO -->
+      <div class="flex flex-col sm:flex-row items-stretch gap-2 w-full md:w-auto mt-4 md:mt-0">
+        <input type="text" id="search" onkeyup="searchProduct()" placeholder="Buscar produto..."
+          class="p-2 border rounded w-full sm:w-auto">
+        <button onclick="toggleCart()" class="bg-green-600 text-white px-4 py-2 rounded">Ver meu carrinho</button>
+      </div>
+    </div>
+ 
+
+  <!-- MENU LATERAL CATEGORIAS (OFF-CANVAS) -->
+  <div class="fixed inset-0 z-50 flex md:hidden" x-show="open"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 translate-x-full"
+    x-transition:enter-end="opacity-100 translate-x-0"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 translate-x-0"
+    x-transition:leave-end="opacity-0 translate-x-full">
+
+    <!-- Fundo escuro -->
+    <div class="flex-1 bg-black bg-opacity-50" @click="open = false"></div>
+
+    <!-- Conteúdo -->
+    <div class="w-3/4 max-w-sm bg-white p-4 overflow-y-auto shadow-lg">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-bold text-green-700">Categorias</h2>
+        <button @click="open = false" class="text-gray-600">✕</button>
+      </div>
+      <nav class="flex flex-col gap-2">
+        <button onclick="filterCategory('todos')" class="text-left px-3 py-2 rounded hover:bg-green-100">Todos</button>
+        <button onclick="filterCategory('bandejado')" class="text-left px-3 py-2 rounded hover:bg-green-100">Bandejado</button>
+        <button onclick="filterCategory('Polpas')" class="text-left px-3 py-2 rounded hover:bg-green-100">Polpas</button>
+        <button onclick="filterCategory('frutas')" class="text-left px-3 py-2 rounded hover:bg-green-100">Frutas</button>
+        <button onclick="filterCategory('folhagens')" class="text-left px-3 py-2 rounded hover:bg-green-100">Folhagens</button>
+        <button onclick="filterCategory('verduras')" class="text-left px-3 py-2 rounded hover:bg-green-100">Verduras/Legumes</button>
+        <button onclick="filterCategory('raizes')" class="text-left px-3 py-2 rounded hover:bg-green-100">Raízes</button>
+        <button onclick="filterCategory('oferta')" class="text-left px-3 py-2 rounded hover:bg-red-100">Ofertas</button>
+      </nav>
+    </div>
+  </div>
+
+</header>
+
+
+  <main class="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="productList">
+
+    <!-- Produtos serão carregados aqui via JavaScript -->
+    <!-- POLPAS: -->
+
+    <!-- POLPAS de Maracujá UN-->
+    <div class="bg-white p-4 rounded shadow relative categoria-Polpas">
+      <img src="imagens/polpamaracuja.jpg" alt="Polpa de Maracujá 300g UN" class="w-full h-40 object-contain rounded">
+      <h2 class="text-lg font-bold mt-2">Polpa de Maracujá 300g UN</h2>
+      <p class="text-sm text-gray-500">Descrição do produto.</p>
+      <p class="text-green-700 font-bold">R$ 6,99</p>
+      <form onsubmit="addToCart(event, 'Polpa de Maracujá UN', 6.99)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+         <option value="1">1 un</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+      </form>
+    </div>
+<!-- Embadejado-->
+<!--Produto: Maçã Bandejado -->
+
+<div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/maca.jpg.png" alt="Maçã" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Maçã Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 4,99</p>
+    <form onsubmit="addToCart(event, 'Maçã Bandejado',4.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> 
+  
+  <!-- Produto: Goiaba Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/goiababdj.jpg" alt="Goiaba" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Goiaba Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Goiaba Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Laranja Pera Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/laranjabdj.jpg" alt="Laranja Pera" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Laranja Pera Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Laranja Pera Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Limão Taiti Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/limaobdj.jpg" alt="Limão Taiti" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Limão Taiti Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Limão Taiti Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Manga Espada Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/mangaespadabdj.jpg" alt="Manga Espada" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Manga Espada Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Manga Espada Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Manga Tommy Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/mangatommybdj.jpg" alt="Manga Tommy" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Manga Tommy Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Manga Tommy Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Maracujá Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/maracujabdj.jpg" alt="Maracujá" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Maracujá Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Maracujá Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+ Produto: Tomate Bandejado 
+<div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/tomatebdj.jpg" alt="Tomate" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Tomate Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Tomate Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Uva Itália Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/uvaitaliabdj.jpg" alt="Uva Itália" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Uva Itália Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Uva Itália Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Alho Bandejado -->
+  <!-- <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/alhobdj.jpg" alt="Alho" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Alho Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Alho Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> -->
+  
+  <!-- Produto: Batata Inglesa Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/batatabdj.jpg" alt="Batata Inglesa" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Batata Inglesa Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Batata Inglesa Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Cebola Branca Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/cebolabdj.jpg" alt="Cebola Branca" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Cebola Branca Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Cebola Branca Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  Produto: Cenoura Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/cenourabdj.jpg" alt="Cenoura" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Cenoura Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Cenoura Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Chuchu Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/chuchubdj.jpg" alt="Chuchu" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Chuchu Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Chuchu Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+   Produto: Chuchu + Pimentão Bandejado 
+  <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
+    <img src="imagens/chuchupimentaobdj.jpg" alt="Chuchu e Pimentão" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Chuchu + Pimentão Bandejado</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 3,99</p>
+    <form onsubmit="addToCart(event, 'Chuchu + Pimentão Bandejado',3.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  
+  Produto: Pimentão Verde Bandejado 
+  <div class="bg-white p-4 rounded shadow
