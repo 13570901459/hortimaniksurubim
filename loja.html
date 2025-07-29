@@ -43,18 +43,31 @@
     </div>
 
     <!-- Menu -->
-    <nav class="bg-gray-100 border-t mt-2">
-      <div class="container mx-auto px-4 py-2 flex flex-wrap gap-4 text-sm font-semibold">
-        <a href="#" class="hover:text-pink-600">Início</a>
-        <a href="#" class="hover:text-pink-600">Novidades</a>
-        <a href="#" class="hover:text-pink-600">Feminino</a>
-        <a href="#" class="hover:text-pink-600">Masculino</a>
-        <a href="#" class="hover:text-pink-600">Infantil</a>
-        <a href="#" class="hover:text-pink-600">Acessórios</a>
-        <a href="#" class="hover:text-pink-600">Promoções</a>
-        <a href="#" class="hover:text-pink-600">Contato</a>
-      </div>
-    </nav>
+    <!-- Menu com suporte a mobile -->
+<nav class="bg-gray-100 border-t mt-2">
+  <div class="container mx-auto px-4 py-2 flex items-center justify-between md:hidden">
+    <span class="font-bold text-sm">Menu</span>
+    <!-- Botão hamburguer visível só no mobile -->
+    <button id="menuToggle" class="text-gray-700 focus:outline-none">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Menu visível no desktop ou ao clicar no botão no mobile -->
+  <div id="menuLinks" class="container mx-auto px-4 py-2 hidden md:flex flex-wrap gap-4 text-sm font-semibold">
+    <a href="#" class="hover:text-pink-600">Início</a>
+    <a href="#" class="hover:text-pink-600">Novidades</a>
+    <a href="#" class="hover:text-pink-600">Feminino</a>
+    <a href="#" class="hover:text-pink-600">Masculino</a>
+    <a href="#" class="hover:text-pink-600">Infantil</a>
+    <a href="#" class="hover:text-pink-600">Acessórios</a>
+    <a href="#" class="hover:text-pink-600">Promoções</a>
+    <a href="#" class="hover:text-pink-600">Contato</a>
+  </div>
+</nav>
   </header>
 
   <!-- Espaço para compensar header fixo -->
@@ -110,6 +123,22 @@
     <!-- Seção de destaques ou produtos -->
     <p class="text-gray-700">Aqui você encontra o melhor da moda com entrega em todo o Brasil.</p>
   </main>
+<!-- Script para abrir/fechar menu no celular -->
+<script>
+  const menuToggle = document.getElementById('menuToggle');
+  const menuLinks = document.getElementById('menuLinks');
 
+  menuToggle.addEventListener('click', () => {
+    menuLinks.classList.toggle('hidden');
+  });
+</script>
+
+  <!-- Rodapé -->
+  <footer class="bg-white shadow-md mt-6">
+    <div class="container mx-auto px-4 py-6 text-center text-gray-600">
+      <p>&copy;Todos os direitos reservados.</p>
+      <p>Desenvolvido por Leandro Silva</p>
+    </div>
+  </footer>
 </body>
 </html>
