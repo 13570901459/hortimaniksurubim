@@ -43,9 +43,9 @@
     <!-- Menu -->
     <!-- Menu com suporte a mobile -->
 <nav class="bg-gray-100 border-t mt-2">
-  <div class="container mx-auto px-4 py-2 flex items-center justify-between md:hidden">
-    <span class="font-bold text-sm">Menu</span>
-    <!-- Botão hamburguer visível só no mobile -->
+  <!-- Topo do menu para mobile -->
+  <div class="container mx-auto px-4 py-3 flex items-center justify-between md:hidden">
+    <span class="font-bold text-base text-gray-700">Menu</span>
     <button id="menuToggle" class="text-gray-700 focus:outline-none">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -54,8 +54,10 @@
     </button>
   </div>
 
-  <!-- Menu visível no desktop ou ao clicar no botão no mobile -->
-  <div id="menuLinks" class="container mx-auto px-4 py-2 hidden md:flex flex-wrap gap-4 text-sm font-semibold">
+  <!-- Menu: horizontal no PC, vertical organizado no celular -->
+  <div id="menuLinks"
+       class="container mx-auto px-4 py-2 hidden md:flex md:flex-wrap md:gap-4 text-sm font-semibold md:justify-start flex-col md:flex-row space-y-2 md:space-y-0">
+       
     <a href="#" class="hover:text-pink-600">Início</a>
     <a href="#" class="hover:text-pink-600">Novidades</a>
     <a href="#" class="hover:text-pink-600">Feminino</a>
@@ -66,6 +68,9 @@
     <a href="#" class="hover:text-pink-600">Contato</a>
   </div>
 </nav>
+
+
+
   </header>
 
   <!-- Espaço para compensar header fixo -->
@@ -129,6 +134,8 @@
   menuToggle.addEventListener('click', () => {
     menuLinks.classList.toggle('hidden');
   });
+
+  
 </script>
 
   <!-- Rodapé -->
