@@ -17,34 +17,40 @@
   <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
 
   <style>
-    .swiper-container-top {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-    }
+      
+  .swiper-container-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    height: 40px; /* Garantia absoluta da altura */
+  }
+  .swiper-slide {
+    height: 100% !important;
+  }
+
   </style>
 </head>
 
 <body class="bg-gray-100">
 
   <!-- SLIDE SUPERIOR - Desenvolvido por Leandro Silva -->
-  <div class="swiper-container swiper-container-top" title="Desenvolvido por Leandro Silva">
-    <div class="swiper-wrapper">
-      <div class="swiper-slide bg-red-600 text-white text-sm text-center font-semibold py-2">
-        <a href="https://nordestemultimarcasatacado.com/produtos" class="block w-full hover:underline">
-          FRETE RÁPIDO PARA TODO O BRASIL!
-        </a>
-      </div>
-      <div class="swiper-slide bg-red-600 text-white text-sm text-center font-semibold py-2">
-        💥 Promoções imperdíveis toda semana!
-      </div>
-      <div class="swiper-slide bg-red-600 text-white text-sm text-center font-semibold py-2">
-        Entrega garantida ou seu dinheiro de volta 💸
-      </div>
+<div class="swiper-container swiper-container-top h-10" title="Desenvolvido por Leandro Silva">
+  <div class="swiper-wrapper">
+    <div class="swiper-slide bg-red-600 text-white text-sm text-center font-semibold flex items-center justify-center">
+      <a href="https://nordestemultimarcasatacado.com/produtos" class="w-full hover:underline">
+        FRETE RÁPIDO PARA TODO O BRASIL!
+      </a>
+    </div>
+    <div class="swiper-slide bg-red-600 text-white text-sm text-center font-semibold flex items-center justify-center">
+      💥 Promoções imperdíveis toda semana!
+    </div>
+    <div class="swiper-slide bg-red-600 text-white text-sm text-center font-semibold flex items-center justify-center">
+      Entrega garantida ou seu dinheiro de volta 💸
     </div>
   </div>
+</div>
 
   <!-- Swiper init -->
   <script>
