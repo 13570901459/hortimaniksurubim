@@ -6,23 +6,66 @@
   <title>Minha Loja de Roupas</title>
   <link rel="icon" href="logo.png" type="image/png">
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Adicione Alpine.js no <head> ou antes do </body> -->
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
+  <!-- Alpine.js -->
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+  <!-- Swiper.js CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
+
+  <!-- Swiper.js JS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+
+  <style>
+    .swiper-container-top {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+    }
+  </style>
 </head>
+
 <body class="bg-gray-100">
 
-  <!-- Header fixo -->
-  <header class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
+  <!-- SLIDE SUPERIOR - Desenvolvido por Leandro Silva -->
+  <div class="swiper-container swiper-container-top" title="Desenvolvido por Leandro Silva">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide bg-red-600 text-white text-sm text-center font-semibold py-2">
+        <a href="https://nordestemultimarcasatacado.com/produtos" class="block w-full hover:underline">
+          FRETE RÁPIDO PARA TODO O BRASIL!
+        </a>
+      </div>
+      <div class="swiper-slide bg-red-600 text-white text-sm text-center font-semibold py-2">
+        💥 Promoções imperdíveis toda semana!
+      </div>
+      <div class="swiper-slide bg-red-600 text-white text-sm text-center font-semibold py-2">
+        Entrega garantida ou seu dinheiro de volta 💸
+      </div>
+    </div>
+  </div>
+
+  <!-- Swiper init -->
+  <script>
+    const swiperTop = new Swiper('.swiper-container-top', {
+      loop: true,
+      autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
+      },
+    });
+  </script>
+
+  <!-- Header ajustado para aparecer abaixo do slide -->
+  <header class="bg-white shadow-md fixed top-[40px] left-0 right-0 z-40">
     <div class="container mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
-      
-      
-        
+
       <!-- LOGO + MENU HAMBURGUER -->
-       <div class="flex items-center">
-         <img src="logo.png" alt="Logo" class="w-12 h-12">
-          <span class="font-bold text-green-700 text-xl">HORTIMANIK</span>
-        </div>
+      <div class="flex items-center">
+        <img src="logo.png" alt="Logo" class="w-12 h-12">
+        <span class="font-bold text-green-700 text-xl">HORTIMANIK</span>
+      </div>
 
       <!-- Busca -->
       <div class="w-full sm:w-auto flex-1">
@@ -31,8 +74,6 @@
 
       <!-- Ícones -->
       <div class="flex items-center gap-4">
-        
-
         <!-- Carrinho -->
         <a href="#" class="text-gray-700 hover:text-pink-600 relative" title="Carrinho">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -42,6 +83,8 @@
         </a>
       </div>
     </div>
+  </header>
+
 
     <!-- Menu -->
 
@@ -99,7 +142,7 @@
 
       <!-- Itens de menu centralizados -->
       <nav class="flex flex-col items-center justify-center flex-grow space-y-6 text-lg font-semibold text-gray-700">
-        <a href="index.html" @click="open = false" class="hover:text-pink-600">Início</a>
+        <a href="#" @click="open = false" class="hover:text-pink-600">Início</a>
         <a href="#" @click="open = false" class="hover:text-pink-600">Novidades</a>
         <a href="#" @click="open = false" class="hover:text-pink-600">Feminino</a>
         <a href="#" @click="open = false" class="hover:text-pink-600">Masculino</a>
@@ -129,20 +172,92 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
     <!-- Produto 1 -->
-    <div class="bg-white shadow rounded overflow-hidden">
-      <img src="imagens/camisa1.jpg" alt="Camisa Oversized Chair Mafia" class="w-full h-80 object-cover">
-      <div class="p-4">
-        <h3 class="text-sm text-gray-800 font-semibold">CAMISA OVERSIZED BALENCIAGA "CHAIR MAFIA"</h3>
-        <p class="text-lg font-bold text-gray-900 mt-2">R$40,00</p>
-        <button class="mt-3 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded flex justify-center items-center gap-2 text-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13L17 13M7 13H5.4M17 13l1.5 6M6 21a1 1 0 100-2 1 1 0 000 2zm12 0a1 1 0 100-2 1 1 0 000 2z" />
-          </svg>
-          COMPRAR
+<div class="bg-white shadow rounded overflow-hidden relative">
+  <!-- Imagem fixa do produto (não muda) -->
+  <img src="preta.jpg" alt="Camisa Oversized" class="w-full h-126 object-cover">
+  
+  <div class="p-4">
+    <h3 class="text-sm text-gray-800 font-semibold">CAMISA OVERSIZED BALENCIAGA "CHAIR MAFIA"</h3>
+    <p class="text-lg font-bold text-gray-900 mt-2">R$40,00</p>
+
+    <!-- Botão que abre o modal -->
+    <button onclick="openModal()" class="mt-3 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded flex justify-center items-center gap-2 text-sm">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13L17 13M7 13H5.4M17 13l1.5 6M6 21a1 1 0 100-2 1 1 0 000 2zm12 0a1 1 0 100-2 1 1 0 000 2z" />
+      </svg>
+      COMPRAR
+    </button>
+
+    <p class="text-xs text-gray-600 mt-1">134 em estoque</p>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-white p-6 rounded-lg w-full max-w-4xl relative">
+    <!-- Botão Fechar -->
+    <button onclick="closeModal()" class="absolute top-2 right-2 text-xl font-bold">&times;</button>
+
+    <!-- Conteúdo lado a lado -->
+    <div class="flex flex-col md:flex-row gap-6">
+      <!-- Imagem lateral -->
+      <div class="w-full md:w-1/2">
+        <img id="modal-img" src="preta.jpg" alt="Camisa Preta" class="w-full h-[500px] object-cover rounded" />
+      </div>
+
+      <!-- Informações do produto -->
+      <div class="w-full md:w-1/2">
+        <h2 class="text-xl font-semibold mb-4">Escolha os detalhes do produto</h2>
+
+        <!-- Cor -->
+        <div class="mb-4">
+          <label class="block font-medium mb-1">Cor:</label>
+          <div class="flex gap-2 flex-wrap">
+            <button onclick="mudarImagemModal('preto')" class="border px-3 py-1 rounded hover:bg-gray-200">Preto</button>
+            <button onclick="mudarImagemModal('branco')" class="border px-3 py-1 rounded hover:bg-gray-200">Branco</button>
+            <button onclick="mudarImagemModal('off')" class="border px-3 py-1 rounded hover:bg-gray-200">Off</button>
+            <button onclick="mudarImagemModal('bege')" class="border px-3 py-1 rounded hover:bg-gray-200">Bege</button>
+          </div>
+        </div>
+
+        <!-- Tamanho -->
+        <div class="mb-4">
+          <label class="block font-medium mb-1">Tamanho:</label>
+          <div class="flex gap-2">
+            <button class="border px-3 py-1 rounded hover:bg-gray-200">P</button>
+            <button class="border px-3 py-1 rounded hover:bg-gray-200">M</button>
+            <button class="border px-3 py-1 rounded hover:bg-gray-200">G</button>
+            <button class="border px-3 py-1 rounded hover:bg-gray-200">GG</button>
+          </div>
+        </div>
+
+        <!-- Quantidade -->
+        <div class="mb-4">
+          <label class="block font-medium mb-1">Quantidade:</label>
+          <input type="number" min="1" value="1" class="w-full border px-3 py-2 rounded" />
+        </div>
+
+        <!-- Botão Finalizar -->
+        <button class="bg-green-600 text-white w-full py-2 rounded hover:bg-green-700">
+          Adicionar ao carrinho
         </button>
-        <p class="text-xs text-gray-600 mt-1">134 em estoque</p>
       </div>
     </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+    <!-- Fim do Produto 1 -->
+
+
+
+                                                                      
+
 
     <!-- Produto 2 com selo -->
     <div class="bg-white shadow rounded overflow-hidden relative">
@@ -179,7 +294,65 @@
     menuLinks.classList.toggle('hidden');
   });
 
+    // Funções para abrir e fechar o modal
+  function openModal() {
+    document.getElementById('modal').classList.remove('hidden');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.add('hidden');
+  }
   
+    // Função para mudar a imagem do produto
+    function mudarImagem(cor) {
+    const img = document.getElementById('produto-img');
+    img.src = `imagens/camisa-${cor}.jpg`; // Ex: imagens/camisa-preto.jpg
+  }
+
+
+
+  function openModal() {
+    document.getElementById('modal').classList.remove('hidden');
+    // Quando abrir, mostrar imagem padrão (preto)
+    mudarImagemModal('preto');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.add('hidden');
+  }
+
+  function mudarImagemModal(cor) {
+    const modalImg = document.getElementById('modal-img');
+    modalImg.src = `imagens/camisa-${cor}.jpg`;
+  }
+
+
+
+  function openModal() {
+    document.getElementById('modal').classList.remove('hidden');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.add('hidden');
+  }
+
+  function mudarImagemModal(cor) {
+    const imagem = document.getElementById('modal-img');
+    if (cor === 'preto') {
+      imagem.src = 'preta.jpg';
+      imagem.alt = 'Camisa Preta';
+    } else if (cor === 'branco') {
+      imagem.src = 'branca.jpg';
+      imagem.alt = 'Camisa Branca';
+    } else if (cor === 'off') {
+      imagem.src = 'off.jpg';
+      imagem.alt = 'Camisa Off White';
+    } else if (cor === 'bege') {
+      imagem.src = 'bege.jpg';
+      imagem.alt = 'Camisa Bege';
+    }
+  }
+
 </script>
 
   <!-- Rodapé -->
