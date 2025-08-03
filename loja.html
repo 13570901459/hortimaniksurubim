@@ -101,45 +101,54 @@
     <a href="#" class="hover:text-pink-600">Contato</a>
   </div>-->
 
-  <!-- MENU LATERAL (full screen mobile) -->
-  <div class="fixed inset-0 z-50 md:hidden" x-show="open"
-    x-transition:enter="transition ease-out duration-300"
-    x-transition:enter-start="opacity-0 translate-x-full"
-    x-transition:enter-end="opacity-100 translate-x-0"
-    x-transition:leave="transition ease-in duration-200"
-    x-transition:leave-start="opacity-100 translate-x-0"
-    x-transition:leave-end="opacity-0 translate-x-full"
-    style="display: none;">
-    
-    <!-- Fundo escurecido -->
-    <div class="absolute inset-0 bg-black bg-opacity-50" @click="open = false"></div>
+ <!-- MENU LATERAL (full screen mobile) -->
+<div class="fixed inset-0 z-50 md:hidden" x-show="open"
+  x-transition:enter="transition ease-out duration-300"
+  x-transition:enter-start="opacity-0 translate-x-full"
+  x-transition:enter-end="opacity-100 translate-x-0"
+  x-transition:leave="transition ease-in duration-200"
+  x-transition:leave-start="opacity-100 translate-x-0"
+  x-transition:leave-end="opacity-0 translate-x-full"
+  style="display: none;">
 
-    <!-- Painel preenchendo a tela -->
-    <div class="relative w-full h-full bg-white p-6 flex flex-col">
-      <!-- Botão de fechar -->
-      <div class="flex justify-end mb-6">
-        <button @click="open = false" class="text-gray-700">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
+  <!-- Fundo escurecido -->
+  <div class="absolute inset-0 bg-black bg-opacity-50" @click="open = false"></div>
 
-      <!-- Itens de menu centralizados -->
-      <nav class="flex flex-col items-center justify-center flex-grow space-y-6 text-lg font-semibold text-gray-700">
-        <button onclick="filterCategory('todos')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Todos</button>
-        <button onclick="filterCategory('bandejado')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Bandejado</button>
-        <button onclick="filterCategory('Polpas')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Polpas</button>
-        <button onclick="filterCategory('frutas')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Frutas</button>
-        <button onclick="filterCategory('folhagens')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Folhagens</button>
-        <button onclick="filterCategory('verduras')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Verduras/Legumes</button>
-        <button onclick="filterCategory('raizes')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Raízes</button>
-        <button onclick="filterCategory('oferta')" class="px-3 py-1 rounded bg-red-100 hover:bg-red-200">Ofertas</button>
-      </nav>
+  <!-- Painel preenchendo a tela -->
+  <div class="relative w-full h-full bg-white p-6 flex flex-col">
+    <!-- Botão de fechar -->
+    <div class="flex justify-end mb-6">
+      <button @click="open = false" class="text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
     </div>
+
+    <!-- Itens de menu centralizados -->
+    <nav class="flex flex-col items-center justify-center flex-grow space-y-6 text-lg font-semibold text-gray-700">
+      <button onclick="goToCategory('todos')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Todos</button>
+      <button onclick="goToCategory('bandejado')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Bandejado</button>
+      <button onclick="goToCategory('Polpas')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Polpas</button>
+      <button onclick="goToCategory('frutas')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Frutas</button>
+      <button onclick="goToCategory('folhagens')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Folhagens</button>
+      <button onclick="goToCategory('verduras')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Verduras/Legumes</button>
+      <button onclick="goToCategory('raizes')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Raízes</button>
+      <button onclick="goToCategory('oferta')" class="px-3 py-1 rounded bg-red-100 hover:bg-red-200">Ofertas</button>
+    </nav>
   </div>
-</nav>
+</div>
+
+<script>
+  function goToCategory(category) {
+    // Fechar o menu ao clicar
+    open = false;
+
+    // Redirecionar para a categoria
+    window.location.href = `/categoria/${category}`; // Ajuste a URL conforme sua estrutura de categorias
+  }
+</script>
 
 
 
