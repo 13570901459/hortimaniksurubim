@@ -44,9 +44,12 @@
 
       <!-- Busca -->
       <div class="w-full sm:w-auto flex-1">
-        <input type="text" placeholder="Buscar roupas, calçados, etc..." class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:border-pink-400">
-      </div>
+       <input type="text" id="search" onkeyup="searchProduct()" placeholder="Buscar produto..." class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:border-pink-400">
+          
+    </div>
 
+
+      
       <!-- Ícones -->
       <div class="flex items-center gap-4">
         
@@ -163,13 +166,13 @@
   <div class="h-36"></div>
 
   <!-- Conteúdo principal -->
+   
+      
+ 
+<main class="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="productList">
   <!-- Conteúdo principal -->
-<main class="container mx-auto px-4 py-6">
-  <h1 class="text-2xl font-bold mb-6">Bem-vindo à Minha Loja de Roupas</h1>
 
-  <!-- Grid de produtos -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-
+ 
     <!-- Produto 1 -->
  <!-- Produtos serão carregados aqui via JavaScript -->
     <!-- POLPAS: -->
