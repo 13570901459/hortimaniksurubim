@@ -8,6 +8,22 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Adicione Alpine.js no <head> ou antes do </body> -->
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+ <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+ <style>
+    .oferta::after {
+      content: 'Oferta';
+      background: red;
+      color: white;
+      padding: 2px 6px;
+      font-size: 0.75rem;
+      border-radius: 4px;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+  </style>
 
 </head>
 <body class="bg-gray-100">
@@ -34,16 +50,16 @@
         
 
         <!-- Carrinho -->
-        <a href="#" class="text-gray-700 hover:text-pink-600 relative" title="Carrinho">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13L17 13M7 13H5.4M17 13l1.5 6M6 21a1 1 0 100-2 1 1 0 000 2zm12 0a1 1 0 100-2 1 1 0 000 2z" />
-          </svg>
-          <span class="absolute -top-2 -right-2 bg-pink-600 text-white text-xs rounded-full px-1">0</span>
-        </a>
-      </div>
-    </div>
+<a href="#" onclick="toggleCart()" class="text-gray-700 hover:text-pink-600 relative" title="Carrinho">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13L17 13M7 13H5.4M17 13l1.5 6M6 21a1 1 0 100-2 1 1 0 000 2zm12 0a1 1 0 100-2 1 1 0 000 2z" />
+  </svg>
+  <span id="cartCount" class="absolute -top-2 -right-2 bg-pink-600 text-white text-xs rounded-full px-1">0</span>
+</a>
+</div>
+</div>
 
-    <!-- Menu -->
+</div>
 
 
 
@@ -61,7 +77,20 @@
   </div>
 
   <!-- Menu horizontal (desktop) -->
-  <div class="container mx-auto px-4 py-2 hidden md:flex flex-wrap gap-4 text-sm font-semibold">
+   <!-- MENU CATEGORIAS -->
+    <div class="container mx-auto px-4 py-2 hidden md:flex flex-wrap gap-4 text-sm font-semibold"></div>
+      <nav :class="{'block': open, 'hidden': !open}" class="flex-wrap gap-2 mt-4 md:mt-0 md:flex md:flex-row hidden">
+        <button onclick="filterCategory('todos')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Todos</button>
+        <button onclick="filterCategory('bandejado')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Bandejado</button>
+        <button onclick="filterCategory('Polpas')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Polpas</button>
+        <button onclick="filterCategory('frutas')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Frutas</button>
+        <button onclick="filterCategory('folhagens')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Folhagens</button>
+        <button onclick="filterCategory('verduras')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Verduras/Legumes</button>
+        <button onclick="filterCategory('raizes')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Raízes</button>
+        <button onclick="filterCategory('oferta')" class="px-3 py-1 rounded bg-red-100 hover:bg-red-200">Ofertas</button>
+      </nav>
+</div>
+ <!--v class="container mx-auto px-4 py-2 hidden md:flex flex-wrap gap-4 text-sm font-semibold">
     <a href="#" class="hover:text-pink-600">Início</a>
     <a href="#" class="hover:text-pink-600">Novidades</a>
     <a href="#" class="hover:text-pink-600">Feminino</a>
@@ -70,7 +99,7 @@
     <a href="#" class="hover:text-pink-600">Acessórios</a>
     <a href="#" class="hover:text-pink-600">Promoções</a>
     <a href="#" class="hover:text-pink-600">Contato</a>
-  </div>
+  </div>-->
 
   <!-- MENU LATERAL (full screen mobile) -->
   <div class="fixed inset-0 z-50 md:hidden" x-show="open"
@@ -1734,80 +1763,145 @@ OBS: Limite de 2kg por cliente.</p>
 <!-- folhagens -->
 
 </main>
-
-    
-    <!-- Seção de destaques ou produtos -->
-    <p class="text-gray-700">Aqui você encontra o melhor da moda com entrega em todo o Brasil.</p>
-  </main>
-<!-- Script para abrir/fechar menu no celular -->
+ <aside id="cart" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="absolute right-0 top-0 bg-white w-full max-w-md h-full p-4 overflow-y-auto">
+      <h2 class="text-xl font-bold mb-4">Carrinho</h2>
+      <ul id="cartItems" class="space-y-4"></ul>
+      <p class="mt-4 font-bold">Total: R$ <span id="total">0.00</span></p>
+      <select id="pagamento" class="w-full mt-2 border p-2 rounded">
+        <option value="Pix">Pix</option>
+        <option value="Cartão">Cartão</option>
+        <option value="Dinheiro">Dinheiro</option>
+      </select>
+      <input type="text" id="cupom" placeholder="Cupom de desconto" class="w-full mt-2 border p-2 rounded">
+      <input type="text" id="nomeCliente" placeholder="Seu nome" class="w-full mt-2 border p-2 rounded" required>
+      <input type="text" id="enderecoCliente" placeholder="Rua,número,bairro e ponto de referência." class="w-full mt-2 border p-2 rounded" required>
+      <button onclick="finalizarPedido()" class="bg-green-600 text-white px-4 py-2 rounded w-full mt-4">Finalizar Pedido</button>
+      <button onclick="limparCarrinho()" class="bg-red-500 text-white px-4 py-2 rounded w-full mt-2">Limpar Carrinho</button>
+      <button onclick="toggleCart()" class="mt-2 text-blue-500 underline w-full">Fechar</button>
+    </div>
+  </aside>
 <script>
-  const menuToggle = document.getElementById('menuToggle');
-  const menuLinks = document.getElementById('menuLinks');
+    const cart = [];
 
-  menuToggle.addEventListener('click', () => {
-    menuLinks.classList.toggle('hidden');
+function toggleCart() {
+  document.getElementById('cart').classList.toggle('hidden');
+}
+
+function addToCart(event, name, price) {
+  event.preventDefault();
+  const form = event.target;
+  const peso = parseFloat(form.peso.value);
+  const quantidade = parseInt(form.quantidade.value);
+  const comentario = form.comentario.value;
+
+  cart.push({ name, peso, quantidade, comentario, price });
+  Swal.fire('Adicionado!', `${quantidade}x ${peso}kg/un de ${name}`, 'success');
+  renderCart();
+}
+
+function renderCart() {
+  const cartItems = document.getElementById('cartItems');
+  cartItems.innerHTML = '';
+  let total = 0;
+  cart.forEach((item, index) => {
+    const itemTotal = item.price * item.peso * item.quantidade;
+    total += itemTotal;
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div class="border p-2 rounded">
+        <p class="font-bold">${item.name}</p>
+        <p>${item.quantidade}x ${item.peso}kg/un</p>
+        <p>Comentário: ${item.comentario || '-'}</p>
+        <p class="text-green-600 font-bold">R$ ${itemTotal.toFixed(2)}</p>
+        <button onclick="removerItem(${index})" class="text-red-500 underline text-sm">Remover</button>
+      </div>
+    `;
+    cartItems.appendChild(li);
+  });
+  document.getElementById('total').textContent = total.toFixed(2);
+
+  // Atualiza o número de itens no ícone do carrinho
+  document.getElementById('cartCount').textContent = cart.length;
+}
+
+function removerItem(index) {
+  cart.splice(index, 1);
+  renderCart();
+}
+
+function limparCarrinho() {
+  cart.length = 0;
+  renderCart();
+}
+
+function finalizarPedido() {
+  const nome = document.getElementById('nomeCliente').value.trim();
+  const endereco = document.getElementById('enderecoCliente').value.trim();
+  const pagamento = document.getElementById('pagamento').value;
+  const cupom = document.getElementById('cupom').value.trim();
+
+  if (!nome || !endereco) {
+    alert('Por favor, preencha nome e endereço.');
+    return;
+  }
+
+  let totalSemDesconto = 0;
+  let textoItens = '';
+
+  cart.forEach(item => {
+    const itemTotal = item.price * item.peso * item.quantidade;
+    totalSemDesconto += itemTotal;
+    textoItens += `${item.quantidade}x ${item.peso}kg/un de ${item.name} - R$ ${itemTotal.toFixed(2)}\n`;
+    if (item.comentario) {
+      textoItens += `  Comentário: ${item.comentario}\n`;
+    }
   });
 
-    // Funções para abrir e fechar o modal
-  function openModal() {
-    document.getElementById('modal').classList.remove('hidden');
+  let totalComDesconto = totalSemDesconto;
+  if (cupom === 'HORTI10') {
+    totalComDesconto *= 0.9;
   }
 
-  function closeModal() {
-    document.getElementById('modal').classList.add('hidden');
-  }
-  
-    // Função para mudar a imagem do produto
-    function mudarImagem(cor) {
-    const img = document.getElementById('produto-img');
-    img.src = `imagens/camisa-${cor}.jpg`; // Ex: imagens/camisa-preto.jpg
-  }
+  const mensagem = 
+    `Olá! Meu nome é ${nome}.\n` +
+    `Gostaria de fazer um pedido para entrega em: ${endereco}.\n\n` +
+    `Itens:\n${textoItens}\n` +
+    `Total sem desconto: R$ ${totalSemDesconto.toFixed(2)}\n` +
+    (cupom === 'HORTI10' ? `Desconto aplicado (HORTI10): 10%\n` : '') +
+    `Total final: R$ ${totalComDesconto.toFixed(2)}\n` +
+    `Forma de pagamento: ${pagamento}`;
+
+  const url = `https://wa.me/5581994036146?text=${encodeURIComponent(mensagem)}`;
+  window.open(url, '_blank');
+}
 
 
-
-  function openModal() {
-    document.getElementById('modal').classList.remove('hidden');
-    // Quando abrir, mostrar imagem padrão (preto)
-    mudarImagemModal('preto');
-  }
-
-  function closeModal() {
-    document.getElementById('modal').classList.add('hidden');
-  }
-
-  function mudarImagemModal(cor) {
-    const modalImg = document.getElementById('modal-img');
-    modalImg.src = `imagens/camisa-${cor}.jpg`;
-  }
-
-
-
-  function openModal() {
-    document.getElementById('modal').classList.remove('hidden');
-  }
-
-  function closeModal() {
-    document.getElementById('modal').classList.add('hidden');
-  }
-
-  function mudarImagemModal(cor) {
-    const imagem = document.getElementById('modal-img');
-    if (cor === 'preto') {
-      imagem.src = 'preta.jpg';
-      imagem.alt = 'Camisa Preta';
-    } else if (cor === 'branco') {
-      imagem.src = 'branca.jpg';
-      imagem.alt = 'Camisa Branca';
-    } else if (cor === 'off') {
-      imagem.src = 'off.jpg';
-      imagem.alt = 'Camisa Off White';
-    } else if (cor === 'bege') {
-      imagem.src = 'bege.jpg';
-      imagem.alt = 'Camisa Bege';
+    function filterCategory(cat) {
+      document.querySelectorAll('[class*=categoria-]').forEach(el => {
+        el.classList.toggle('hidden', cat !== 'todos' && !el.classList.contains(`categoria-${cat}`));
+      });
     }
-  }
 
-</script>
+    function searchProduct() {
+      const input = document.getElementById('search').value.toLowerCase();
+      document.querySelectorAll('#productList > div').forEach(card => {
+        const title = card.querySelector('h2').textContent.toLowerCase();
+        card.classList.toggle('hidden', !title.includes(input));
+      });
+    }
+    function filterCategory(cat) {
+            document.querySelectorAll('[class*=categoria-]').forEach(el => {
+                if (cat === 'oferta') {
+                    el.classList.toggle('hidden', !el.classList.contains('oferta'));
+                } else if (cat === 'todos') {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.toggle('hidden', !el.classList.contains(`categoria-${cat}`));
+                }
+            });
+        }
+  </script>
 
   <!-- Rodapé -->
   <footer class="bg-white shadow-md mt-6">
