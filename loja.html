@@ -127,10 +127,7 @@
       </div>
 
       <!-- Itens de menu centralizados -->
-      
-<div class="container mx-auto px-4 py-2 hidden md:flex flex-wrap gap-4 text-sm font-semibold"></div>
-     <nav class="flex flex-col items-center justify-center flex-grow space-y-6 text-lg font-semibold text-gray-700"></nav>
-      <nav :class="{'block': open, 'hidden': !open}" class="flex-wrap gap-2 mt-4 md:mt-0 md:flex md:flex-row hidden">
+      <nav class="flex flex-col items-center justify-center flex-grow space-y-6 text-lg font-semibold text-gray-700">
         <button onclick="filterCategory('todos')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Todos</button>
         <button onclick="filterCategory('bandejado')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Bandejado</button>
         <button onclick="filterCategory('Polpas')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Polpas</button>
@@ -140,25 +137,13 @@
         <button onclick="filterCategory('raizes')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Raízes</button>
         <button onclick="filterCategory('oferta')" class="px-3 py-1 rounded bg-red-100 hover:bg-red-200">Ofertas</button>
       </nav>
-</div>
+    </div>
   </div>
 </nav>
 
-<!--
-<div class="container mx-auto px-4 py-2 hidden md:flex flex-wrap gap-4 text-sm font-semibold"></div>
-     <nav class="flex flex-col items-center justify-center flex-grow space-y-6 text-lg font-semibold text-gray-700"></nav>
-      <nav :class="{'block': open, 'hidden': !open}" class="flex-wrap gap-2 mt-4 md:mt-0 md:flex md:flex-row hidden">
-        <button onclick="filterCategory('todos')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Todos</button>
-        <button onclick="filterCategory('bandejado')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Bandejado</button>
-        <button onclick="filterCategory('Polpas')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Polpas</button>
-        <button onclick="filterCategory('frutas')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Frutas</button>
-        <button onclick="filterCategory('folhagens')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Folhagens</button>
-        <button onclick="filterCategory('verduras')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Verduras/Legumes</button>
-        <button onclick="filterCategory('raizes')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Raízes</button>
-        <button onclick="filterCategory('oferta')" class="px-3 py-1 rounded bg-red-100 hover:bg-red-200">Ofertas</button>
-      </nav>
-</div>
--->
+
+
+
   </header>
 
   <!-- Espaço para compensar header fixo -->
