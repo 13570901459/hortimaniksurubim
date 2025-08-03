@@ -25,6 +25,32 @@
       top: 10px;
       right: 10px;
     }
+   
+.menu-categorias button {
+  background: white;
+  color: rgb(21, 128, 61);
+  padding: 6px 12px;
+  border: none;
+  border-radius: 0;
+  font-weight: 500;
+  font-size: 14px;
+  transition: border-bottom 0.2s ease;
+}
+
+.menu-categorias button:hover {
+  border-bottom: 2px solid green;
+  background: transparent;
+}
+
+.menu-categorias .oferta {
+  color: red;
+  font-weight: bold;
+}
+
+.menu-categorias .oferta:hover {
+  border-bottom: 2px solid red;
+}
+
   </style>
 
 </head>
@@ -83,17 +109,17 @@
 
   <!-- Menu horizontal (desktop) -->
    <!-- MENU CATEGORIAS -->
-    <div class="container mx-auto px-4 py-2 hidden md:flex flex-wrap gap-4 text-sm font-semibold"></div>
-      <nav :class="{'block': open, 'hidden': !open}" class="flex-wrap gap-2 mt-4 md:mt-0 md:flex md:flex-row hidden">
-        <button onclick="filterCategory('todos')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Todos</button>
-        <button onclick="filterCategory('bandejado')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Bandejado</button>
-        <button onclick="filterCategory('Polpas')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Polpas</button>
-        <button onclick="filterCategory('frutas')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Frutas</button>
-        <button onclick="filterCategory('folhagens')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Folhagens</button>
-        <button onclick="filterCategory('verduras')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Verduras/Legumes</button>
-        <button onclick="filterCategory('raizes')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Raízes</button>
-        <button onclick="filterCategory('oferta')" class="px-3 py-1 rounded bg-red-100 hover:bg-red-200">Ofertas</button>
-      </nav>
+   <div class="container mx-auto px-4 py-2 hidden md:flex flex-wrap gap-4 text-sm font-semibold">
+  <nav class="menu-categorias flex-wrap gap-2 mt-4 md:mt-0 md:flex md:flex-row hidden">
+    <button onclick="filterCategory('todos')">Todos</button>
+    <button onclick="filterCategory('bandejado')">Bandejado</button>
+    <button onclick="filterCategory('Polpas')">Polpas</button>
+    <button onclick="filterCategory('frutas')">Frutas</button>
+    <button onclick="filterCategory('folhagens')">Folhagens</button>
+    <button onclick="filterCategory('verduras')">Verduras/Legumes</button>
+    <button onclick="filterCategory('raizes')">Raízes</button>
+    <button onclick="filterCategory('oferta')" class="oferta">Ofertas</button>
+  </nav>
 </div>
  <!--v class="container mx-auto px-4 py-2 hidden md:flex flex-wrap gap-4 text-sm font-semibold">
     <a href="#" class="hover:text-pink-600">Início</a>
@@ -1537,7 +1563,7 @@
 <div class="bg-white p-4 rounded shadow relative categoria-verduras oferta">
     <img src="imagens/cebola_branca.jpg" alt="Cebola Branca" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Cebola Branca KG</h2>
-    <p class="text-sm text-gray-500">Produto de primeira qualidade.</p>
+    <p class="text-sm text-gray-500">Produto de primeira qualidade, ideal para temperar.</p>
 <!-- Preço anterior riscado -->
     <p class="text-red-500 line-through text-sm">R$ 4,99</p> 
     <p class="text-green-700 font-bold">R$ 3,99</p>
