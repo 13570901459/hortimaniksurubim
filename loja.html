@@ -6,72 +6,23 @@
   <title>Minha Loja de Roupas</title>
   <link rel="icon" href="logo.png" type="image/png">
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Adicione Alpine.js no <head> ou antes do </body> -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-  <!-- Alpine.js -->
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-
-  <!-- Swiper.js CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
-
-  <!-- Swiper.js JS -->
-  <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
-
-  <style>
-      
-  .swiper-container-top {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 50;
-    height: 40px; /* Garantia absoluta da altura */
-  }
-  .swiper-slide {
-    height: 100% !important;
-  }
-
-  </style>
 </head>
-
 <body class="bg-gray-100">
 
-  <!-- SLIDE SUPERIOR - Desenvolvido por Leandro Silva -->
-<div class="swiper-container swiper-container-top h-10" title="Desenvolvido por Leandro Silva">
-  <div class="swiper-wrapper">
-    <div class="swiper-slide bg-red-600 text-white text-sm text-center font-semibold flex items-center justify-center">
-      <a href="https://nordestemultimarcasatacado.com/produtos" class="w-full hover:underline">
-        FRETE RÁPIDO PARA TODO O BRASIL!
-      </a>
-    </div>
-    <div class="swiper-slide bg-red-600 text-white text-sm text-center font-semibold flex items-center justify-center">
-      💥 Promoções imperdíveis toda semana!
-    </div>
-    <div class="swiper-slide bg-red-600 text-white text-sm text-center font-semibold flex items-center justify-center">
-      Entrega garantida ou seu dinheiro de volta 💸
-    </div>
-  </div>
-</div>
-
-  <!-- Swiper init -->
-  <script>
-    const swiperTop = new Swiper('.swiper-container-top', {
-      loop: true,
-      autoplay: {
-        delay: 3000,
-        disableOnInteraction: false,
-      },
-    });
-  </script>
-
-  <!-- Header ajustado para aparecer abaixo do slide -->
-  <header class="bg-white shadow-md fixed top-[40px] left-0 right-0 z-40">
+  <!-- Header fixo -->
+  <header class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
     <div class="container mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
-
+      
+      
+        
       <!-- LOGO + MENU HAMBURGUER -->
-      <div class="flex items-center">
-        <img src="logo.png" alt="Logo" class="w-12 h-12">
-        <span class="font-bold text-green-700 text-xl">HORTIMANIK</span>
-      </div>
+       <div class="flex items-center">
+         <img src="logo.png" alt="Logo" class="w-12 h-12">
+          <span class="font-bold text-green-700 text-xl">HORTIMANIK</span>
+        </div>
 
       <!-- Busca -->
       <div class="w-full sm:w-auto flex-1">
@@ -80,6 +31,8 @@
 
       <!-- Ícones -->
       <div class="flex items-center gap-4">
+        
+
         <!-- Carrinho -->
         <a href="#" class="text-gray-700 hover:text-pink-600 relative" title="Carrinho">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -89,8 +42,6 @@
         </a>
       </div>
     </div>
-  </header>
-
 
     <!-- Menu -->
 
