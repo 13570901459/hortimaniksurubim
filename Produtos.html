@@ -2,14 +2,18 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HORTIMANIK - Delivery Hortifruti</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Minha Loja de Roupas</title>
   <link rel="icon" href="logo.png" type="image/png">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Adicione Alpine.js no <head> ou antes do </body> -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+ <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-  <style>
+ <style>
     .oferta::after {
       content: 'Oferta';
       background: red;
@@ -22,28 +26,64 @@
       right: 10px;
     }
   </style>
-</head>
-<body class="bg-green-50">
-  <header x-data="{ open: false }" class="bg-white shadow p-4 sticky top-0 z-50">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
 
+</head>
+<body class="bg-gray-100">
+
+  <!-- Header fixo -->
+  <header class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
+    <div class="container mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+      
+      
+        
       <!-- LOGO + MENU HAMBURGUER -->
-      <div class="flex justify-between items-center w-full md:w-auto">
-        <div class="flex items-center space-x-2">
-          <img src="logo.png" alt="Logo" class="w-12 h-12">
+       <div class="flex items-center">
+         <img src="logo.png" alt="Logo" class="w-12 h-12">
           <span class="font-bold text-green-700 text-xl">HORTIMANIK</span>
         </div>
-        <!-- Botão menu mobile -->
-        <button @click="open = !open" class="md:hidden text-green-700 focus:outline-none">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-      </div>
 
-      <!-- MENU CATEGORIAS -->
+      <!-- Busca -->
+      <div class="w-full sm:w-auto flex-1">
+       <input type="text" id="search" onkeyup="searchProduct()" placeholder="Buscar produto..." class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:border-pink-400">
+          
+    </div>
+
+
+      
+      <!-- Ícones -->
+      <div class="flex items-center gap-4">
+        
+
+        <!-- Carrinho -->
+<a href="#" onclick="toggleCart()" class="text-gray-700 hover:text-pink-600 relative" title="Carrinho">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13L17 13M7 13H5.4M17 13l1.5 6M6 21a1 1 0 100-2 1 1 0 000 2zm12 0a1 1 0 100-2 1 1 0 000 2z" />
+  </svg>
+  <span id="cartCount" class="absolute -top-2 -right-2 bg-pink-600 text-white text-xs rounded-full px-1">0</span>
+</a>
+</div>
+</div>
+
+</div>
+
+
+
+<!-- MENU -->
+<nav class="bg-gray-100 border-t mt-2" x-data="{ open: false }">
+  <!-- Topo com botão hamburguer (mobile) -->
+  <div class="container mx-auto px-4 py-3 flex items-center justify-between md:hidden">
+    <span class="font-bold text-base text-gray-700">Categorias</span>
+    <button @click="open = true" class="text-gray-700 focus:outline-none">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Menu horizontal (desktop) -->
+   <!-- MENU CATEGORIAS -->
+    <div class="container mx-auto px-4 py-2 hidden md:flex flex-wrap gap-4 text-sm font-semibold"></div>
       <nav :class="{'block': open, 'hidden': !open}" class="flex-wrap gap-2 mt-4 md:mt-0 md:flex md:flex-row hidden">
         <button onclick="filterCategory('todos')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Todos</button>
         <button onclick="filterCategory('bandejado')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Bandejado</button>
@@ -54,20 +94,87 @@
         <button onclick="filterCategory('raizes')" class="px-3 py-1 rounded bg-green-100 hover:bg-green-200">Raízes</button>
         <button onclick="filterCategory('oferta')" class="px-3 py-1 rounded bg-red-100 hover:bg-red-200">Ofertas</button>
       </nav>
+</div>
+ <!--v class="container mx-auto px-4 py-2 hidden md:flex flex-wrap gap-4 text-sm font-semibold">
+    <a href="#" class="hover:text-pink-600">Início</a>
+    <a href="#" class="hover:text-pink-600">Novidades</a>
+    <a href="#" class="hover:text-pink-600">Feminino</a>
+    <a href="#" class="hover:text-pink-600">Masculino</a>
+    <a href="#" class="hover:text-pink-600">Infantil</a>
+    <a href="#" class="hover:text-pink-600">Acessórios</a>
+    <a href="#" class="hover:text-pink-600">Promoções</a>
+    <a href="#" class="hover:text-pink-600">Contato</a>
+  </div>-->
 
-      <!-- BUSCA + CARRINHO -->
-      <div class="flex flex-col sm:flex-row items-stretch gap-2 w-full md:w-auto mt-4 md:mt-0">
-        <input type="text" id="search" onkeyup="searchProduct()" placeholder="Buscar produto..."
-          class="p-2 border rounded w-full sm:w-auto">
-        <button onclick="toggleCart()" class="bg-green-600 text-white px-4 py-2 rounded">Ver meu carrinho</button>
-      </div>
+  <!-- MENU SLIDE LATERAL (mobile) -->
+<div 
+  class="fixed inset-0 z-50 md:hidden" 
+  x-show="open"
+  x-transition:enter="transition ease-out duration-300"
+  x-transition:enter-start="opacity-0"
+  x-transition:enter-end="opacity-100"
+  x-transition:leave="transition ease-in duration-200"
+  x-transition:leave-start="opacity-100"
+  x-transition:leave-end="opacity-0"
+  style="display: none;"
+>
+  <!-- Fundo escurecido -->
+  <div class="absolute inset-0 bg-black bg-opacity-50" @click="open = false"></div>
+
+  <!-- Painel deslizante -->
+  <div 
+    class="absolute right-0 top-0 h-full w-3/4 bg-white p-6 shadow-lg"
+    x-show="open"
+    x-transition:enter="transition transform ease-out duration-300"
+    x-transition:enter-start="translate-x-full"
+    x-transition:enter-end="translate-x-0"
+    x-transition:leave="transition transform ease-in duration-200"
+    x-transition:leave-start="translate-x-0"
+    x-transition:leave-end="translate-x-full"
+  >
+    <!-- Botão de fechar -->
+    <div class="flex justify-end mb-6">
+      <button @click="open = false" class="text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
+
+    <!-- Itens de menu -->
+    <nav class="flex flex-col space-y-4 text-lg font-semibold text-gray-700">
+      <button onclick="filterCategory('todos')" class="px-3 py-2 rounded bg-green-100 hover:bg-green-200">Todos</button>
+      <button onclick="filterCategory('bandejado')" class="px-3 py-2 rounded bg-green-100 hover:bg-green-200">Bandejado</button>
+      <button onclick="filterCategory('Polpas')" class="px-3 py-2 rounded bg-green-100 hover:bg-green-200">Polpas</button>
+      <button onclick="filterCategory('frutas')" class="px-3 py-2 rounded bg-green-100 hover:bg-green-200">Frutas</button>
+      <button onclick="filterCategory('folhagens')" class="px-3 py-2 rounded bg-green-100 hover:bg-green-200">Folhagens</button>
+      <button onclick="filterCategory('verduras')" class="px-3 py-2 rounded bg-green-100 hover:bg-green-200">Verduras/Legumes</button>
+      <button onclick="filterCategory('raizes')" class="px-3 py-2 rounded bg-green-100 hover:bg-green-200">Raízes</button>
+      <button onclick="filterCategory('oferta')" class="px-3 py-2 rounded bg-red-100 hover:bg-red-200">Ofertas</button>
+    </nav>
+  </div>
+</div>
+
+
+
+  <!-- Fim do menu lateral -->
+
   </header>
 
+  <!-- Espaço para compensar header fixo -->
+  <div class="h-36"></div>
 
-  <main class="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="productList">
+  <!-- Conteúdo principal -->
+   
+      
+ 
+<main class="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="productList">
+  <!-- Conteúdo principal -->
 
-    <!-- Produtos serão carregados aqui via JavaScript -->
+ 
+    <!-- Produto 1 -->
+ <!-- Produtos serão carregados aqui via JavaScript -->
     <!-- POLPAS: -->
 
     <!-- POLPAS de Maracujá UN-->
@@ -1430,8 +1537,7 @@
 <div class="bg-white p-4 rounded shadow relative categoria-verduras oferta">
     <img src="imagens/cebola_branca.jpg" alt="Cebola Branca" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Cebola Branca KG</h2>
-    <p class="text-sm text-gray-500">Os 10 primeiros pedidos levam cebola  por apenas R$ 0,99 o kg!
-OBS: Limite de 2kg por cliente.</p>
+    <p class="text-sm text-gray-500">Produto de primeira qualidade.</p>
 <!-- Preço anterior riscado -->
     <p class="text-red-500 line-through text-sm">R$ 4,99</p> 
     <p class="text-green-700 font-bold">R$ 3,99</p>
@@ -1671,9 +1777,8 @@ OBS: Limite de 2kg por cliente.</p>
   
 <!-- folhagens -->
 
-  </main>
-
-  <aside id="cart" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+</main>
+ <aside id="cart" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
     <div class="absolute right-0 top-0 bg-white w-full max-w-md h-full p-4 overflow-y-auto">
       <h2 class="text-xl font-bold mb-4">Carrinho</h2>
       <ul id="cartItems" class="space-y-4"></ul>
@@ -1691,99 +1796,101 @@ OBS: Limite de 2kg por cliente.</p>
       <button onclick="toggleCart()" class="mt-2 text-blue-500 underline w-full">Fechar</button>
     </div>
   </aside>
-
-  <script>
+<script>
     const cart = [];
 
-    function toggleCart() {
-      document.getElementById('cart').classList.toggle('hidden');
-    }
+function toggleCart() {
+  document.getElementById('cart').classList.toggle('hidden');
+}
 
-    function addToCart(event, name, price) {
-      event.preventDefault();
-      const form = event.target;
-      const peso = parseFloat(form.peso.value);
-      const quantidade = parseInt(form.quantidade.value);
-      const comentario = form.comentario.value;
+function addToCart(event, name, price) {
+  event.preventDefault();
+  const form = event.target;
+  const peso = parseFloat(form.peso.value);
+  const quantidade = parseInt(form.quantidade.value);
+  const comentario = form.comentario.value;
 
-      cart.push({ name, peso, quantidade, comentario, price });
-      Swal.fire('Adicionado!', `${quantidade}x ${peso}kg/un de ${name}`, 'success');
-      renderCart();
-    }
+  cart.push({ name, peso, quantidade, comentario, price });
+  Swal.fire('Adicionado!', `${quantidade}x ${peso}kg/un de ${name}`, 'success');
+  renderCart();
+}
 
-    function renderCart() {
-      const cartItems = document.getElementById('cartItems');
-      cartItems.innerHTML = '';
-      let total = 0;
-      cart.forEach((item, index) => {
-        const itemTotal = item.price * item.peso * item.quantidade;
-        total += itemTotal;
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <div class="border p-2 rounded">
-            <p class="font-bold">${item.name}</p>
-            <p>${item.quantidade}x ${item.peso}kg/un</p>
-            <p>Comentário: ${item.comentario || '-'}</p>
-            <p class="text-green-600 font-bold">R$ ${itemTotal.toFixed(2)}</p>
-            <button onclick="removerItem(${index})" class="text-red-500 underline text-sm">Remover</button>
-          </div>
-        `;
-        cartItems.appendChild(li);
-      });
-      document.getElementById('total').textContent = total.toFixed(2);
-    }
+function renderCart() {
+  const cartItems = document.getElementById('cartItems');
+  cartItems.innerHTML = '';
+  let total = 0;
+  cart.forEach((item, index) => {
+    const itemTotal = item.price * item.peso * item.quantidade;
+    total += itemTotal;
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div class="border p-2 rounded">
+        <p class="font-bold">${item.name}</p>
+        <p>${item.quantidade}x ${item.peso}kg/un</p>
+        <p>Comentário: ${item.comentario || '-'}</p>
+        <p class="text-green-600 font-bold">R$ ${itemTotal.toFixed(2)}</p>
+        <button onclick="removerItem(${index})" class="text-red-500 underline text-sm">Remover</button>
+      </div>
+    `;
+    cartItems.appendChild(li);
+  });
+  document.getElementById('total').textContent = total.toFixed(2);
 
-    function removerItem(index) {
-      cart.splice(index, 1);
-      renderCart();
-    }
+  // Atualiza o número de itens no ícone do carrinho
+  document.getElementById('cartCount').textContent = cart.length;
+}
 
-    function limparCarrinho() {
-      cart.length = 0;
-      renderCart();
-    }
+function removerItem(index) {
+  cart.splice(index, 1);
+  renderCart();
+}
 
-    function finalizarPedido() {
-      const nome = document.getElementById('nomeCliente').value.trim();
-      const endereco = document.getElementById('enderecoCliente').value.trim();
-      const pagamento = document.getElementById('pagamento').value;
-      const cupom = document.getElementById('cupom').value.trim();
+function limparCarrinho() {
+  cart.length = 0;
+  renderCart();
+}
 
-      if (!nome || !endereco) {
-        alert('Por favor, preencha nome e endereço.');
-        return;
-      }
+function finalizarPedido() {
+  const nome = document.getElementById('nomeCliente').value.trim();
+  const endereco = document.getElementById('enderecoCliente').value.trim();
+  const pagamento = document.getElementById('pagamento').value;
+  const cupom = document.getElementById('cupom').value.trim();
 
-      let totalSemDesconto = 0;
-      let textoItens = '';
-
-      cart.forEach(item => {
-  const itemTotal = item.price * item.peso * item.quantidade;
-  totalSemDesconto += itemTotal;
-  textoItens += `${item.quantidade}x ${item.peso}kg/un de ${item.name} - R$ ${itemTotal.toFixed(2)}\n`;
-  if (item.comentario) {
-    textoItens += `  Comentário: ${item.comentario}\n`;
+  if (!nome || !endereco) {
+    alert('Por favor, preencha nome e endereço.');
+    return;
   }
-});
 
+  let totalSemDesconto = 0;
+  let textoItens = '';
 
-      let totalComDesconto = totalSemDesconto;
-      if (cupom === 'HORTI10') {
-        totalComDesconto *= 0.9;
-      }
-
-      const mensagem = 
-        `Olá! Meu nome é ${nome}.\n` +
-        `Gostaria de fazer um pedido para entrega em: ${endereco}.\n\n` +
-        `Itens:\n${textoItens}\n` +
-        `Total sem desconto: R$ ${totalSemDesconto.toFixed(2)}\n` +
-        (cupom === 'HORTI10' ? `Desconto aplicado (HORTI10): 10%\n` : '') +
-        `Total final: R$ ${totalComDesconto.toFixed(2)}\n` +
-        `Forma de pagamento: ${pagamento}`;
-
-      const url = `https://wa.me/5581994036146?text=${encodeURIComponent(mensagem)}`;
-      window.open(url, '_blank');
+  cart.forEach(item => {
+    const itemTotal = item.price * item.peso * item.quantidade;
+    totalSemDesconto += itemTotal;
+    textoItens += `${item.quantidade}x ${item.peso}kg/un de ${item.name} - R$ ${itemTotal.toFixed(2)}\n`;
+    if (item.comentario) {
+      textoItens += `  Comentário: ${item.comentario}\n`;
     }
+  });
+
+  let totalComDesconto = totalSemDesconto;
+  if (cupom === 'HORTI10') {
+    totalComDesconto *= 0.9;
+  }
+
+  const mensagem = 
+    `Olá! Meu nome é ${nome}.\n` +
+    `Gostaria de fazer um pedido para entrega em: ${endereco}.\n\n` +
+    `Itens:\n${textoItens}\n` +
+    `Total sem desconto: R$ ${totalSemDesconto.toFixed(2)}\n` +
+    (cupom === 'HORTI10' ? `Desconto aplicado (HORTI10): 10%\n` : '') +
+    `Total final: R$ ${totalComDesconto.toFixed(2)}\n` +
+    `Forma de pagamento: ${pagamento}`;
+
+  const url = `https://wa.me/5581994036146?text=${encodeURIComponent(mensagem)}`;
+  window.open(url, '_blank');
+}
+
 
     function filterCategory(cat) {
       document.querySelectorAll('[class*=categoria-]').forEach(el => {
@@ -1810,5 +1917,13 @@ OBS: Limite de 2kg por cliente.</p>
             });
         }
   </script>
+
+  <!-- Rodapé -->
+  <footer class="bg-white shadow-md mt-6">
+    <div class="container mx-auto px-4 py-6 text-center text-gray-600">
+      <p>&copy;Todos os direitos reservados.</p>
+      <p>Desenvolvido por Leandro Silva</p>
+    </div>
+  </footer>
 </body>
 </html>
