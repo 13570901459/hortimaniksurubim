@@ -93,6 +93,19 @@
 </div>
 
 
+<!-- MENU CATEGORIAS ESTILO APP (HORIZONTAL SCROLL) -->
+<div class="overflow-x-auto whitespace-nowrap bg-white border-y">
+  <nav class="flex gap-4 px-4 py-3 text-sm font-semibold">
+    <button onclick="filterCategory('todos')" class="text-gray-700 hover:text-green-600 whitespace-nowrap">Todos</button>
+    <button onclick="filterCategory('bandejado')" class="text-gray-700 hover:text-green-600 whitespace-nowrap">Bandejado</button>
+    <button onclick="filterCategory('Polpas')" class="text-gray-700 hover:text-green-600 whitespace-nowrap">Polpas</button>
+    <button onclick="filterCategory('frutas')" class="text-gray-700 hover:text-green-600 whitespace-nowrap">Frutas</button>
+    <button onclick="filterCategory('folhagens')" class="text-gray-700 hover:text-green-600 whitespace-nowrap">Folhagens</button>
+    <button onclick="filterCategory('verduras')" class="text-gray-700 hover:text-green-600 whitespace-nowrap">Verduras/Legumes</button>
+    <button onclick="filterCategory('raizes')" class="text-gray-700 hover:text-green-600 whitespace-nowrap">Raízes</button>
+    <button onclick="filterCategory('oferta')" class="text-red-600 hover:text-red-800 whitespace-nowrap">Ofertas</button>
+  </nav>
+</div>
 
 <!-- MENU -->
 <nav class="bg-gray-100 border-t mt-2" x-data="{ open: false }">
@@ -106,6 +119,10 @@
       </svg>
     </button>
   </div>
+
+
+
+
 
   <!-- Menu horizontal (desktop) -->
    <!-- MENU CATEGORIAS -->
@@ -1999,5 +2016,6 @@ function finalizarPedido() {
   </footer>
 </body>
 </html>
+
 
 
