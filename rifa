@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rifa dos Animais</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1, h2 {
+      color: #333;
+    }
+    .animal {
+      background: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 8px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .animal button {
+      padding: 5px 10px;
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .animal button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+    #lista {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    #sortear {
+      margin-top: 20px;
+      padding: 12px 20px;
+      font-size: 18px;
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: none;
+    }
+    #resultado {
+      margin-top: 20px;
+      font-size: 22px;
+      color: green;
+      font-weight: bold;
+    }
+    #login-container {
+      max-width: 300px;
+      margin: 100px auto;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 100%;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    #entrar {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="login-container" style="display: none;">
+    <h2>Bem-vindo!</h2>
+    <p>Digite seu nome para acessar a rifa:</p>
+    <input type="text" id="organizador" placeholder="Seu nome">
+    <button id="entrar" onclick="entrar()">Entrar</button>
+  </div>
+
+  <div id="rifa-container" style="display: none;">
+    <h1>Rifa dos Animais 🐾</h1>
+    <h3 id="organizador-info"></h3>
+    <div id="lista"></div>
+
+    <button id="sortear" onclick="sortear()">🎉 Sortear Ganhador</button>
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    const animais = [
+      "Leão", "Tigre", "Elefante", "Macaco", "Girafa", "Hipopótamo",
+      "Jacaré", "Onça", "Lobo", "Urso", "Rinoceronte", "Zebra",
+      "Cavalo", "Cachorro", "Gato", "Raposa", "Pato", "Ganso",
+      "Galinha", "Águia", "Coruja", "Peixe", "Tubarão", "Baleia", "Delfim"
+    ];
+
+    let escolhidos = {};
+
+    function entrar() {
+      const nome = document.getElementById("organizador").value.trim();
+      if (nome) {
+        localStorage.setItem("organizador", nome);
+        iniciarRifa();
+      }
+    }
+
+    function iniciarRifa() {
+      document.getElementById("login-container").style.display = "none";
+      document.getElementById("rifa-container").style.display = "block";
+
+      const nomeOrganizador = localStorage.getItem("organizador");
+      document.getElementById("organizador-info").innerText = "Organizador: " + nomeOrganizador;
+
+      const salvos = localStorage.getItem("escolhidos");
+      if (salvos) {
+        escolhidos = JSON.parse(salvos);
+      }
+
+      renderLista();
+    }
+
+    function renderLista() {
+      const lista = document.getElementById('lista');
+      lista.innerHTML = '';
+      animais.forEach(animal => {
+        const div = document.createElement('div');
+        div.className = 'animal';
+        if (escolhidos[animal]) {
+          div.innerHTML = `<strong>${animal}</strong> - ${escolhidos[animal]} <button disabled>Escolhido</button>`;
+        } else {
+          div.innerHTML = `<strong>${animal}</strong> <button onclick="escolher('${animal}')">Escolher</button>`;
+        }
+        lista.appendChild(div);
+      });
+
+      if (Object.keys(escolhidos).length === animais.length) {
+        document.getElementById('sortear').style.display = 'inline-block';
+      }
+    }
+
+    function escolher(animal) {
+      const nome = prompt(`Quem escolheu o animal "${animal}"?`);
+      if (nome && nome.trim() !== '') {
+        escolhidos[animal] = nome.trim();
+        localStorage.setItem("escolhidos", JSON.stringify(escolhidos));
+        renderLista();
+      }
+    }
+
+    function sortear() {
+      const chaves = Object.entries(escolhidos);
+      const sorteado = chaves[Math.floor(Math.random() * chaves.length)];
+      document.getElementById('resultado').innerText = `🎉 Ganhador: ${sorteado[1]} com o animal ${sorteado[0]}!`;
+    }
+
+    // Verifica se já tem login
+    if (localStorage.getItem("organizador")) {
+      iniciarRifa();
+    } else {
+      document.getElementById("login-container").style.display = "block";
+    }
+  </script>
+
+</body>
+</html>
