@@ -1,176 +1,147 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Rifa dos Animais</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rifa de Animais</title>
+  <link rel="manifest" href="manifest.json">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f8f8f8;
+      font-family: sans-serif;
       margin: 0;
-      padding: 20px;
+      background-color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+    }
+    .app {
+      width: 100%;
+      max-width: 400px;
+      background: #fff;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      font-size: 1.5rem;
       text-align: center;
     }
-    h1, h2 {
-      color: #333;
-    }
     .animal {
-      background: white;
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin: 8px;
-      border-radius: 8px;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-    }
-    .animal button {
-      padding: 5px 10px;
-      background-color: #27ae60;
-      color: white;
-      border: none;
-      border-radius: 5px;
+      padding: 0.5rem;
+      border-bottom: 1px solid #ddd;
       cursor: pointer;
     }
-    .animal button:disabled {
-      background-color: #aaa;
-      cursor: not-allowed;
+    .animal.taken {
+      color: #aaa;
+      pointer-events: none;
     }
-    #lista {
-      max-width: 400px;
-      margin: 0 auto;
-    }
-    #sortear {
-      margin-top: 20px;
-      padding: 12px 20px;
-      font-size: 18px;
-      background-color: #2980b9;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      display: none;
-    }
-    #resultado {
-      margin-top: 20px;
-      font-size: 22px;
-      color: green;
-      font-weight: bold;
-    }
-    #login-container {
-      max-width: 300px;
-      margin: 100px auto;
-    }
-    input[type="text"] {
-      padding: 10px;
+    input, button {
       width: 100%;
-      font-size: 16px;
-      margin-bottom: 10px;
+      margin-top: 0.5rem;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
     }
-    #entrar {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #2ecc71;
+    button {
+      background-color: #28a745;
       color: white;
-      border: none;
-      border-radius: 6px;
+      font-weight: bold;
       cursor: pointer;
+    }
+    button.secondary {
+      background-color: #dc3545;
+    }
+    button.export {
+      background-color: #007bff;
+    }
+    .participants {
+      margin-top: 1rem;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
-
-  <div id="login-container" style="display: none;">
-    <h2>Bem-vindo!</h2>
-    <p>Digite seu nome para acessar a rifa:</p>
-    <input type="text" id="organizador" placeholder="Seu nome">
-    <button id="entrar" onclick="entrar()">Entrar</button>
-  </div>
-
-  <div id="rifa-container" style="display: none;">
-    <h1>Rifa dos Animais 🐾</h1>
-    <h3 id="organizador-info"></h3>
-    <div id="lista"></div>
-
-    <button id="sortear" onclick="sortear()">🎉 Sortear Ganhador</button>
-    <div id="resultado"></div>
+  <div class="app">
+    <h1>Rifa de Animais 🐾</h1>
+    <input type="text" id="nomeCliente" placeholder="Seu nome" />
+    <div id="listaAnimais"></div>
+    <button onclick="sortear()">🎲 Sortear</button>
+    <button class="secondary" onclick="resetarRifa()">🔁 Resetar</button>
+    <button class="export" onclick="exportarLista()">📤 Exportar Lista</button>
+    <div class="participants" id="listaParticipantes"></div>
   </div>
 
   <script>
-    const animais = [
-      "Leão", "Tigre", "Elefante", "Macaco", "Girafa", "Hipopótamo",
-      "Jacaré", "Onça", "Lobo", "Urso", "Rinoceronte", "Zebra",
-      "Cavalo", "Cachorro", "Gato", "Raposa", "Pato", "Ganso",
-      "Galinha", "Águia", "Coruja", "Peixe", "Tubarão", "Baleia", "Delfim"
-    ];
+    const animais = ["Leão", "Elefante", "Macaco", "Cachorro", "Gato", "Coelho", "Tigre", "Panda", "Girafa", "Raposa"];
+    let escolhas = JSON.parse(localStorage.getItem('rifaEscolhas')) || {};
 
-    let escolhidos = {};
-
-    function entrar() {
-      const nome = document.getElementById("organizador").value.trim();
-      if (nome) {
-        localStorage.setItem("organizador", nome);
-        iniciarRifa();
-      }
-    }
-
-    function iniciarRifa() {
-      document.getElementById("login-container").style.display = "none";
-      document.getElementById("rifa-container").style.display = "block";
-
-      const nomeOrganizador = localStorage.getItem("organizador");
-      document.getElementById("organizador-info").innerText = "Organizador: " + nomeOrganizador;
-
-      const salvos = localStorage.getItem("escolhidos");
-      if (salvos) {
-        escolhidos = JSON.parse(salvos);
-      }
-
-      renderLista();
-    }
-
-    function renderLista() {
-      const lista = document.getElementById('lista');
-      lista.innerHTML = '';
+    function renderAnimais() {
+      const container = document.getElementById("listaAnimais");
+      container.innerHTML = "";
       animais.forEach(animal => {
-        const div = document.createElement('div');
-        div.className = 'animal';
-        if (escolhidos[animal]) {
-          div.innerHTML = `<strong>${animal}</strong> - ${escolhidos[animal]} <button disabled>Escolhido</button>`;
-        } else {
-          div.innerHTML = `<strong>${animal}</strong> <button onclick="escolher('${animal}')">Escolher</button>`;
+        const div = document.createElement("div");
+        div.className = "animal" + (escolhas[animal] ? " taken" : "");
+        div.innerText = `${animal} ${escolhas[animal] ? '- ' + escolhas[animal] : ''}`;
+        if (!escolhas[animal]) {
+          div.onclick = () => escolherAnimal(animal);
         }
-        lista.appendChild(div);
+        container.appendChild(div);
       });
-
-      if (Object.keys(escolhidos).length === animais.length) {
-        document.getElementById('sortear').style.display = 'inline-block';
-      }
+      atualizarListaParticipantes();
     }
 
-    function escolher(animal) {
-      const nome = prompt(`Quem escolheu o animal "${animal}"?`);
-      if (nome && nome.trim() !== '') {
-        escolhidos[animal] = nome.trim();
-        localStorage.setItem("escolhidos", JSON.stringify(escolhidos));
-        renderLista();
-      }
+    function escolherAnimal(animal) {
+      const nome = document.getElementById("nomeCliente").value.trim();
+      if (!nome) return alert("Digite seu nome!");
+      if (Object.values(escolhas).includes(nome)) return alert("Você já escolheu um animal!");
+      escolhas[animal] = nome;
+      salvarDados();
+      renderAnimais();
+    }
+
+    function salvarDados() {
+      localStorage.setItem("rifaEscolhas", JSON.stringify(escolhas));
     }
 
     function sortear() {
-      const chaves = Object.entries(escolhidos);
-      const sorteado = chaves[Math.floor(Math.random() * chaves.length)];
-      document.getElementById('resultado').innerText = `🎉 Ganhador: ${sorteado[1]} com o animal ${sorteado[0]}!`;
+      const nomes = Object.entries(escolhas);
+      if (nomes.length === 0) return alert("Nenhum participante ainda!");
+      const sorteado = nomes[Math.floor(Math.random() * nomes.length)];
+      alert(`Sorteado: ${sorteado[1]} com o animal ${sorteado[0]}! 🎉`);
     }
 
-    // Verifica se já tem login
-    if (localStorage.getItem("organizador")) {
-      iniciarRifa();
-    } else {
-      document.getElementById("login-container").style.display = "block";
+    function resetarRifa() {
+      if (confirm("Tem certeza que deseja resetar a rifa?")) {
+        escolhas = {};
+        salvarDados();
+        renderAnimais();
+      }
     }
+
+    function atualizarListaParticipantes() {
+      const lista = document.getElementById("listaParticipantes");
+      lista.innerHTML = '<strong>Participantes:</strong><br>' +
+        Object.entries(escolhas).map(([animal, nome]) => `${nome} - ${animal}`).join("<br>");
+    }
+
+    function exportarLista() {
+      const texto = Object.entries(escolhas)
+        .map(([animal, nome]) => `${nome} - ${animal}`)
+        .join("\n");
+      const blob = new Blob([texto], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "participantes.txt";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    renderAnimais();
   </script>
-
 </body>
 </html>
