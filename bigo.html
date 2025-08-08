@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cartela de Bingo</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    .bingo-card { display: grid; grid-template-columns: repeat(5, 60px); gap: 5px; justify-content: center; margin-top: 20px; }
+    .cell {
+      width: 60px; height: 60px; display: flex; justify-content: center; align-items: center;
+      border: 1px solid #999; cursor: pointer; background: #fff;
+      font-weight: bold; font-size: 20px;
+    }
+    .marked { background: #4caf50; color: white; }
+    #cardId { font-weight: bold; margin-top: 10px; }
+    button { margin-top: 20px; padding: 10px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+
+  <h1>Cartela de Bingo</h1>
+  <div id="cardId"></div>
+  <div class="bingo-card" id="bingoCard"></div>
+  <button onclick="generateNewCard()">Gerar nova cartela</button>
+
+  <script>
+    const STORAGE_KEY = 'bingoCard';
+
+    function generateNumbers(start, end, count) {
+      const numbers = [];
+      while (numbers.length < count) {
+        const num = Math.floor(Math.random() * (end - start + 1)) + start;
+        if (!numbers.includes(num)) numbers.push(num);
+      }
+      return numbers.sort((a, b) => a - b);
+    }
+
+    function generateCardData() {
+      return {
+        id: Math.random().toString(36).substring(2, 8).toUpperCase(),
+        values: [
+          ...generateNumbers(1, 15, 5),
+          ...generateNumbers(16, 30, 5),
+          ...generateNumbers(31, 45, 5),
+          ...generateNumbers(46, 60, 5),
+          ...generateNumbers(61, 75, 5)
+        ],
+        marked: Array(25).fill(false)
+      };
+    }
+
+    function renderCard(card) {
+      const cardEl = document.getElementById('bingoCard');
+      const idEl = document.getElementById('cardId');
+      cardEl.innerHTML = '';
+      idEl.textContent = `ID da Cartela: ${card.id}`;
+
+      card.values.forEach((num, index) => {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        if (card.marked[index]) cell.classList.add('marked');
+        cell.textContent = (index === 12) ? '★' : num; // casa do meio
+        cell.onclick = () => {
+          if (index !== 12) {
+            card.marked[index] = !card.marked[index];
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(card));
+            renderCard(card);
+          }
+        };
+        cardEl.appendChild(cell);
+      });
+    }
+
+    function generateNewCard() {
+      const card = generateCardData();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(card));
+      renderCard(card);
+    }
+
+    function init() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        renderCard(JSON.parse(saved));
+      } else {
+        generateNewCard();
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
