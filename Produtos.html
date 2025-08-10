@@ -225,7 +225,7 @@
 <!-- Embadejado-->
 <!--Produto: Maçã Bandejado -->
 <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
-    <img src="imagens/maca.jpg.png" alt="Maçã" class="w-full h-40 object-contain rounded">
+    <img src="imagens/maca.jpg.png" alt="pacote" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Maçã Bandejado</h2>
     <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
     <p class="text-green-700 font-bold">R$ 4,99</p>
@@ -239,6 +239,21 @@
     </form>
   </div> 
   
+  <!--Produto: 4 pacote por 9,99. Tomate, cenoura, ceboala e Batata-inglesa -->
+<div class="bg-white p-4 rounded shadow relative categoria-bandejado oferta">
+    <img src="imagens/pacote.png" alt="Maçã" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">4 pacote por 9,99. Tomate, cenoura, ceboala e Batata-inglesa.</h2>
+    <p class="text-sm text-gray-500">Produtos selecionados e embalados.</p>
+    <p class="text-green-700 font-bold">R$ 9,99</p>
+    <form onsubmit="addToCart(event, '4 pacote por 9,99. Tomate, cenoura, ceboala e Batata-inglesa.',9.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> 
   <!-- Produto: Goiaba Bandejado 
   <div class="bg-white p-4 rounded shadow relative categoria-bandejado">
     <img src="imagens/goiababdj.jpg" alt="Goiaba" class="w-full h-40 object-contain rounded">
@@ -2003,6 +2018,5 @@ function finalizarPedido() {
   </footer>
 </body>
 </html>
-
 
 
