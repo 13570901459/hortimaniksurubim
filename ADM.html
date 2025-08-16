@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -112,6 +112,8 @@
             <th>Custo Unit.</th>
             <th>Margem (%)</th>
             <th>Preço Venda</th>
+            <th>Lucro Unit.</th>
+            <th>Lucro Total</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -146,13 +148,15 @@ function salvar() {
 function formatar(valor) { return "R$ " + valor.toFixed(2).replace(".", ","); }
 
 function atualizarTabelas() {
-  // === preenche a TABELA DE PRODUTOS no TBODY correto ===
   const tbody = document.getElementById("listaProdutos");
   tbody.innerHTML = "";
   let totalCompra = 0, lucroBruto = 0;
 
   produtos.forEach((p,i) => {
     const tr = document.createElement("tr");
+    const lucroUnit = p.venda - p.custo;
+    const lucroTotal = lucroUnit * p.qtd;
+
     tr.innerHTML = `
       <td data-label="Produto">${p.nome}</td>
       <td data-label="Valor Caixa">${formatar(p.valor)}</td>
@@ -160,6 +164,8 @@ function atualizarTabelas() {
       <td data-label="Custo Unit.">${formatar(p.custo)}</td>
       <td data-label="Margem (%)">${parseFloat(p.margem).toFixed(2)}%</td>
       <td data-label="Preço Venda">${formatar(p.venda)}</td>
+      <td data-label="Lucro Unit.">${formatar(lucroUnit)}</td>
+      <td data-label="Lucro Total">${formatar(lucroTotal)}</td>
       <td data-label="Ações">
         <button class="edit-btn" onclick="editarProduto(${i})"><i class="fa-solid fa-pen"></i></button>
         <button class="del-btn" onclick="excluirProduto(${i})"><i class="fa-solid fa-trash"></i></button>
@@ -167,10 +173,9 @@ function atualizarTabelas() {
     tbody.appendChild(tr);
 
     totalCompra += p.valor;
-    lucroBruto += (p.venda - p.custo) * p.qtd; // ainda calculamos para o resumo
+    lucroBruto += lucroTotal;
   });
 
-  // === tabela de gastos ===
   const tabelaG = document.getElementById("tabelaGastos");
   tabelaG.innerHTML = "";
   let totalGastos = 0;
@@ -189,7 +194,6 @@ function atualizarTabelas() {
   document.getElementById("lucroBruto").textContent = formatar(lucroBruto);
   document.getElementById("lucroLiquido").textContent = formatar(lucroBruto - totalGastos);
 
-  // mantém o filtro aplicado após atualizar a lista
   const q = document.getElementById("search");
   if (q && q.value) searchProduct();
 }
@@ -220,7 +224,6 @@ function adicionarProduto() {
   salvar();
   atualizarTabelas();
 
-  // limpar campos
   document.getElementById("produto").value = "";
   document.getElementById("valor").value = "";
   document.getElementById("qtd").value = "";
@@ -284,7 +287,6 @@ function excluirGasto(i) {
   }
 }
 
-// === BUSCA instantânea (agora sobre #listaProdutos) ===
 function searchProduct() {
   const input = document.getElementById("search").value.toLowerCase();
   const rows = document.querySelectorAll("#listaProdutos tr");
@@ -294,13 +296,11 @@ function searchProduct() {
   });
 }
 
-// === Recolher/Expandir a tabela ===
 function toggleTabela() {
   const tabela = document.getElementById("tabela-container");
   tabela.style.display = (tabela.style.display === "none") ? "block" : "none";
 }
 
-// inicia
 atualizarTabelas();
 </script>
 </body>
