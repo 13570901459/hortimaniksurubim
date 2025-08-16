@@ -40,7 +40,6 @@
   .print-btn { background: #00b4d8; color: white; }
   .edit-btn { background: #ffc107; color: #000; }
   .del-btn { background: #e63946; color: white; }
-  .toggle-btn { background: #495057; color: #fff; }
   table { width: 100%; border-collapse: collapse; margin-top: 15px; }
   th, td { border: 1px solid #33415c; padding: 8px; text-align: center; }
   th { background: #003566; color: #fff; }
@@ -69,7 +68,11 @@
     <label>Produto: <input id="produto"></label>
     <label>Valor Caixa (R$): <input id="valor" type="number" step="0.01"></label>
     <label>Qtd Caixa: <input id="qtd" type="number" step="0.01"></label>
-    <label>Margem (%): <input id="margem" type="number" value="30"></label>
+    <label>Margem (%): <input id="margem" type="number" step="0.01"></label>
+    <label>Preço Venda Unit. (R$): <input id="venda" type="number" step="0.01"></label>
+    <small style="color:#90e0ef;display:block;margin-top:5px;">
+      👉 Preencha <b>Margem %</b> ou <b>Preço de Venda</b>. Se preencher os dois, o Preço de Venda tem prioridade.
+    </small>
     <button class="add-btn" onclick="adicionarProduto()"><i class="fa-solid fa-plus"></i> Adicionar</button>
   </div>
 
@@ -88,9 +91,7 @@
   <!-- Produtos -->
   <div class="card">
     <h3><i class="fa-solid fa-apple-whole"></i> Produtos</h3>
-    <input type="text" id="buscaProduto" placeholder="Buscar produto..." onkeyup="buscarProduto()" style="width:100%;padding:8px;margin-bottom:10px;border-radius:5px;border:none;">
-    <button class="toggle-btn" onclick="toggleProdutos()"><i class="fa-solid fa-eye-slash"></i> Recolher/Expandir Produtos</button>
-    <table id="tabelaProdutosWrapper">
+    <table>
       <thead>
         <tr>
           <th>Produto</th><th>Compra</th><th>Qtd</th><th>Custo Unitário</th>
@@ -119,7 +120,6 @@
 <script>
 let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
 let gastos = JSON.parse(localStorage.getItem("gastos")) || [];
-let produtosVisiveis = true;
 
 function salvar() {
   localStorage.setItem("produtos", JSON.stringify(produtos));
@@ -175,27 +175,61 @@ function adicionarProduto() {
   let valor = parseFloat(document.getElementById("valor").value);
   let qtd = parseFloat(document.getElementById("qtd").value);
   let margem = parseFloat(document.getElementById("margem").value);
-  if (!nome || !valor || !qtd) return alert("Preencha todos os campos!");
+  let vendaDigitada = parseFloat(document.getElementById("venda").value);
+
+  if (!nome || !valor || !qtd) return alert("Preencha todos os campos obrigatórios!");
+
   let custo = valor / qtd;
-  let venda = custo * (1 + margem/100);
-  produtos.push({ nome, valor, qtd, custo, margem, venda });
+  let venda, margemFinal;
+
+  if (!isNaN(vendaDigitada) && vendaDigitada > 0) {
+    venda = vendaDigitada;
+    margemFinal = ((venda / custo) - 1) * 100;
+  } else if (!isNaN(margem) && margem > 0) {
+    margemFinal = margem;
+    venda = custo * (1 + margem/100);
+  } else {
+    return alert("Informe Margem (%) ou Preço de Venda!");
+  }
+
+  produtos.push({ nome, valor, qtd, custo, margem: margemFinal.toFixed(2), venda });
   salvar(); atualizarTabelas();
+
   document.getElementById("produto").value = "";
   document.getElementById("valor").value = "";
   document.getElementById("qtd").value = "";
+  document.getElementById("margem").value = "";
+  document.getElementById("venda").value = "";
 }
+
 function editarProduto(i) {
   let p = produtos[i];
   let novoNome = prompt("Nome:", p.nome);
   let novoValor = parseFloat(prompt("Valor da caixa:", p.valor));
   let novaQtd = parseFloat(prompt("Qtd caixa:", p.qtd));
-  let novaMargem = parseFloat(prompt("Margem %:", p.margem));
+  let novaMargem = prompt("Margem % (ou deixe em branco):", p.margem);
+  let novoVenda = prompt("Preço de Venda Unit. (ou deixe em branco):", p.venda);
+
   if (!novoNome || !novoValor || !novaQtd) return;
+
   let custo = novoValor / novaQtd;
-  let venda = custo * (1 + novaMargem/100);
-  produtos[i] = { nome: novoNome, valor: novoValor, qtd: novaQtd, custo, margem: novaMargem, venda };
+  let venda, margemFinal;
+
+  if (novoVenda && !isNaN(parseFloat(novoVenda))) {
+    venda = parseFloat(novoVenda);
+    margemFinal = ((venda / custo) - 1) * 100;
+  } else if (novaMargem && !isNaN(parseFloat(novaMargem))) {
+    margemFinal = parseFloat(novaMargem);
+    venda = custo * (1 + margemFinal/100);
+  } else {
+    alert("Informe Margem ou Preço de Venda!");
+    return;
+  }
+
+  produtos[i] = { nome: novoNome, valor: novoValor, qtd: novaQtd, custo, margem: margemFinal.toFixed(2), venda };
   salvar(); atualizarTabelas();
 }
+
 function excluirProduto(i) {
   if (confirm("Excluir este produto?")) { produtos.splice(i,1); salvar(); atualizarTabelas(); }
 }
@@ -210,19 +244,6 @@ function adicionarGasto() {
 }
 function excluirGasto(i) {
   if (confirm("Excluir este gasto?")) { gastos.splice(i,1); salvar(); atualizarTabelas(); }
-}
-function buscarProduto() {
-  let filtro = document.getElementById("buscaProduto").value.toLowerCase();
-  let linhas = document.querySelectorAll("#tabelaProdutos tr");
-  linhas.forEach(linha => {
-    let nome = linha.cells[0].textContent.toLowerCase();
-    linha.style.display = nome.includes(filtro) ? "" : "none";
-  });
-}
-function toggleProdutos() {
-  let tabela = document.getElementById("tabelaProdutosWrapper");
-  produtosVisiveis = !produtosVisiveis;
-  tabela.style.display = produtosVisiveis ? "table" : "none";
 }
 atualizarTabelas();
 </script>
