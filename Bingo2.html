@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bingo Online – Firebase</title>
+  <style>
+    :root{
+      --bg:#0b1020;--panel:#0f172a;--ink:#e5e7eb;--muted:#9ca3af;--brand:#22c55e;--accent:#38bdf8;--danger:#ef4444;--win:#f59e0b
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial; background:radial-gradient(70rem 70rem at 20% -10%, #1f2937, var(--bg)); color:var(--ink)}
+    header,main,footer{max-width:1000px;margin:auto;padding:16px}
+    header{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .brand{display:flex;gap:10px;align-items:center}
+    .brand .t{font-weight:900;font-size:20px;letter-spacing:.4px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .card{background:linear-gradient(180deg, rgba(148,163,184,.05), rgba(2,6,23,.6));border:1px solid rgba(148,163,184,.2);border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+    .panel{display:grid;grid-template-columns:1fr;gap:8px}
+    input,select{background:#0b1220;border:1px solid rgba(148,163,184,.25);color:#e5e7eb;padding:10px;border-radius:12px;min-width:200px}
+    button{background:linear-gradient(180deg,#16a34a,#15803d);border:0;color:#fff;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer}
+    button.secondary{background:linear-gradient(180deg,#334155,#1f2937)}
+    button.danger{background:linear-gradient(180deg,#ef4444,#b91c1c)}
+    .grid{width:100%;border-collapse:separate;border-spacing:8px}
+    th,td{width:18%;aspect-ratio:1/1;text-align:center;border-radius:14px;position:relative;overflow:hidden}
+    th{background:linear-gradient(180deg,#0ea5e9,#0369a1);color:white;font-size:clamp(18px,5vw,28px);font-weight:900;letter-spacing:4px;text-shadow:0 2px 8px rgba(0,0,0,.35)}
+    td{background:linear-gradient(180deg,#111827,#0b1220);border:1px solid rgba(148,163,184,.2);font-size:clamp(16px,5vw,26px);font-weight:800;cursor:pointer}
+    td.marked{background:linear-gradient(180deg,#14532d,#052e16);border-color:rgba(34,197,94,.6)}
+    td.free{background:linear-gradient(180deg,#4338ca,#1e1b4b)}
+    td.winner{box-shadow:0 0 0 3px var(--win) inset}
+    .status{color:var(--muted)}
+    .pill{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);padding:6px 10px;border-radius:999px;font-weight:700}
+    .list{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow:auto}
+    .item{display:flex;justify-content:space-between;gap:8px;padding:8px;border:1px solid rgba(148,163,184,.2);border-radius:12px;background:rgba(2,6,23,.4)}
+    .big{font-size:clamp(28px,6vw,44px);font-weight:900}
+    .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);z-index:50}
+    .overlay.show{display:flex}
+    .toast{background:#0b1020;border:1px solid rgba(148,163,184,.25);border-radius:18px;padding:24px 20px;max-width:560px}
+    .toast h2{margin:0 0 6px}
+    .numbers{display:flex;flex-wrap:wrap;gap:6px}
+    .ball{padding:6px 10px;border-radius:999px;border:1px solid rgba(148,163,184,.25);background:#0b1220}
+    .grid-wrap{overflow:auto}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l2.39 4.84 5.34.78-3.86 3.76.91 5.31L12 14.77 7.22 16.69l.91-5.31L4.27 7.62l5.34-.78L12 2z" fill="url(#g)"/><defs><linearGradient id="g" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs></svg>
+      <div class="t">Bingo Online – Firebase</div>
+    </div>
+    <div class="status" id="status">Conectando…</div>
+  </header>
+
+  <main>
+    <section class="row">
+      <div class="card" style="flex:1 1 320px">
+        <div class="panel">
+          <div class="row">
+            <select id="role">
+              <option value="player">Entrar como Jogador</option>
+              <option value="host">Entrar como Anfitrião</option>
+            </select>
+            <input id="roomCode" placeholder="Código da sala (ex: ABC123)" />
+            <button id="btnJoin">Entrar / Criar</button>
+          </div>
+          <div class="row" id="hostControls" style="display:none">
+            <button id="btnCreateRoom">Criar nova sala</button>
+            <button class="secondary" id="btnDraw">Sortear número</button>
+            <button class="danger" id="btnReset">Reiniciar sala</button>
+          </div>
+          <div class="row" id="nameRow">
+            <input id="playerName" placeholder="Seu nome" />
+            <button id="btnSetName">Confirmar nome</button>
+            <span class="pill">Seu ID: <span id="uidShort">—</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="flex:1 1 320px">
+        <div class="panel">
+          <div><b>Sala:</b> <span id="roomDisplay">—</span></div>
+          <div><b>Números sorteados:</b></div>
+          <div class="numbers" id="drawnList"></div>
+          <div><b>Último número:</b> <span class="big" id="lastNumber">—</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="flex:1 1 320px">
+        <div class="panel">
+          <div><b>Jogadores na sala</b></div>
+          <div class="list" id="playersList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="row" style="margin-top:12px">
+      <div class="card grid-wrap" style="flex:2 1 520px">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><b>Sua cartela</b> <span class="pill">ID: <span id="cardId">—</span></span></div>
+          <div class="row">
+            <button class="secondary" id="btnNewCard">Nova cartela</button>
+            <button class="secondary" id="btnClear">Limpar marcas</button>
+          </div>
+        </div>
+        <table class="grid" aria-label="Cartela de Bingo">
+          <thead><tr><th>B</th><th>I</th><th>N</th><th>G</th><th>O</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div class="status" id="cardStatus">Aguardando…</div>
+      </div>
+
+      <div class="card" style="flex:1 1 320px">
+        <div class="panel">
+          <div><b>Quase bingo</b> <span class="status">(linhas/colunas/diagonais a 1 número)</span></div>
+          <div class="list" id="almostList"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="overlay" id="bingoOverlay">
+    <div class="toast">
+      <h2>🎉 BINGO!</h2>
+      <p id="winnerText">Temos um vencedor.</p>
+      <div style="margin-top:12px" class="row">
+        <button class="secondary" id="btnCloseOverlay">OK</button>
+        <button id="btnShowWinner">Conferir cartela do vencedor</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <small class="status">Dica: o anfitrião cria a sala e usa "Sortear número". Jogadores entram com o código, confirmam o nome, ganham uma cartela e tudo atualiza em tempo real.</small>
+  </footer>
+
+  <!-- Firebase (v10 modular) -->
+  <script type="module">
+    // 1) COLOQUE SEU CONFIG DO FIREBASE AQUI
+    // Crie um projeto no Firebase, ative Auth (Anônima) e Realtime Database.
+    // Copie a config do app web e substitua os valores abaixo.
+    const firebaseConfig = {
+      apiKey: "COLOQUE_SUA_API_KEY",
+      authDomain: "SEU_PROJETO.firebaseapp.com",
+      databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
+      projectId: "SEU_PROJETO",
+      storageBucket: "SEU_PROJETO.appspot.com",
+      messagingSenderId: "",
+      appId: ""
+    };
+
+    // 2) IMPORTS
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+    import { getDatabase, ref, set, get, onValue, update, push, child, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+    // 3) INIT
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // UI elts
+    const roleSel = document.getElementById('role');
+    const roomInput = document.getElementById('roomCode');
+    const btnJoin = document.getElementById('btnJoin');
+    const btnCreateRoom = document.getElementById('btnCreateRoom');
+    const btnDraw = document.getElementById('btnDraw');
+    const btnReset = document.getElementById('btnReset');
+    const hostControls = document.getElementById('hostControls');
+    const nameRow = document.getElementById('nameRow');
+    const playerNameInput = document.getElementById('playerName');
+    const btnSetName = document.getElementById('btnSetName');
+    const uidShort = document.getElementById('uidShort');
+    const statusBar = document.getElementById('status');
+    const roomDisplay = document.getElementById('roomDisplay');
+    const drawnList = document.getElementById('drawnList');
+    const lastNumberEl = document.getElementById('lastNumber');
+    const playersList = document.getElementById('playersList');
+    const tbody = document.getElementById('tbody');
+    const cardStatus = document.getElementById('cardStatus');
+    const cardIdEl = document.getElementById('cardId');
+    const btnNewCard = document.getElementById('btnNewCard');
+    const btnClear = document.getElementById('btnClear');
+    const almostList = document.getElementById('almostList');
+    const overlay = document.getElementById('bingoOverlay');
+    const btnCloseOverlay = document.getElementById('btnCloseOverlay');
+    const btnShowWinner = document.getElementById('btnShowWinner');
+    const winnerText = document.getElementById('winnerText');
+
+    let UID = null;
+    let currentRoom = null;
+    let myPlayerKey = null; // chave no /rooms/{code}/players/{myPlayerKey}
+
+    // Auth anônima
+    onAuthStateChanged(auth, async (u)=>{
+      if(u){
+        UID = u.uid;
+        uidShort.textContent = UID.slice(0,6);
+        statusBar.textContent = 'Autenticado';
+      } else {
+        try{
+          await signInAnonymously(auth);
+        }catch(e){
+          statusBar.textContent = 'Erro na autenticação';
+          console.error(e);
+        }
+      }
+    });
+
+    // Helpers
+    const ranges = [[1,15],[16,30],[31,45],[46,60],[61,75]];
+    function pickUnique(min,max,count){
+      const pool = Array.from({length:max-min+1},(_,i)=>i+min);
+      for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+      return pool.slice(0,count).sort((a,b)=>a-b);
+    }
+    function generateCard(){
+      const columns = ranges.map(([a,b], idx)=>pickUnique(a,b,(idx===2?4:5)));
+      const grid = Array.from({length:5},()=>Array(5).fill(0));
+      for(let r=0;r<5;r++){
+        for(let c=0;c<5;c++){
+          if(r===2 && c===2){grid[r][c]=0; continue;} // FREE
+          const index = (c===2 && r>1)? r-1 : r;
+          grid[r][c] = columns[c][index];
+        }
+      }
+      return grid; // 5x5
+    }
+    function gridToList(g){ return g.flat(); }
+    function newMarks(){
+      const m = Array.from({length:5},()=>Array(5).fill(false));
+      m[2][2]=true; // free
+      return m;
+    }
+    function checkLines(m){
+      const winners=[];
+      // linhas
+      for(let r=0;r<5;r++) if(m[r].every(v=>v)) winners.push({type:'row',idx:r});
+      // colunas
+      for(let c=0;c<5;c++) if([0,1,2,3,4].every(r=>m[r][c])) winners.push({type:'col',idx:c});
+      // diagonais
+      if([0,1,2,3,4].every(i=>m[i][i])) winners.push({type:'diag',idx:0});
+      if([0,1,2,3,4].every(i=>m[i][4-i])) winners.push({type:'diag',idx:1});
+      return winners;
+    }
+    function almostBingo(g,m,drawn){
+      // retorna lista de linhas/colunas/diagonais que faltam 1
+      const res=[];
+      // linhas
+      for(let r=0;r<5;r++){
+        const vals = m[r];
+        const miss = vals.filter(v=>!v).length;
+        if(miss===1) res.push(`Linha ${r+1}`)
+      }
+      // colunas
+      for(let c=0;c<5;c++){
+        const miss = [0,1,2,3,4].filter(r=>!m[r][c]).length;
+        if(miss===1) res.push(`Coluna ${c+1}`)
+      }
+      // diagonais
+      const missA = [0,1,2,3,4].filter(i=>!m[i][i]).length;
+      if(missA===1) res.push('Diagonal principal');
+      const missB = [0,1,2,3,4].filter(i=>!m[i][4-i]).length;
+      if(missB===1) res.push('Diagonal secundária');
+      return res;
+    }
+
+    function renderCard(grid, marks){
+      tbody.innerHTML='';
+      for(let r=0;r<5;r++){
+        const tr=document.createElement('tr');
+        for(let c=0;c<5;c++){
+          const td=document.createElement('td');
+          td.dataset.r=r; td.dataset.c=c;
+          if(r===2 && c===2){
+            td.classList.add('marked','free');
+            td.textContent='FREE';
+          }else{
+            td.textContent=grid[r][c];
+          }
+          if(marks && marks[r][c]) td.classList.add('marked');
+          td.addEventListener('click',()=>{
+            toggleMark(td);
+            saveMyMarks();
+          });
+          tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+      }
+    }
+
+    function readMarksFromDOM(){
+      const m = Array.from({length:5},()=>Array(5).fill(false));
+      tbody.querySelectorAll('td').forEach(td=>{
+        const r=+td.dataset.r, c=+td.dataset.c;
+        if(td.classList.contains('marked')) m[r][c]=true;
+      });
+      return m;
+    }
+    function toggleMark(td){
+      if(td.classList.contains('free')) return; // FREE já marcado
+      td.classList.toggle('marked');
+      evaluateBingo();
+    }
+
+    // Estado local da minha cartela
+    let myGrid = null; // 5x5 números
+    let myMarks = null; // 5x5 bool
+
+    // Handlers UI
+    roleSel.addEventListener('change',()=>{
+      hostControls.style.display = (roleSel.value==='host')?'flex':'none';
+    });
+
+    btnCreateRoom.addEventListener('click', async ()=>{
+      const code = makeRoomCode();
+      await set(ref(db, `rooms/${code}`), {
+        createdAt: Date.now(),
+        numbers: [],
+        last: null,
+        winner: null
+      });
+      roomInput.value = code;
+      statusBar.textContent = `Sala criada: ${code}`;
+    });
+
+    btnJoin.addEventListener('click', async ()=>{
+      const code = (roomInput.value||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+      if(!code){ alert('Digite o código da sala.'); return; }
+      await ensureRoom(code);
+      currentRoom = code;
+      roomDisplay.textContent = code;
+      attachRoomListeners(code);
+      statusBar.textContent = `Conectado à sala ${code}`;
+      if(roleSel.value==='host') hostControls.style.display='flex';
+    });
+
+    btnSetName.addEventListener('click', async ()=>{
+      const name = (playerNameInput.value||'').trim();
+      if(!name){ alert('Digite seu nome.'); return; }
+      if(!currentRoom){ alert('Entre numa sala primeiro.'); return; }
+      if(!myPlayerKey){
+        // cria player
+        const playersRef = ref(db, `rooms/${currentRoom}/players`);
+        const newRef = push(playersRef);
+        myPlayerKey = newRef.key;
+        myGrid = generateCard();
+        myMarks = newMarks();
+        await set(newRef, {
+          uid: UID,
+          name,
+          card: myGrid,
+          marks: myMarks,
+          createdAt: Date.now()
+        });
+        cardIdEl.textContent = myPlayerKey;
+        renderCard(myGrid, myMarks);
+      } else {
+        await update(ref(db, `rooms/${currentRoom}/players/${myPlayerKey}`), { name });
+      }
+      statusBar.textContent = `Nome salvo: ${name}`;
+    });
+
+    btnNewCard.addEventListener('click', async ()=>{
+      if(!currentRoom || !myPlayerKey) return;
+      myGrid = generateCard();
+      myMarks = newMarks();
+      renderCard(myGrid, myMarks);
+      await update(ref(db, `rooms/${currentRoom}/players/${myPlayerKey}`), { card: myGrid, marks: myMarks });
+    });
+
+    btnClear.addEventListener('click', async ()=>{
+      if(!currentRoom || !myPlayerKey) return;
+      myMarks = newMarks();
+      renderCard(myGrid, myMarks);
+      await update(ref(db, `rooms/${currentRoom}/players/${myPlayerKey}`), { marks: myMarks });
+    });
+
+    btnDraw.addEventListener('click', async ()=>{
+      if(!currentRoom) return;
+      const roomSnap = await get(ref(db, `rooms/${currentRoom}`));
+      const data = roomSnap.val();
+      const drawn = data?.numbers || [];
+      if(drawn.length>=75){ alert('Todos os números já foram sorteados.'); return; }
+      const n = drawNext(drawn);
+      drawn.push(n);
+      await update(ref(db, `rooms/${currentRoom}`), { numbers: drawn, last: n });
+    });
+
+    btnReset.addEventListener('click', async ()=>{
+      if(!currentRoom) return;
+      if(!confirm('Reiniciar sala? Isso limpa sorteio e vencedores, mas mantém jogadores.')) return;
+      await update(ref(db, `rooms/${currentRoom}`), { numbers: [], last: null, winner: null });
+      // limpar marks dos jogadores
+      const playersSnap = await get(ref(db, `rooms/${currentRoom}/players`));
+      if(playersSnap.exists()){
+        const updates = {};
+        playersSnap.forEach(ch=>{
+          updates[`rooms/${currentRoom}/players/${ch.key}/marks`] = newMarks();
+        });
+        await update(ref(db), updates);
+      }
+    });
+
+    btnCloseOverlay.addEventListener('click', ()=> overlay.classList.remove('show'));
+    btnShowWinner.addEventListener('click', async ()=>{
+      if(!currentRoom) return;
+      const winSnap = await get(ref(db, `rooms/${currentRoom}/winner`));
+      if(winSnap.exists()){
+        const w = winSnap.val();
+        const pSnap = await get(ref(db, `rooms/${currentRoom}/players/${w.playerKey}`));
+        if(pSnap.exists()){
+          const p = pSnap.val();
+          showWinnerCard(p);
+        }
+      }
+    });
+
+    function makeRoomCode(){
+      const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let s=''; for(let i=0;i<6;i++) s+=chars[Math.floor(Math.random()*chars.length)];
+      return s;
+    }
+
+    async function ensureRoom(code){
+      const snap = await get(ref(db, `rooms/${code}`));
+      if(!snap.exists()){
+        await set(ref(db, `rooms/${code}`), {
+          createdAt: Date.now(), numbers: [], last: null, winner: null
+        });
+      }
+    }
+
+    function drawNext(drawn){
+      const pool = new Set(Array.from({length:75},(_,i)=>i+1));
+      drawn.forEach(n=>pool.delete(n));
+      const arr=[...pool];
+      return arr[Math.floor(Math.random()*arr.length)];
+    }
+
+    function attachRoomListeners(code){
+      // sorteio
+      onValue(ref(db, `rooms/${code}/numbers`), (snap)=>{
+        const arr = snap.val()||[];
+        renderDrawn(arr);
+        if(arr.length && myGrid){
+          // marca automaticamente
+          autoMarkFromDraw(arr[arr.length-1]);
+        }
+      });
+      onValue(ref(db, `rooms/${code}/last`), (snap)=>{
+        lastNumberEl.textContent = snap.val()||'—';
+      });
+      // winner
+      onValue(ref(db, `rooms/${code}/winner`), (snap)=>{
+        const w = snap.val();
+        if(w){
+          winnerText.textContent = `Vencedor: ${w.name} (cartela ${w.playerKey})`;
+          overlay.classList.add('show');
+        } else {
+          overlay.classList.remove('show');
+        }
+      });
+      // players list
+      onValue(ref(db, `rooms/${code}/players`), (snap)=>{
+        const players = snap.val()||{};
+        renderPlayers(players);
+        // se eu já me registrei, sincroniza minha cartela
+        if(myPlayerKey && players[myPlayerKey]){
+          const p = players[myPlayerKey];
+          myGrid = p.card; myMarks = p.marks;
+          renderCard(myGrid, myMarks);
+        }
+        // render quase bingo para cada
+        renderAlmost(players);
+      });
+    }
+
+    function renderDrawn(arr){
+      drawnList.innerHTML='';
+      arr.forEach(n=>{
+        const d=document.createElement('div'); d.className='ball'; d.textContent=n; drawnList.appendChild(d);
+      });
+    }
+
+    function renderPlayers(players){
+      playersList.innerHTML='';
+      Object.entries(players).forEach(([k,p])=>{
+        c
