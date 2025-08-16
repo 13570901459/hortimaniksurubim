@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Banca de Frutas</title>
-<!-- Ícones Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 <style>
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -23,11 +21,7 @@
     font-weight: bold;
     box-shadow: 0 2px 6px rgba(0,0,0,.3);
   }
-  .container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 15px;
-  }
+  .container { max-width: 1200px; margin: auto; padding: 15px; }
   .card {
     background: #1e2a47;
     padding: 15px;
@@ -35,95 +29,41 @@
     border-radius: 10px;
     box-shadow: 0 3px 8px rgba(0,0,0,.4);
   }
-  .card h3 {
-    margin-top: 0;
-    color: #90e0ef;
-  }
+  .card h3 { margin-top: 0; color: #90e0ef; }
   .card input {
-    margin: 5px;
-    padding: 8px;
-    border-radius: 5px;
-    border: none;
-    outline: none;
-    width: 150px;
+    margin: 5px; padding: 8px; border-radius: 5px; border: none; outline: none; width: 150px;
   }
   button {
-    margin: 5px;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
+    margin: 5px; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;
   }
   .add-btn { background: #0077b6; color: white; }
   .print-btn { background: #00b4d8; color: white; }
   .edit-btn { background: #ffc107; color: #000; }
   .del-btn { background: #e63946; color: white; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-  }
-  th, td {
-    border: 1px solid #33415c;
-    padding: 8px;
-    text-align: center;
-  }
-  th {
-    background: #003566;
-    color: #fff;
-  }
-  tfoot td {
-    font-weight: bold;
-    background: #001d3d;
-    color: #fff;
-  }
-
-  /* Responsividade */
+  .toggle-btn { background: #495057; color: #fff; }
+  table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+  th, td { border: 1px solid #33415c; padding: 8px; text-align: center; }
+  th { background: #003566; color: #fff; }
+  tfoot td { font-weight: bold; background: #001d3d; color: #fff; }
+  /* responsivo */
   @media (max-width: 768px) {
-    .card input {
-      display: block;
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    table, thead, tbody, th, td, tr {
-      display: block;
-    }
-    thead tr {
-      display: none;
-    }
-    tbody tr {
-      margin-bottom: 15px;
-      background: #14213d;
-      border-radius: 6px;
-      padding: 10px;
-    }
-    td {
-      text-align: right;
-      padding-left: 50%;
-      position: relative;
-      border: none;
-      border-bottom: 1px solid #33415c;
-    }
-    td::before {
-      content: attr(data-label);
-      position: absolute;
-      left: 10px;
-      text-align: left;
-      font-weight: bold;
-      color: #90e0ef;
-    }
+    .card input { display: block; width: 100%; margin-bottom: 10px; }
+    table, thead, tbody, th, td, tr { display: block; }
+    thead tr { display: none; }
+    tbody tr { margin-bottom: 15px; background: #14213d; border-radius: 6px; padding: 10px; }
+    td { text-align: right; padding-left: 50%; position: relative; border: none; border-bottom: 1px solid #33415c; }
+    td::before { content: attr(data-label); position: absolute; left: 10px; font-weight: bold; color: #90e0ef; }
   }
 </style>
 </head>
 <body>
-
 <header>
   <i class="fa-solid fa-store"></i> Controle da Banca de Frutas
 </header>
 
 <div class="container">
 
+  <!-- Adicionar Produto -->
   <div class="card">
     <h3><i class="fa-solid fa-box"></i> Adicionar Produto</h3>
     <label>Produto: <input id="produto"></label>
@@ -133,40 +73,35 @@
     <button class="add-btn" onclick="adicionarProduto()"><i class="fa-solid fa-plus"></i> Adicionar</button>
   </div>
 
+  <!-- Gastos -->
   <div class="card">
     <h3><i class="fa-solid fa-wallet"></i> Gastos Extras</h3>
     <label>Descrição: <input id="descGasto"></label>
     <label>Valor (R$): <input id="valorGasto" type="number" step="0.01"></label>
     <button class="add-btn" onclick="adicionarGasto()"><i class="fa-solid fa-plus"></i> Adicionar Gasto</button>
-
     <table>
-      <thead>
-        <tr><th>Descrição</th><th>Valor</th><th>Ações</th></tr>
-      </thead>
+      <thead><tr><th>Descrição</th><th>Valor</th><th>Ações</th></tr></thead>
       <tbody id="tabelaGastos"></tbody>
     </table>
   </div>
 
+  <!-- Produtos -->
   <div class="card">
     <h3><i class="fa-solid fa-apple-whole"></i> Produtos</h3>
-    <table>
+    <input type="text" id="buscaProduto" placeholder="Buscar produto..." onkeyup="buscarProduto()" style="width:100%;padding:8px;margin-bottom:10px;border-radius:5px;border:none;">
+    <button class="toggle-btn" onclick="toggleProdutos()"><i class="fa-solid fa-eye-slash"></i> Recolher/Expandir Produtos</button>
+    <table id="tabelaProdutosWrapper">
       <thead>
         <tr>
-          <th>Produto</th>
-          <th>Compra</th>
-          <th>Qtd</th>
-          <th>Custo Unitário</th>
-          <th>Margem</th>
-          <th>Venda Unit.</th>
-          <th>Lucro Unit.</th>
-          <th>Lucro Total</th>
-          <th>Ações</th>
+          <th>Produto</th><th>Compra</th><th>Qtd</th><th>Custo Unitário</th>
+          <th>Margem</th><th>Venda Unit.</th><th>Lucro Unit.</th><th>Lucro Total</th><th>Ações</th>
         </tr>
       </thead>
       <tbody id="tabelaProdutos"></tbody>
     </table>
   </div>
 
+  <!-- Resumo -->
   <div class="card">
     <h3><i class="fa-solid fa-chart-line"></i> Resumo Final</h3>
     <table>
@@ -179,21 +114,18 @@
     </table>
     <button class="print-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimir</button>
   </div>
-
 </div>
 
 <script>
 let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
 let gastos = JSON.parse(localStorage.getItem("gastos")) || [];
+let produtosVisiveis = true;
 
 function salvar() {
   localStorage.setItem("produtos", JSON.stringify(produtos));
   localStorage.setItem("gastos", JSON.stringify(gastos));
 }
-
-function formatar(valor) {
-  return "R$ " + valor.toFixed(2).replace(".", ",");
-}
+function formatar(valor) { return "R$ " + valor.toFixed(2).replace(".", ","); }
 
 function atualizarTabelas() {
   let tabelaP = document.getElementById("tabelaProdutos");
@@ -214,8 +146,7 @@ function atualizarTabelas() {
       <td data-label="Ações">
         <button class="edit-btn" onclick="editarProduto(${i})"><i class="fa-solid fa-pen"></i></button>
         <button class="del-btn" onclick="excluirProduto(${i})"><i class="fa-solid fa-trash"></i></button>
-      </td>
-    `;
+      </td>`;
     tabelaP.appendChild(tr);
     totalCompra += p.valor;
     lucroBruto += (p.venda - p.custo) * p.qtd;
@@ -226,11 +157,9 @@ function atualizarTabelas() {
   let totalGastos = 0;
   gastos.forEach((g,i) => {
     let tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td data-label="Descrição">${g.desc}</td>
+    tr.innerHTML = `<td data-label="Descrição">${g.desc}</td>
       <td data-label="Valor">${formatar(g.valor)}</td>
-      <td data-label="Ações"><button class="del-btn" onclick="excluirGasto(${i})"><i class="fa-solid fa-trash"></i></button></td>
-    `;
+      <td data-label="Ações"><button class="del-btn" onclick="excluirGasto(${i})"><i class="fa-solid fa-trash"></i></button></td>`;
     tabelaG.appendChild(tr);
     totalGastos += g.valor;
   });
@@ -246,21 +175,15 @@ function adicionarProduto() {
   let valor = parseFloat(document.getElementById("valor").value);
   let qtd = parseFloat(document.getElementById("qtd").value);
   let margem = parseFloat(document.getElementById("margem").value);
-
   if (!nome || !valor || !qtd) return alert("Preencha todos os campos!");
-
   let custo = valor / qtd;
   let venda = custo * (1 + margem/100);
-
   produtos.push({ nome, valor, qtd, custo, margem, venda });
-  salvar();
-  atualizarTabelas();
-
+  salvar(); atualizarTabelas();
   document.getElementById("produto").value = "";
   document.getElementById("valor").value = "";
   document.getElementById("qtd").value = "";
 }
-
 function editarProduto(i) {
   let p = produtos[i];
   let novoNome = prompt("Nome:", p.nome);
@@ -271,37 +194,36 @@ function editarProduto(i) {
   let custo = novoValor / novaQtd;
   let venda = custo * (1 + novaMargem/100);
   produtos[i] = { nome: novoNome, valor: novoValor, qtd: novaQtd, custo, margem: novaMargem, venda };
-  salvar();
-  atualizarTabelas();
+  salvar(); atualizarTabelas();
 }
-
 function excluirProduto(i) {
-  if (confirm("Excluir este produto?")) {
-    produtos.splice(i,1);
-    salvar();
-    atualizarTabelas();
-  }
+  if (confirm("Excluir este produto?")) { produtos.splice(i,1); salvar(); atualizarTabelas(); }
 }
-
 function adicionarGasto() {
   let desc = document.getElementById("descGasto").value;
   let valor = parseFloat(document.getElementById("valorGasto").value);
   if (!desc || !valor) return alert("Preencha descrição e valor!");
   gastos.push({ desc, valor });
-  salvar();
-  atualizarTabelas();
+  salvar(); atualizarTabelas();
   document.getElementById("descGasto").value = "";
   document.getElementById("valorGasto").value = "";
 }
-
 function excluirGasto(i) {
-  if (confirm("Excluir este gasto?")) {
-    gastos.splice(i,1);
-    salvar();
-    atualizarTabelas();
-  }
+  if (confirm("Excluir este gasto?")) { gastos.splice(i,1); salvar(); atualizarTabelas(); }
 }
-
+function buscarProduto() {
+  let filtro = document.getElementById("buscaProduto").value.toLowerCase();
+  let linhas = document.querySelectorAll("#tabelaProdutos tr");
+  linhas.forEach(linha => {
+    let nome = linha.cells[0].textContent.toLowerCase();
+    linha.style.display = nome.includes(filtro) ? "" : "none";
+  });
+}
+function toggleProdutos() {
+  let tabela = document.getElementById("tabelaProdutosWrapper");
+  produtosVisiveis = !produtosVisiveis;
+  tabela.style.display = produtosVisiveis ? "table" : "none";
+}
 atualizarTabelas();
 </script>
 </body>
