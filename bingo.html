@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cartela de Bingo</title>
+  <style>
+    :root {
+      --bg: #0f172a;          /* slate-900 */
+      --panel: #111827;       /* gray-900 */
+      --ink: #e5e7eb;         /* gray-200 */
+      --muted: #9ca3af;       /* gray-400 */
+      --brand: #22c55e;       /* green-500 */
+      --accent: #38bdf8;      /* sky-400 */
+      --danger: #ef4444;      /* red-500 */
+      --win: #f59e0b;         /* amber-500 */
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(90rem 90rem at 10% -10%, #1f2937 0, var(--bg) 45%);
+      color: var(--ink);
+    }
+    header{
+      max-width: 980px; margin: 24px auto 12px; padding:0 16px;
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+    }
+    .title{
+      display:flex; align-items:center; gap:12px;
+    }
+    .badge{font-size:12px; color:var(--muted)}
+    .card-id{
+      display:flex; align-items:center; gap:8px; font-weight:600; letter-spacing:.5px;
+      background:rgba(56,189,248,.08); border:1px solid rgba(56,189,248,.3); padding:6px 10px; border-radius:10px;
+    }
+    .actions{display:flex; flex-wrap:wrap; gap:8px}
+    button{
+      background:linear-gradient(180deg, #16a34a, #15803d);
+      color:white; border:0; padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700;
+      box-shadow: 0 6px 20px rgba(34,197,94,.25);
+    }
+    button.secondary{background:linear-gradient(180deg, #334155, #1f2937); box-shadow:none; color:#e2e8f0}
+    button.danger{background:linear-gradient(180deg, #ef4444, #b91c1c)}
+    button:active{transform:translateY(1px)}
+
+    main{max-width:980px; margin:12px auto 32px; padding:0 16px}
+    .board{
+      user-select:none; background:rgba(255,255,255,.03); border:1px solid rgba(148,163,184,.2); border-radius:18px; padding:18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    .grid{width:100%; border-collapse:separate; border-spacing:8px}
+    th, td{
+      width:18%; aspect-ratio:1/1; text-align:center; border-radius:14px; position:relative; overflow:hidden;
+    }
+    th{
+      background:linear-gradient(180deg, #0ea5e9, #0369a1); color:white; font-size:clamp(20px, 6vw, 34px); letter-spacing:4px; font-weight:900; text-shadow:0 2px 8px rgba(0,0,0,.35);
+    }
+    td{
+      background:linear-gradient(180deg, #111827, #0b1220); border:1px solid rgba(148,163,184,.18);
+      font-size:clamp(18px, 5vw, 28px); font-weight:800; color:#e5e7eb;
+      transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease;
+      cursor:pointer;
+    }
+    td:hover{transform:translateY(-1px); box-shadow:0 10px 18px rgba(0,0,0,.35)}
+    td .sub{position:absolute; inset:auto 8px 8px auto; font-size:11px; color:var(--muted)}
+    td.marked{background:linear-gradient(180deg, #14532d, #052e16); border-color:rgba(34,197,94,.6)}
+    td.marked::after{
+      content:"✓"; position:absolute; inset:0; display:grid; place-items:center; font-size:clamp(28px, 7vw, 44px); color:var(--brand);
+      text-shadow:0 2px 10px rgba(34,197,94,.35); font-weight:900;
+    }
+    td.free{background:linear-gradient(180deg, #4338ca, #1e1b4b); border-color:rgba(129,140,248,.7)}
+    td.winner{box-shadow:0 0 0 3px var(--win) inset, 0 0 30px rgba(245,158,11,.35)}
+
+    .status{
+      display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:14px;
+      color:var(--muted)
+    }
+    .status b{color:var(--ink)}
+
+    /* Bingo overlay */
+    .overlay{
+      position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:50;
+      backdrop-filter: blur(2px);
+    }
+    .overlay.show{display:flex}
+    .toast{
+      background: radial-gradient(40rem 30rem at 30% 10%, rgba(56,189,248,.12), transparent 60%), #0b1020;
+      border:1px solid rgba(148,163,184,.25); border-radius:18px; padding:26px 28px; text-align:center; color:#fff;
+      box-shadow:0 20px 60px rgba(0,0,0,.55);
+    }
+    .toast h2{font-size:clamp(28px, 6vw, 44px); margin:0 0 6px; letter-spacing:3px}
+    .toast p{margin:0; color:#cbd5e1}
+    .toast .row{display:flex; gap:10px; justify-content:center; margin-top:14px}
+
+    /* confetti dots */
+    .confetti {position: fixed; inset: 0; pointer-events: none; overflow:hidden}
+    .dot{position:absolute; width:10px; height:10px; border-radius:50%; opacity:.9; animation:fall 1.8s linear forwards}
+    @keyframes fall {
+      from { transform: translateY(-10vh) rotate(0deg); }
+      to   { transform: translateY(110vh) rotate(720deg); }
+    }
+
+    footer{max-width:980px;margin:16px auto 40px; padding:0 16px; color:var(--muted); font-size:14px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M12 2l2.39 4.84 5.34.78-3.86 3.76.91 5.31L12 14.77 7.22 16.69l.91-5.31L4.27 7.62l5.34-.78L12 2z" fill="url(#g)"/>
+        <defs><linearGradient id="g" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs>
+      </svg>
+      <div>
+        <div style="font-size:22px; font-weight:900; letter-spacing:.5px">Cartela de Bingo</div>
+        <div class="badge">Gere, marque e detecte BINGO (linhas, colunas e diagonais)</div>
+      </div>
+    </div>
+    <div class="actions">
+      <button id="newCardBtn" title="Gerar nova cartela">Nova cartela</button>
+      <button class="secondary" id="resetMarksBtn" title="Desmarcar tudo">Limpar marcações</button>
+      <button class="secondary" id="printBtn" title="Imprimir ou salvar em PDF">Imprimir</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="board">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; flex-wrap:wrap">
+        <div class="card-id">ID da cartela: <span id="cardId"></span>
+          <button class="secondary" id="copyIdBtn" style="padding:6px 10px">Copiar ID</button>
+        </div>
+        <div class="status">Status: <b id="statusText">Aguardando marcações…</b></div>
+      </div>
+
+      <table class="grid" aria-label="Cartela de Bingo">
+        <thead>
+          <tr>
+            <th>B</th><th>I</th><th>N</th><th>G</th><th>O</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <div class="overlay" id="bingoOverlay" role="dialog" aria-modal="true">
+    <div class="toast">
+      <h2>🎉 B I N G O !</h2>
+      <p>Você completou uma linha, coluna ou diagonal.</p>
+      <div class="row">
+        <button id="okOverlay" class="secondary">OK</button>
+        <button id="screenshotBtn">Baixar imagem</button>
+      </div>
+    </div>
+    <div class="confetti" id="confetti"></div>
+  </div>
+
+  <footer>
+    Dica: toque nas casas para marcar/desmarcar. A casa central é livre.
+  </footer>
+
+  <script>
+    const tbody = document.getElementById('tbody');
+    const statusText = document.getElementById('statusText');
+    const overlay = document.getElementById('bingoOverlay');
+    const confetti = document.getElementById('confetti');
+    const cardIdEl = document.getElementById('cardId');
+
+    const ranges = [
+      [1,15], [16,30], [31,45], [46,60], [61,75]
+    ];
+
+    const STORAGE_KEY = 'bingo-card-v1';
+
+    function uuid(){
+      if (crypto && crypto.randomUUID) return crypto.randomUUID();
+      return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);
+    }
+
+    function pickUnique(min, max, count){
+      const pool = Array.from({length: max-min+1}, (_,i)=>i+min);
+      for(let i=pool.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      return pool.slice(0, count).sort((a,b)=>a-b);
+    }
+
+    function buildCard(){
+      // gera ID e números
+      const id = uuid();
+      const columns = ranges.map(([a,b], idx)=>{
+        const need = (idx===2) ? 4 : 5; // coluna N tem espaço livre
+        return pickUnique(a,b,need);
+      });
+
+      // monta grid 5x5
+      tbody.innerHTML = '';
+      for(let r=0;r<5;r++){
+        const tr = document.createElement('tr');
+        for(let c=0;c<5;c++){
+          const td = document.createElement('td');
+          td.dataset.r = r; td.dataset.c = c;
+          if(r===2 && c===2){
+            td.classList.add('marked','free');
+            td.innerHTML = '<div class="sub">FREE</div>';
+          } else {
+            const colArr = columns[c];
+            const index = (c===2 && r>1) ? r-1 : r; // pular espaço livre ao preencher coluna N
+            const value = colArr[index];
+            td.textContent = value;
+            td.dataset.val = value;
+            td.innerHTML += '<div class="sub">'+value+'</div>';
+            td.addEventListener('click',()=>toggle(td));
+          }
+          tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+      }
+
+      clearWinners();
+      statusText.textContent = 'Aguardando marcações…';
+
+      const state = { id, marks: getMarks() };
+      cardIdEl.textContent = id;
+      saveState(state);
+    }
+
+    function getMarks(){
+      const marks = [];
+      for(const td of tbody.querySelectorAll('td')){
+        marks.push(td.classList.contains('marked'));
+      }
+      return marks;
+    }
+
+    function restoreMarks(marks){
+      const tds = [...tbody.querySelectorAll('td')];
+      marks.forEach((m,i)=>{
+        if(m) tds[i].classList.add('marked'); else tds[i].classList.remove('marked');
+      });
+    }
+
+    function toggle(td){
+      td.classList.toggle('marked');
+      const winners = checkBingo();
+      const state = loadState();
+      if(state){ state.marks = getMarks(); saveState(state); }
+      if(winners.length){
+        celebrate(winners);
+      } else {
+        statusText.textContent = 'Continuando…';
+        clearWinners();
+      }
+    }
+
+    function matrixMarked(){
+      const M = Array.from({length:5},()=>Array(5).fill(false));
+      for(const td of tbody.querySelectorAll('td')){
+        const r = +td.dataset.r, c = +td.dataset.c;
+        M[r][c] = td.classList.contains('marked');
+      }
+      return M;
+    }
+
+    function checkBingo(){
+      const M = matrixMarked();
+      const lines = [];
+      // linhas
+      for(let r=0;r<5;r++) if(M[r].every(v=>v)) lines.push({type:'row', idx:r});
+      // colunas
+      for(let c=0;c<5;c++) if(M.every(row=>row[c])) lines.push({type:'col', idx:c});
+      // diagonais
+      if([0,1,2,3,4].every(i=>M[i][i])) lines.push({type:'diag', idx:0});
+      if([0,1,2,3,4].every(i=>M[i][4-i])) lines.push({type:'diag', idx:1});
+      return lines;
+    }
+
+    function clearWinners(){
+      for(const td of tbody.querySelectorAll('td')) td.classList.remove('winner');
+    }
+
+    function paintWinners(lines){
+      clearWinners();
+      lines.forEach(L=>{
+        if(L.type==='row'){
+          for(let c=0;c<5;c++) tbody.querySelector(`td[data-r="${L.idx}"][data-c="${c}"]`).classList.add('winner');
+        } else if(L.type==='col'){
+          for(let r=0;r<5;r++) tbody.querySelector(`td[data-r="${r}"][data-c="${L.idx}"]`).classList.add('winner');
+        } else if(L.type==='diag' && L.idx===0){
+          for(let i=0;i<5;i++) tbody.querySelector(`td[data-r="${i}"][data-c="${i}"]`).classList.add('winner');
+        } else if(L.type==='diag' && L.idx===1){
+          for(let i=0;i<5;i++) tbody.querySelector(`td[data-r="${i}"][data-c="${4-i}"]`).classList.add('winner');
+        }
+      });
+    }
+
+    function vibrate(ms=80){ if(navigator.vibrate) navigator.vibrate(ms); }
+
+    function fireworks(){
+      confetti.innerHTML = '';
+      const N = 120;
+      for(let i=0;i<N;i++){
+        const d = document.createElement('div');
+        d.className = 'dot';
+        d.style.left = Math.random()*100 + 'vw';
+        d.style.top = (-Math.random()*30) + 'vh';
+        d.style.background = `hsl(${Math.random()*360}, 90%, 60%)`;
+        d.style.animationDelay = (Math.random()*0.6) + 's';
+        d.style.transform = `translateY(-10vh) rotate(${Math.random()*360}deg)`;
+        confetti.appendChild(d);
+      }
+      setTimeout(()=>confetti.innerHTML='', 2200);
+    }
+
+    function celebrate(lines){
+      paintWinners(lines);
+      statusText.textContent = 'BINGO!';
+      overlay.classList.add('show');
+      fireworks();
+      vibrate(120);
+      // pequeno beep com WebAudio
+      try{
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination);
+        o.type = 'triangle'; o.frequency.value = 880; g.gain.value = 0.001;
+        o.start();
+        g.gain.exponentialRampToValueAtTime(0.2, audioCtx.currentTime + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
+        o.stop(audioCtx.currentTime + 0.45);
+      }catch(e){}
+    }
+
+    function saveState(state){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    function loadState(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return null;
+      try{ return JSON.parse(raw); }catch{ return null }
+    }
+
+    function regenerate(){
+      buildCard();
+    }
+
+    function resetMarks(){
+      for(const td of tbody.querySelectorAll('td')){
+        if(!(td.classList.contains('free'))) td.classList.remove('marked');
+      }
+      clearWinners();
+      statusText.textContent = 'Marcações limpas.';
+      const state = loadState(); if(state){ state.marks = getMarks(); saveState(state); }
+    }
+
+    function printCard(){ window.print(); }
+
+    function copyId(){
+      const id = cardIdEl.textContent.trim();
+      navigator.clipboard.writeText(id).then(()=>{
+        statusText.textContent = 'ID copiado!';
+        vibrate(40);
+      }).catch(()=>{});
+    }
+
+    // exporta imagem simples da cartela
+    async function screenshotBoard(){
+      const node = document.querySelector('.board');
+      // uso leve de html2canvas embutido
+      if(!window.html2canvas){
+        await loadScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
+      }
+      const canvas = await html2canvas(node, {backgroundColor: '#0f172a', scale: 2});
+      const link = document.createElement('a');
+      link.download = 'cartela-bingo-'+cardIdEl.textContent+'.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function loadScript(src){
+      return new Promise((res, rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); });
+    }
+
+    // Eventos UI
+    document.getElementById('newCardBtn').addEventListener('click', regenerate);
+    document.getElementById('resetMarksBtn').addEventListener('click', resetMarks);
+    document.getElementById('printBtn').addEventListener('click', printCard);
+    document.getElementById('copyIdBtn').addEventListener('click', copyId);
+    document.getElementById('okOverlay').addEventListener('click', ()=> overlay.classList.remove('show'));
+    document.getElementById('screenshotBtn').addEventListener('click', screenshotBoard);
+
+    // Inicialização: tenta carregar card salvo, senão cria um novo
+    (function init(){
+      const saved = loadState();
+      if(saved){
+        // reconstruir uma cartela com mesma distribuição é complexo sem guardar números; então apenas gera nova e restaura marcas (aproximação)
+        buildCard();
+        restoreMarks(saved.marks || []);
+        cardIdEl.textContent = saved.id || uuid();
+      } else {
+        buildCard();
+      }
+    })();
+  </script>
+</body>
+</html>
