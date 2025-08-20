@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caixa de Pedidos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0d1b2a;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #1b263b;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.4em;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .form-box {
+      background: #1b263b;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .form-box input, .form-box select, .form-box button {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      border: none;
+      font-size: 1em;
+    }
+
+    .form-box button {
+      background: #415a77;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .produtos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: #1b263b;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .card h3 {
+      margin: 0 0 5px;
+    }
+
+    .card p {
+      margin: 3px 0;
+    }
+
+    .card button {
+      margin-top: 8px;
+      background: #415a77;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .carrinho {
+      margin-top: 25px;
+      background: #1b263b;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .carrinho h2 {
+      margin: 0 0 10px;
+    }
+
+    .carrinho ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .carrinho li {
+      padding: 8px;
+      border-bottom: 1px solid #415a77;
+    }
+
+    .whatsapp-btn {
+      margin-top: 15px;
+      width: 100%;
+      padding: 12px;
+      font-size: 1.1em;
+      background: #25d366;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>Caixa de Pedidos</header>
+  <div class="container">
+
+    <!-- Formulário -->
+    <div class="form-box">
+      <input type="text" id="nomeProduto" placeholder="Nome do produto">
+      <input type="number" id="precoProduto" placeholder="Preço (R$)" step="0.01">
+      <select id="tipoProduto">
+        <option value="Kg">Kg</option>
+        <option value="Un">Un</option>
+      </select>
+      <button onclick="adicionarProduto()">Adicionar Produto</button>
+    </div>
+
+    <!-- Lista de Produtos -->
+    <div class="produtos" id="listaProdutos"></div>
+
+    <!-- Carrinho -->
+    <div class="carrinho">
+      <h2>Carrinho</h2>
+      <ul id="carrinhoLista"></ul>
+      <button class="whatsapp-btn" onclick="enviarWhatsApp()">Enviar para WhatsApp</button>
+    </div>
+  </div>
+
+  <script>
+    let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
+    let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+
+    function salvarDados() {
+      localStorage.setItem("produtos", JSON.stringify(produtos));
+      localStorage.setItem("carrinho", JSON.stringify(carrinho));
+    }
+
+    function adicionarProduto() {
+      const nome = document.getElementById("nomeProduto").value;
+      const preco = document.getElementById("precoProduto").value;
+      const tipo = document.getElementById("tipoProduto").value;
+
+      if (!nome || !preco) {
+        alert("Preencha o nome e preço do produto!");
+        return;
+      }
+
+      const produto = { nome, preco, tipo };
+      produtos.push(produto);
+      salvarDados();
+      renderizarProdutos();
+      document.getElementById("nomeProduto").value = "";
+      document.getElementById("precoProduto").value = "";
+    }
+
+    function renderizarProdutos() {
+      const lista = document.getElementById("listaProdutos");
+      lista.innerHTML = "";
+      produtos.forEach((p, i) => {
+        lista.innerHTML += `
+          <div class="card">
+            <h3>${p.nome}</h3>
+            <p>Preço: R$ ${p.preco}</p>
+            <p>Tipo: ${p.tipo}</p>
+            <button onclick="adicionarCarrinho(${i})">Adicionar ao Carrinho</button>
+          </div>
+        `;
+      });
+    }
+
+    function adicionarCarrinho(i) {
+      carrinho.push(produtos[i]);
+      salvarDados();
+      renderizarCarrinho();
+    }
+
+    function renderizarCarrinho() {
+      const lista = document.getElementById("carrinhoLista");
+      lista.innerHTML = "";
+      carrinho.forEach((p, i) => {
+        lista.innerHTML += `<li>${p.nome} - R$ ${p.preco} (${p.tipo})</li>`;
+      });
+    }
+
+    function enviarWhatsApp() {
+      if (carrinho.length === 0) {
+        alert("O carrinho está vazio!");
+        return;
+      }
+      let mensagem = "Pedido:%0A";
+      carrinho.forEach(p => {
+        mensagem += `- ${p.nome} (${p.tipo}) R$ ${p.preco}%0A`;
+      });
+
+      let numero = "5581991152441"; // seu número
+      let url = `https://wa.me/${numero}?text=${mensagem}`;
+      window.open(url, "_blank");
+    }
+
+    // Renderizar ao carregar
+    renderizarProdutos();
+    renderizarCarrinho();
+  </script>
+</body>
+</html>
