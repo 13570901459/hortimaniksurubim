@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banca Azul</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0d1b2a;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #1b263b;
+      padding: 15px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    main {
+      padding: 15px;
+    }
+    .form-produto {
+      background: #1b263b;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .form-produto input, .form-produto select, .form-produto button {
+      padding: 8px;
+      margin: 5px 0;
+      border: none;
+      border-radius: 5px;
+      width: 100%;
+    }
+    .form-produto button {
+      background: #415a77;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .produtos, .carrinho {
+      margin-top: 20px;
+    }
+    .produto-card {
+      background: #1b263b;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .produto-card button {
+      background: #415a77;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
+    }
+    h2 {
+      margin-top: 30px;
+      border-bottom: 2px solid #415a77;
+      padding-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <header>Banca de Frutas - Azul</header>
+
+  <main>
+    <div class="form-produto">
+      <h3>Adicionar Produto</h3>
+      <input type="text" id="nomeProduto" placeholder="Nome do Produto">
+      <input type="number" id="valorProduto" placeholder="Preço (R$)" step="0.01">
+      <select id="tipoProduto">
+        <option value="kg">Kg</option>
+        <option value="un">Unidade</option>
+      </select>
+      <button onclick="adicionarProduto()">Adicionar</button>
+    </div>
+
+    <section class="produtos">
+      <h2>Produtos</h2>
+      <div id="listaProdutos"></div>
+    </section>
+
+    <section class="carrinho">
+      <h2>Carrinho</h2>
+      <div id="listaCarrinho"></div>
+      <p><strong>Total: R$ <span id="total">0.00</span></strong></p>
+    </section>
+  </main>
+
+  <script>
+    let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
+    let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+
+    function salvarDados() {
+      localStorage.setItem("produtos", JSON.stringify(produtos));
+      localStorage.setItem("carrinho", JSON.stringify(carrinho));
+    }
+
+    function adicionarProduto() {
+      const nome = document.getElementById("nomeProduto").value;
+      const valor = parseFloat(document.getElementById("valorProduto").value);
+      const tipo = document.getElementById("tipoProduto").value;
+
+      if (!nome || !valor) {
+        alert("Preencha todos os campos!");
+        return;
+      }
+
+      produtos.push({ nome, valor, tipo });
+      salvarDados();
+      mostrarProdutos();
+
+      document.getElementById("nomeProduto").value = "";
+      document.getElementById("valorProduto").value = "";
+    }
+
+    function mostrarProdutos() {
+      const lista = document.getElementById("listaProdutos");
+      lista.innerHTML = "";
+      produtos.forEach((p, i) => {
+        lista.innerHTML += `
+          <div class="produto-card">
+            <span>${p.nome} - R$ ${p.valor.toFixed(2)} / ${p.tipo}</span>
+            <div>
+              <button onclick="editarProduto(${i})">Editar</button>
+              <button onclick="adicionarCarrinho(${i})">Carrinho</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function editarProduto(i) {
+      const novoNome = prompt("Novo nome:", produtos[i].nome);
+      const novoValor = parseFloat(prompt("Novo valor:", produtos[i].valor));
+      const novoTipo = prompt("Novo tipo (kg/un):", produtos[i].tipo);
+
+      if (novoNome && novoValor) {
+        produtos[i] = { nome: novoNome, valor: novoValor, tipo: novoTipo };
+        salvarDados();
+        mostrarProdutos();
+      }
+    }
+
+    function adicionarCarrinho(i) {
+      carrinho.push(produtos[i]);
+      salvarDados();
+      mostrarCarrinho();
+    }
+
+    function mostrarCarrinho() {
+      const lista = document.getElementById("listaCarrinho");
+      lista.innerHTML = "";
+      let total = 0;
+
+      carrinho.forEach((c, i) => {
+        total += c.valor;
+        lista.innerHTML += `
+          <div class="produto-card">
+            <span>${c.nome} - R$ ${c.valor.toFixed(2)} / ${c.tipo}</span>
+            <button onclick="removerCarrinho(${i})">Remover</button>
+          </div>
+        `;
+      });
+
+      document.getElementById("total").innerText = total.toFixed(2);
+    }
+
+    function removerCarrinho(i) {
+      carrinho.splice(i, 1);
+      salvarDados();
+      mostrarCarrinho();
+    }
+
+    mostrarProdutos();
+    mostrarCarrinho();
+  </script>
+</body>
+</html>
