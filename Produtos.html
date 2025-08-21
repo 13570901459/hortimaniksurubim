@@ -1658,7 +1658,28 @@
         <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
         <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
     </form>
+</div> 
+
+<!-- Produto:FEIJÃO VERDE kg -->
+<div class="bg-white p-4 rounded shadow relative categoria-verduras oferta">
+    <img src="imagens/feijaoverde.jpg" alt="Cebola Branca" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Feijão Verde KG</h2>
+    <p class="text-sm text-gray-500">Produto verdinho e novinho.</p>
+    <!-- Preço anterior riscado -->
+<!--<p class="text-red-500 line-through text-sm">R$ 14,99</p> -->
+    <!-- Preço anterior riscado -->
+    <p class="text-green-700 font-bold">R$ 11,99</p>
+    <form onsubmit="addToCart(event, 'Cebola Branca KG', 11.99)" class="mt-2 space-y-2">
+        <select class="w-full border rounded p-1" name="peso">
+            <option value="1">1kg</option>
+            <option value="0.5">500g</option>
+        </select>
+        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
 </div>
+  
 <!-- Verduras -->
 
 <!-- Raizes -->
@@ -2038,6 +2059,7 @@ function finalizarPedido() {
   </footer>
 </body>
 </html>
+
 
 
 
