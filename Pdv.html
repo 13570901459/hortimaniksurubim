@@ -18,12 +18,16 @@
   --text2:#cbd5e1;
 }
 .horti-btn{background:linear-gradient(180deg,var(--horti-red),var(--horti-dark));color:#fff}
-#productsList>div,#cartList>div{background:var(--surface);border-color:var(--border);color:var(--text);}
+#productsList>div,#cartList>div{background:var(--surface);border-color:var(--border);color:#f1f5f9;}
+.autocomplete-suggestions{
+  background:var(--surface);border:1px solid var(--border);max-height:150px;overflow-y:auto;position:absolute;width:100%;z-index:50;
+}
+.autocomplete-suggestion{padding:4px;cursor:pointer;}
+.autocomplete-suggestion:hover{background:#2d3e59;}
 </style>
 </head>
 <body class="bg-[var(--bg)] text-gray-100">
 <div class="max-w-[98%] mx-auto p-2">
-
 <header class="flex items-center gap-4 mb-2 bg-[var(--panel)] p-3 rounded-lg shadow flex-wrap">
 <img src="logo.png" alt="Logo Hortimanik" class="h-12 w-12 object-contain rounded-md bg-white p-1">
 <div>
@@ -66,8 +70,9 @@
 <div class="flex flex-col lg:flex-row gap-4 flex-1">
 
 <!-- Registrar venda -->
-<div class="flex-1 flex flex-col">
+<div class="flex-1 flex flex-col relative">
 <input id="searchSaleProduct" placeholder="Buscar produto..." class="p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white">
+<div id="autocomplete" class="autocomplete-suggestions hidden"></div>
 <div class="grid grid-cols-2 gap-2 mt-2">
 <input id="saleQty" type="number" step="0.01" value="1" class="p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white">
 <input id="salePrice" type="number" step="0.01" placeholder="Preço unitário" class="p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white">
@@ -132,30 +137,50 @@
 
 </div>
 </div>
-</div>
 </section>
 </main>
 </div>
 
 <script>
+// Funções utilitárias
 const $=id=>document.getElementById(id);
 const money=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-
 let products=JSON.parse(localStorage.getItem("products")||"[]");
-let cart=[]; 
-let discount=0;
+let cart=[]; let discount=0;
 
-// Produtos
+// Render produtos cadastrados
 function saveProducts(){localStorage.setItem("products",JSON.stringify(products));}
-function renderProducts(f=""){ 
-  $("productsList").innerHTML="";
-  products.filter(p=>p.name.toLowerCase().includes(f.toLowerCase()))
-  .forEach((p,i)=>{
+function renderProducts(f=""){
+  const list=$("productsList");
+  list.innerHTML="";
+  products.filter(p=>p.name.toLowerCase().includes(f.toLowerCase())).forEach((p,i)=>{
     const d=document.createElement("div");
-    d.className="p-2 border rounded flex justify-between";
-    d.innerHTML=`<div>${p.name} (${p.unit}) - ${money(p.price)}</div>`;
-    $("productsList").appendChild(d);
+    d.className="p-2 border rounded flex justify-between items-center text-sm";
+    d.innerHTML=`<div>${p.name} (${p.unit}) - ${money(p.price)}</div>
+    <div class="flex gap-1">
+    <button class="text-blue-400 text-xs" onclick="editProduct(${i})">Editar</button>
+    <button class="text-red-400 text-xs" onclick="deleteProduct(${i})">Excluir</button>
+    </div>`;
+    list.appendChild(d);
   });
+}
+function editProduct(i){
+  const p=products[i];
+  const name=prompt("Editar nome",p.name);
+  if(name) p.name=name;
+  const unit=prompt("Editar unidade",p.unit);
+  if(unit) p.unit=unit;
+  const price=prompt("Editar preço",p.price);
+  if(price) p.price=parseFloat(price)||p.price;
+  products[i]=p;
+  // Atualiza carrinho automaticamente
+  cart=cart.map(c=>c.name===p.name?{...c, price:p.price, unit:p.unit}:c);
+  saveProducts();
+  renderProducts();
+  renderCart();
+}
+function deleteProduct(i){
+  if(confirm("Deseja excluir este produto?")){products.splice(i,1);saveProducts();renderProducts();}
 }
 
 // Carrinho
@@ -166,24 +191,37 @@ function updateSubtotal(){
 }
 function addToCart(){
   const term=$("searchSaleProduct").value.trim();
+  if(!term) return;
   const prod=products.find(p=>p.name.toLowerCase()===term.toLowerCase());
   let price=parseFloat($("salePrice").value)||0;
+  let unit="UN";
+  if(prod){price=prod.price;unit=prod.unit;}
   const qty=parseFloat($("saleQty").value)||0;
-  if(prod) price=prod.price;
-  if(!term||qty<=0||price<=0) return;
-  cart.push({name:term,unit:prod?prod.unit:"UN",qty,price,sub:qty*price});
+  if(qty<=0) return;
+  cart.push({name:term,unit,qty,price,sub:qty*price});
   renderCart();
 }
 function renderCart(){
   $("cartList").innerHTML="";
   cart.forEach((c,i)=>{
     const d=document.createElement("div");
-    d.className="p-2 border rounded flex justify-between items-center";
-    d.innerHTML=`<div>${c.name} (${c.unit})<br><span class="text-sm text-gray-300">${c.qty} x ${money(c.price)} = ${money(c.sub)}</span></div>
-    <button onclick="removeCart(${i})" class="text-red-400 text-sm">Excluir</button>`;
+    d.className="p-2 border rounded flex justify-between items-center text-sm";
+    d.innerHTML=`<div>${c.name} (${c.unit})<br><span class="text-gray-300">${c.qty} x ${money(c.price)} = ${money(c.sub)}</span></div>
+    <div class="flex gap-1">
+    <button class="text-yellow-400 text-xs" onclick="editCart(${i})">Editar</button>
+    <button class="text-red-400 text-xs" onclick="removeCart(${i})">Excluir</button>
+    </div>`;
     $("cartList").appendChild(d);
   });
   calcTotals();
+}
+function editCart(i){
+  const c=cart[i];
+  const qty=parseFloat(prompt("Editar quantidade",c.qty))||c.qty;
+  c.qty=qty;
+  c.sub=c.qty*c.price;
+  cart[i]=c;
+  renderCart();
 }
 function removeCart(i){cart.splice(i,1);renderCart();}
 function calcTotals(){
@@ -196,7 +234,24 @@ function calcTotals(){
   $("grandTotal").textContent=grand.toFixed(2);
 }
 
-// WhatsApp
+// Autocomplete
+$("searchSaleProduct").addEventListener("input",e=>{
+  const term=e.target.value.toLowerCase();
+  const suggestions=products.filter(p=>p.name.toLowerCase().includes(term));
+  const box=$("autocomplete");
+  box.innerHTML="";
+  if(term && suggestions.length>0){box.classList.remove("hidden");
+    suggestions.forEach(p=>{
+      const div=document.createElement("div");
+      div.className="autocomplete-suggestion";
+      div.textContent=p.name;
+      div.onclick=()=>{ $("searchSaleProduct").value=p.name; $("salePrice").value=p.price; $("saleQty").value=(p.unit==="KG"?0.5:1); updateSubtotal(); box.classList.add("hidden"); };
+      box.appendChild(div);
+    });
+  }else box.classList.add("hidden");
+});
+
+// WhatsApp e PDF
 function sendWhatsApp(){
   if(cart.length===0) return alert("Carrinho vazio");
   const phone=$("phoneInput").value;
@@ -209,7 +264,6 @@ function sendWhatsApp(){
   window.open(`https://wa.me/${phone}?text=${msg}`,"_blank");
 }
 
-// PDF
 async function exportPDF(){
   if(cart.length===0) return alert("Carrinho vazio");
   const {jsPDF}=window.jspdf;
@@ -246,8 +300,9 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("applyCouponBtn").onclick=()=>{
     const code=$("couponCode").value.trim().toUpperCase();
     discount=0;
-    if(code==="HORTI10") discount=cart.reduce((s,i)=>s+i.sub,0)*0.1;
-    if(code==="HORTI5") discount=cart.reduce((s,i)=>s+i.sub,0)*0.05;
+    const total=cart.reduce((s,i)=>s+i.sub,0);
+    if(code==="HORTI10") discount=total*0.1;
+    if(code==="HORTI5") discount=total*0.05;
     calcTotals();
   };
   $("deliveryType").onchange=e=>{
