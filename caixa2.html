@@ -1,274 +1,629 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Caixa - Enviar pedido para WhatsApp</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PDV HORTIMANIK — Caixa</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --horti-red:#e11d2b;
+  --horti-dark:#9b141b;
+  --bg:#1b263b;
+  --panel:#24344d;
+  --surface:#2d3e59;
+  --border:#3b4a66;
+  --text:#f1f5f9;
+  --text2:#cbd5e1;
+}
+.horti-btn{background:linear-gradient(180deg,var(--horti-red),var(--horti-dark));color:#fff}
+#productsList>div,#cartList>div{background:var(--surface);border-color:var(--border);color:var(--text);}
+.autocomplete-suggestions{background:var(--surface);border:1px solid var(--border);max-height:180px;overflow:auto;position:absolute;width:100%;z-index:50;border-radius:6px;}
+.autocomplete-suggestion{padding:8px;cursor:pointer;font-size:0.95rem;}
+.autocomplete-suggestion:hover{background:#2d3e59;}
+.small-btn{font-size:0.8rem;padding:6px 8px;border-radius:6px;}
+</style>
 </head>
-<body class="bg-gray-100 p-6">
-  <div class="max-w-4xl mx-auto">
-    <h1 class="text-2xl font-bold mb-4">Caixa — Registrar produto e enviar pedido por WhatsApp</h1>
+<body class="bg-[var(--bg)] text-gray-100">
+<div class="max-w-[98%] mx-auto p-2">
 
-    <!-- Registrar produto -->
-    <section class="bg-white p-4 rounded-lg shadow mb-6">
-      <h2 class="font-semibold mb-3">1) Registrar produto</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <input id="produtoNome" class="border p-2 rounded" placeholder="Nome (ex: Tomate)" />
-        <input id="produtoPreco" class="border p-2 rounded" placeholder="Preço por kg (ex: 4.99)" inputmode="decimal" />
-        <button id="btnAddProduto" class="bg-green-500 text-white px-4 py-2 rounded">Adicionar produto</button>
-      </div>
-      <p class="text-sm text-gray-500 mt-2">Os produtos adicionados ficam disponíveis no menu abaixo.</p>
+  <!-- Header -->
+  <header class="flex items-center gap-4 mb-2 bg-[var(--panel)] p-3 rounded-lg shadow flex-wrap">
+    <img src="logo.png" alt="Logo Hortimanik" class="h-12 w-12 object-contain rounded-md bg-white p-1" />
+    <div>
+      <h1 class="text-2xl font-extrabold text-white">HORTIMANIK — PDV</h1>
+      <p class="text-sm text-[var(--text2)]">Caixa registradora — Exportar para PDF ou WhatsApp</p>
+    </div>
 
-      <ul id="listaProdutos" class="mt-3 space-y-2"></ul>
+    <div class="ml-auto text-right">
+      <div class="text-sm text-[var(--text2)]">Telefone WhatsApp</div>
+      <input id="phoneInput" class="mt-1 border border-[var(--border)] rounded px-2 py-1 text-sm bg-[var(--surface)] text-white placeholder-gray-400" placeholder="Ex.: 55819XXXXXXXX" />
+    </div>
+  </header>
+
+  <main class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+    <!-- Left: cadastro & lista -->
+    <section class="lg:col-span-1 max-h-[90vh] overflow-auto">
+
+      <!-- Formulário single product -->
+      <details open class="mb-4 bg-[var(--panel)] p-4 rounded shadow">
+        <summary class="cursor-pointer font-semibold">Cadastrar produto (um a um)</summary>
+        <form id="productForm" class="mt-3 grid gap-2">
+          <input id="pName" placeholder="Nome do produto" class="p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white" required />
+          <div class="flex gap-2">
+            <select id="pUnit" class="p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white w-1/2">
+              <option value="UN">Un</option>
+              <option value="KG">Kg</option>
+            </select>
+            <input id="pPrice" type="text" inputmode="decimal" placeholder="Preço (ex: 7.99)" class="p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white w-1/2" required />
+          </div>
+          <div class="flex gap-2">
+            <button id="saveProductBtn" class="horti-btn px-3 py-2 rounded">Salvar produto</button>
+            <button id="cancelEditBtn" type="button" class="border border-[var(--border)] text-[var(--text2)] px-3 py-2 rounded hidden">Cancelar</button>
+          </div>
+        </form>
+      </details>
+
+      <!-- Cadastro em lote -->
+      <details class="mb-4 bg-[var(--panel)] p-4 rounded shadow">
+        <summary class="cursor-pointer font-semibold">Cadastrar produtos em lote (1 por linha)</summary>
+        <form id="multiProductForm" class="mt-3 grid gap-2">
+          <label class="text-sm text-[var(--text2)]">Formato por linha: <code>Nome;Unidade;Preço</code></label>
+          <textarea id="multiProducts" rows="6" class="w-full p-2 rounded text-black" placeholder="Exemplo:
+Tomate;KG;7.99
+Banana;KG;4.50
+Maçã;UN;2.50"></textarea>
+          <div class="flex gap-2">
+            <button class="horti-btn px-3 py-2 rounded">Cadastrar todos</button>
+            <button id="batchAndExport" type="button" class="border border-[var(--border)] text-[var(--text2)] px-3 py-2 rounded">Cadastrar e exportar JSON</button>
+          </div>
+        </form>
+      </details>
+
+      <!-- Produtos cadastrados -->
+      <details open class="bg-[var(--panel)] p-4 rounded shadow">
+        <summary class="cursor-pointer font-semibold">Produtos cadastrados</summary>
+        <div class="mt-3">
+          <div class="flex gap-2 mb-2">
+            <input id="searchProducts" placeholder="Buscar produto..." class="flex-1 p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white" />
+            <button id="exportProductsBtn" class="border border-[var(--border)] px-3 py-2 rounded text-[var(--text2)] small-btn">Exportar JSON</button>
+            <label class="border border-[var(--border)] px-3 py-2 rounded text-[var(--text2)] cursor-pointer small-btn">
+              <input id="importFile" type="file" accept="application/json" class="hidden" />Importar
+            </label>
+          </div>
+          <div id="productsList" class="space-y-2 max-h-96 overflow-auto"></div>
+        </div>
+      </details>
     </section>
 
-    <!-- Caixa -->
-    <section class="bg-white p-4 rounded-lg shadow mb-6">
-      <h2 class="font-semibold mb-3">2) Registrar venda</h2>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-        <div>
-          <label class="block text-sm text-gray-600">Produto</label>
-          <select id="selectProduto" class="border p-2 rounded w-full">
-            <option value="">-- selecione --</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm text-gray-600">Quantidade (kg)</label>
-          <input id="quantidade" type="number" step="0.01" min="0" class="border p-2 rounded w-full" placeholder="0.50" />
-        </div>
-        <div>
-          <label class="block text-sm text-gray-600">Preço calculado</label>
-          <div id="precoCalculado" class="border p-2 rounded">R$ 0,00</div>
-        </div>
-        <div>
-          <button id="btnAdicionarCarrinho" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Adicionar ao carrinho</button>
-        </div>
-      </div>
+    <!-- Right: PDV / Caixa -->
+    <section class="lg:col-span-2">
+      <div class="bg-[var(--panel)] p-4 rounded shadow h-[90vh] flex flex-col">
+        <h2 class="font-semibold text-lg mb-2 text-white">Caixa Registradora</h2>
 
-      <h3 class="mt-4 font-medium">Itens do carrinho</h3>
-      <ul id="carrinho" class="mt-2 space-y-2"></ul>
+        <div class="flex flex-col lg:flex-row gap-4 flex-1">
 
-      <div class="mt-4 flex justify-between items-center">
-        <div>
-          <label class="block text-sm text-gray-600">Telefone para WhatsApp (opcional, sem espaços, com DDD)</label>
-          <input id="telefoneWhats" class="border p-2 rounded" placeholder="5581991234567 ou deixe vazio" />
-        </div>
-        <div class="text-right">
-          <div class="text-sm text-gray-600">Total</div>
-          <div id="total" class="text-xl font-bold">R$ 0,00</div>
-        </div>
-      </div>
+          <!-- Registrar venda -->
+          <div class="flex-1 flex flex-col relative">
+            <input id="searchSaleProduct" placeholder="Buscar produto..." autocomplete="off" class="p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white" />
+            <div id="autocomplete" class="autocomplete-suggestions hidden"></div>
 
-      <div class="mt-4 flex gap-2">
-        <button id="btnEnviarWhats" class="bg-green-600 text-white px-4 py-2 rounded">Enviar pedido por WhatsApp</button>
-        <button id="btnLimpar" class="bg-gray-300 px-4 py-2 rounded">Limpar carrinho</button>
+            <div class="grid grid-cols-2 gap-2 mt-2">
+              <input id="saleQty" type="number" step="0.01" value="1" class="p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white" />
+              <input id="salePrice" type="text" inputmode="decimal" placeholder="Preço unitário" class="p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white" />
+            </div>
+
+            <div class="mt-2 flex justify-between text-sm text-[var(--text2)]">
+              <div>Subtotal: <span id="saleSubtotal">R$0,00</span></div>
+              <div class="flex gap-2">
+                <button id="addToCartBtn" class="horti-btn px-3 py-1 rounded">Adicionar</button>
+                <button id="clearSaleBtn" class="border border-[var(--border)] px-3 py-1 rounded text-[var(--text2)]">Limpar</button>
+              </div>
+            </div>
+
+            <div class="mt-4 flex-1 overflow-auto border border-[var(--border)] rounded p-2 bg-[var(--surface)]">
+              <div class="flex justify-between items-center mb-2">
+                <h3 class="font-semibold text-white">Carrinho</h3>
+                <button id="clearCartBtn" class="text-red-400 text-sm border border-red-600 px-2 py-1 rounded">Limpar carrinho</button>
+              </div>
+              <div id="cartList" class="space-y-2"></div>
+            </div>
+          </div>
+
+          <!-- Totais e finalização -->
+          <div class="w-full lg:w-1/3 flex flex-col border border-[var(--border)] rounded p-2 bg-[var(--surface)]">
+            <div class="flex-1 overflow-auto">
+              <div class="mb-2">
+                <label class="text-sm text-[var(--text2)]">Taxa de entrega (R$)</label>
+                <input id="deliveryFee" type="number" step="0.01" value="0" class="border border-[var(--border)] bg-[var(--panel)] text-white p-2 rounded w-full" />
+              </div>
+
+              <div class="mt-2 flex gap-2">
+                <input id="couponCode" placeholder="Cupom" class="p-2 rounded bg-[var(--panel)] text-white flex-1" />
+                <button id="applyCouponBtn" class="horti-btn px-2 rounded">Aplicar</button>
+              </div>
+
+              <div class="mt-2">
+                <label class="text-sm text-[var(--text2)]">Cliente</label>
+                <input id="clientName" class="border border-[var(--border)] bg-[var(--panel)] text-white p-2 rounded w-full" />
+              </div>
+
+              <div class="mt-2">
+                <label class="text-sm text-[var(--text2)]">Entrega</label>
+                <select id="deliveryType" class="border border-[var(--border)] bg-[var(--panel)] text-white p-2 rounded w-full">
+                  <option value="Retirada">Retirada</option>
+                  <option value="Entrega">Entrega</option>
+                </select>
+                <input id="clientAddress" placeholder="Endereço de entrega" class="hidden mt-2 p-2 rounded bg-[var(--panel)] text-white w-full" />
+              </div>
+
+              <div class="mt-2">
+                <label class="text-sm text-[var(--text2)]">Forma de pagamento</label>
+                <select id="paymentMethod" class="border border-[var(--border)] bg-[var(--panel)] text-white p-2 rounded w-full">
+                  <option>Pix</option>
+                  <option>Dinheiro</option>
+                  <option>Cartão</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="border-t border-[var(--border)] pt-2 mt-2 text-[var(--text2)]">
+              <div>Total itens: R$ <span id="totalItems">0.00</span></div>
+              <div>Desconto: R$ <span id="totalDiscount">0.00</span></div>
+              <div>Entrega: R$ <span id="totalDelivery">0.00</span></div>
+              <div class="font-bold text-lg text-white">Total: R$ <span id="grandTotal">0.00</span></div>
+            </div>
+
+            <div class="mt-2 space-y-2">
+              <button id="sendWhatsapp" class="horti-btn w-full py-2 rounded">Enviar WhatsApp</button>
+              <button id="exportPDF" class="horti-btn w-full py-2 rounded">Exportar PDF</button>
+            </div>
+          </div>
+
+        </div>
       </div>
     </section>
+  </main>
+</div>
 
-    <footer class="text-sm text-gray-500">Feito para Hortimanik — ajuste conforme precisar.</footer>
-  </div>
+<script>
+/* ----------------- Utilitários ----------------- */
+const $ = id => document.getElementById(id);
+const money = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const parsePrice = s => {
+  if (s === undefined || s === null) return 0;
+  return parseFloat(String(s).replace(/\./g, '').replace(',', '.')) || 0;
+};
 
-  <script>
-    // Estado
-    const produtos = [];
-    const carrinho = [];
+/* ----------------- Estado ----------------- */
+const KEY_PRODUCTS = 'horti_products_v2';
+const KEY_CART = 'horti_cart_v2';
+let products = JSON.parse(localStorage.getItem(KEY_PRODUCTS) || '[]');
+let cart = JSON.parse(localStorage.getItem(KEY_CART) || '[]');
+let editProductIndex = null;
+let discount = 0;
 
-    // Elementos
-    const produtoNome = document.getElementById('produtoNome');
-    const produtoPreco = document.getElementById('produtoPreco');
-    const btnAddProduto = document.getElementById('btnAddProduto');
-    const listaProdutos = document.getElementById('listaProdutos');
+/* ----------------- Persistência ----------------- */
+function saveProducts() {
+  localStorage.setItem(KEY_PRODUCTS, JSON.stringify(products));
+}
+function saveCart() {
+  localStorage.setItem(KEY_CART, JSON.stringify(cart));
+}
 
-    const selectProduto = document.getElementById('selectProduto');
-    const quantidadeInput = document.getElementById('quantidade');
-    const precoCalculadoDiv = document.getElementById('precoCalculado');
-    const btnAdicionarCarrinho = document.getElementById('btnAdicionarCarrinho');
-    const carrinhoUL = document.getElementById('carrinho');
-    const totalDiv = document.getElementById('total');
-    const btnEnviarWhats = document.getElementById('btnEnviarWhats');
-    const telefoneWhats = document.getElementById('telefoneWhats');
-    const btnLimpar = document.getElementById('btnLimpar');
+/* ----------------- Exportar JSON (download) ----------------- */
+function downloadProductsJSON(filename = null) {
+  const ts = new Date();
+  const name = filename || `products-${ts.getFullYear()}${String(ts.getMonth()+1).padStart(2,'0')}${String(ts.getDate()).padStart(2,'0')}-${String(ts.getHours()).padStart(2,'0')}${String(ts.getMinutes()).padStart(2,'0')}.json`;
+  const dataStr = JSON.stringify(products, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
 
-    // Helpers
-    function formatBRL(valor){
-      return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+/* ----------------- Render produtos ----------------- */
+function renderProducts(filter = '') {
+  const list = $('productsList');
+  list.innerHTML = '';
+  const f = String(filter || '').toLowerCase();
+  products
+    .filter(p => p.name.toLowerCase().includes(f))
+    .forEach((p, i) => {
+      const d = document.createElement('div');
+      d.className = 'p-2 border rounded flex justify-between items-center text-sm';
+      d.innerHTML = `<div><div class="font-semibold">${p.name}</div><div class="text-[var(--text2)] text-xs">${p.unit} — ${money(p.price)}</div></div>
+      <div class="flex gap-2">
+        <button class="text-blue-300 small-btn" onclick="startEditProduct(${i})">Editar</button>
+        <button class="text-red-400 small-btn" onclick="deleteProduct(${i})">Excluir</button>
+      </div>`;
+      list.appendChild(d);
+    });
+}
+
+/* ----------------- Cadastro único (form) ----------------- */
+function resetProductForm() {
+  $('pName').value = '';
+  $('pUnit').value = 'UN';
+  $('pPrice').value = '';
+  editProductIndex = null;
+  $('saveProductBtn').textContent = 'Salvar produto';
+  $('cancelEditBtn').classList.add('hidden');
+}
+function startEditProduct(i) {
+  const p = products[i];
+  editProductIndex = i;
+  $('pName').value = p.name;
+  $('pUnit').value = p.unit;
+  $('pPrice').value = p.price;
+  $('saveProductBtn').textContent = 'Atualizar produto';
+  $('cancelEditBtn').classList.remove('hidden');
+  // scroll to top so user sees the form (mobile)
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function deleteProduct(i) {
+  const p = products[i];
+  if (!confirm(`Excluir "${p.name}"?\nIsto também removerá do carrinho os itens com esse nome.`)) return;
+  // remove produto
+  products.splice(i, 1);
+  // remover itens do carrinho que tenham exatamente esse nome (case-insens.)
+  cart = cart.filter(ci => ci.name.toLowerCase() !== p.name.toLowerCase());
+  saveProducts(); saveCart(); renderProducts($('searchProducts').value); renderCart();
+}
+
+/* ----------------- Batch cadastro ----------------- */
+function handleBatchRegister(shouldExport = false) {
+  const txt = $('multiProducts').value.trim();
+  if (!txt) return alert('Campo vazio.');
+  const lines = txt.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+  let added = 0;
+  lines.forEach(line => {
+    // aceita: Nome;Unit;Price  -> se usar vírgula em preço, converte
+    const parts = line.split(';').map(p => p.trim());
+    if (parts.length >= 3) {
+      const name = parts[0];
+      const unit = parts[1].toUpperCase();
+      const price = parsePrice(parts.slice(2).join(';'));
+      if (!name || !unit || price <= 0) return;
+      // evita duplicata pelo nome (insensível)
+      if (!products.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+        products.push({ name, unit, price });
+        added++;
+      }
     }
+  });
+  if (added === 0) alert('Nenhum produto novo encontrado / validado.');
+  saveProducts(); renderProducts($('searchProducts').value);
+  $('multiProducts').value = '';
+  if (shouldExport) downloadProductsJSON();
+  alert(`Produtos adicionados: ${added}`);
+}
 
-    function atualizarSelect(){
-      selectProduto.innerHTML = '<option value="">-- selecione --</option>';
-      produtos.forEach((p, idx) => {
-        const opt = document.createElement('option');
-        opt.value = idx;
-        opt.textContent = `${p.nome} — ${formatBRL(p.precoPorKg)} / kg`;
-        selectProduto.appendChild(opt);
+/* ----------------- Carrinho ----------------- */
+function renderCart() {
+  const list = $('cartList');
+  list.innerHTML = '';
+  cart.forEach((c, i) => {
+    const d = document.createElement('div');
+    d.className = 'p-2 border rounded flex justify-between items-center text-sm';
+    d.innerHTML = `<div>
+      <div class="font-semibold">${c.name} <span class="text-[var(--text2)] text-xs">(${c.unit})</span></div>
+      <div class="text-[var(--text2)] text-xs">${c.qty} x ${money(c.price)} = ${money(c.sub)}</div>
+    </div>
+    <div class="flex gap-2">
+      <button class="text-yellow-300 small-btn" onclick="editCartItem(${i})">Editar</button>
+      <button class="text-red-400 small-btn" onclick="removeCartItem(${i})">Excluir</button>
+    </div>`;
+    list.appendChild(d);
+  });
+  calcTotals();
+}
+function addToCartFromForm() {
+  const term = $('searchSaleProduct').value.trim();
+  if (!term) return alert('Escolha um produto ou digite um nome.');
+  const qty = parseFloat($('saleQty').value) || 0;
+  let price = parsePrice($('salePrice').value);
+  const prod = products.find(p => p.name.toLowerCase() === term.toLowerCase());
+  const unit = prod ? prod.unit : 'UN';
+  if (prod) price = prod.price;
+  if (qty <= 0 || price <= 0) return alert('Quantidade ou preço inválido.');
+  cart.push({ name: term, unit, qty, price, sub: qty * price });
+  saveCart(); renderCart();
+  // limpa campo para novo item
+  $('searchSaleProduct').value = '';
+  $('saleQty').value = 1;
+  $('salePrice').value = '';
+  updateSaleSubtotal();
+}
+function editCartItem(i) {
+  const c = cart[i];
+  const newQty = parseFloat(prompt('Editar quantidade (use ponto para decimais):', String(c.qty)));
+  if (newQty === null) return;
+  if (isNaN(newQty) || newQty <= 0) return alert('Quantidade inválida.');
+  c.qty = newQty;
+  c.sub = c.qty * c.price;
+  cart[i] = c;
+  saveCart(); renderCart();
+}
+function removeCartItem(i) {
+  if (!confirm('Remover item do carrinho?')) return;
+  cart.splice(i, 1);
+  saveCart(); renderCart();
+}
+function clearCartConfirm() {
+  if (!confirm('Limpar todo o carrinho?')) return;
+  cart = [];
+  saveCart(); renderCart();
+}
+
+/* ----------------- Totais, cupom, entrega ----------------- */
+function calcTotals() {
+  const total = cart.reduce((s, it) => s + it.sub, 0);
+  const delivery = parseFloat($('deliveryFee').value) || 0;
+  const grand = total - discount + delivery;
+  $('totalItems').textContent = total.toFixed(2);
+  $('totalDiscount').textContent = discount.toFixed(2);
+  $('totalDelivery').textContent = delivery.toFixed(2);
+  $('grandTotal').textContent = grand.toFixed(2);
+}
+function applyCouponCode() {
+  const code = $('couponCode').value.trim().toUpperCase();
+  discount = 0;
+  const total = cart.reduce((s, i) => s + i.sub, 0);
+  if (code === 'HORTI10') discount = total * 0.10;
+  else if (code === 'HORTI5') discount = total * 0.05;
+  else if (code === '') discount = 0;
+  else alert('Cupom inválido');
+  calcTotals();
+}
+
+/* ----------------- Autocomplete (inteligente) ----------------- */
+function buildSuggestions(term) {
+  const box = $('autocomplete');
+  box.innerHTML = '';
+  if (!term) { box.classList.add('hidden'); return; }
+  const s = term.toLowerCase();
+  const suggestions = products.filter(p => p.name.toLowerCase().includes(s)).slice(0, 50);
+  if (suggestions.length === 0) { box.classList.add('hidden'); return; }
+  suggestions.forEach(p => {
+    const r = document.createElement('div');
+    r.className = 'autocomplete-suggestion';
+    r.innerHTML = `<strong>${p.name}</strong> <span class="text-[var(--text2)] text-xs"> — ${p.unit} — ${money(p.price)}</span>`;
+    r.onclick = () => {
+      $('searchSaleProduct').value = p.name;
+      $('salePrice').value = p.price;
+      $('saleQty').value = p.unit === 'KG' ? 0.5 : 1;
+      updateSaleSubtotal();
+      box.classList.add('hidden');
+    };
+    box.appendChild(r);
+  });
+  box.classList.remove('hidden');
+}
+
+/* ----------------- WhatsApp e PDF ----------------- */
+function sendWhatsApp() {
+  if (cart.length === 0) return alert('Carrinho vazio');
+  const phone = $('phoneInput').value.replace(/\D/g, '');
+  if (!phone) return alert('Informe o telefone para WhatsApp.');
+  const client = $('clientName').value || 'Cliente';
+  const type = $('deliveryType').value;
+  const addr = (type === 'Entrega') ? $('clientAddress').value || '-' : 'Retirada na loja';
+  const payment = $('paymentMethod').value;
+  const items = cart.map(i => `- ${i.name} ${i.qty} ${i.unit} x ${money(i.price)} = ${money(i.sub)}`).join('\n');
+  const msg = `Pedido HORTIMANIK\nCliente: ${client}\n${type}: ${addr}\nPagamento: ${payment}\n\nItens:\n${items}\n\nTotal: R$ ${$('grandTotal').textContent}`;
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+
+async function exportPDF() {
+  if (cart.length === 0) return alert('Carrinho vazio');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt' });
+  doc.setFontSize(12);
+  doc.text('HORTIMANIK - Pedido', 40, 40);
+  doc.setFontSize(10);
+  doc.text(`Cliente: ${$('clientName').value || 'Cliente'}`, 40, 60);
+  const type = $('deliveryType').value;
+  if (type === 'Entrega') doc.text(`Entrega: ${$('clientAddress').value || '-'}`, 40, 80);
+  doc.text(`Pagamento: ${$('paymentMethod').value}`, 40, 100);
+
+  let y = 130;
+  doc.setFontSize(9);
+  cart.forEach((c, idx) => {
+    const line = `${idx + 1}. ${c.name} (${c.unit}) — ${c.qty} x R$${c.price.toFixed(2)} = R$${c.sub.toFixed(2)}`;
+    doc.text(line, 40, y);
+    y += 16;
+    if (y > 750) { doc.addPage(); y = 40; }
+  });
+
+  y += 12;
+  doc.text(`Total: R$${$('grandTotal').textContent}`, 40, y);
+  doc.save(`pedido-hortimanik-${Date.now()}.pdf`);
+}
+
+/* ----------------- Eventos e inicialização ----------------- */
+document.addEventListener('DOMContentLoaded', () => {
+  // render inicial
+  renderProducts();
+  renderCart();
+
+  // product form submit (single)
+  $('productForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = $('pName').value.trim();
+    const unit = $('pUnit').value;
+    const price = parsePrice($('pPrice').value);
+    if (!name || price <= 0) return alert('Informe nome e preço válidos.');
+
+    if (editProductIndex === null) {
+      // adicionar novo produto, evitando duplicata pelo nome
+      if (products.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+        if (!confirm('Produto já existe com este nome. Deseja adicionar mesmo assim?')) return;
+      }
+      products.push({ name, unit, price });
+      saveProducts();
+      renderProducts($('searchProducts').value);
+      downloadProductsJSON(); // gera JSON automaticamente após cadastro único
+      alert('Produto cadastrado e JSON exportado.');
+      resetProductForm();
+    } else {
+      // editar produto: atualizar produto e atualizar itens do carrinho que tinham o mesmo nome antigo
+      const old = products[editProductIndex];
+      const oldName = old.name;
+      products[editProductIndex] = { name, unit, price };
+      // atualizar carrinho onde nome case-insensitive bate com oldName
+      cart = cart.map(ci => {
+        if (ci.name.toLowerCase() === oldName.toLowerCase()) {
+          return { ...ci, name, unit, price, sub: ci.qty * price };
+        }
+        return ci;
       });
+      saveProducts(); saveCart();
+      renderProducts($('searchProducts').value);
+      renderCart();
+      downloadProductsJSON(); // exporta json após atualização
+      alert('Produto atualizado e JSON exportado.');
+      resetProductForm();
     }
+  });
 
-    function renderListaProdutos(){
-      listaProdutos.innerHTML = '';
-      produtos.forEach((p, idx) => {
-        const li = document.createElement('li');
-        li.className = 'flex justify-between items-center border rounded p-2';
-        li.innerHTML = `<div><strong>${p.nome}</strong><div class="text-sm text-gray-600">${formatBRL(p.precoPorKg)} / kg</div></div>
-                        <div class="flex gap-2">
-                          <button data-idx="${idx}" class="btnRemover bg-red-500 text-white px-2 py-1 rounded">Remover</button>
-                        </div>`;
-        listaProdutos.appendChild(li);
-      });
+  // cancelar edição
+  $('cancelEditBtn').addEventListener('click', () => resetProductForm());
 
-      document.querySelectorAll('.btnRemover').forEach(btn=>{
-        btn.addEventListener('click', (e)=>{
-          const idx = Number(e.currentTarget.dataset.idx);
-          produtos.splice(idx,1);
-          atualizarSelect();
-          renderListaProdutos();
+  // batch cadastro (form submit)
+  $('multiProductForm').addEventListener('submit', e => {
+    e.preventDefault();
+    handleBatchRegister(false);
+  });
+  // cadastrar e exportar JSON
+  $('batchAndExport').addEventListener('click', () => handleBatchRegister(true));
+
+  // buscar produtos na lista
+  $('searchProducts').addEventListener('input', e => renderProducts(e.target.value));
+
+  // exportar JSON botão
+  $('exportProductsBtn').addEventListener('click', () => downloadProductsJSON());
+
+  // import JSON
+  $('importFile').addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result);
+        if (!Array.isArray(parsed)) throw new Error('JSON inválido');
+        // merge por nome (não duplica)
+        let added = 0;
+        parsed.forEach(p => {
+          if (!p.name) return;
+          if (!products.some(q => q.name.toLowerCase() === p.name.toLowerCase())) {
+            // garantir campos
+            const unit = (p.unit || 'UN').toUpperCase();
+            const price = parsePrice(p.price);
+            products.push({ name: p.name, unit, price });
+            added++;
+          }
         });
-      });
+        saveProducts(); renderProducts();
+        alert(`Import concluído. Novos produtos adicionados: ${added}`);
+      } catch (err) {
+        alert('Erro ao importar JSON: ' + err.message);
+      }
+    };
+    reader.readAsText(f);
+    // limpar input
+    e.target.value = '';
+  });
+
+  // Autocomplete searchSaleProduct
+  $('searchSaleProduct').addEventListener('input', e => {
+    const term = e.target.value.trim();
+    buildSuggestions(term);
+  });
+  // Se pressionar Enter dentro do campo de busca, tenta selecionar primeiro resultado
+  $('searchSaleProduct').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const box = $('autocomplete');
+      const first = box.querySelector('.autocomplete-suggestion');
+      if (first) first.click();
     }
+  });
 
-    function atualizarPrecoCalculado(){
-      const idx = selectProduto.value;
-      const q = parseFloat(quantidadeInput.value || 0);
-      if(idx === '' || isNaN(q) || q <= 0){
-        precoCalculadoDiv.textContent = formatBRL(0);
-        return;
-      }
-      const preco = produtos[idx].precoPorKg * q;
-      precoCalculadoDiv.textContent = formatBRL(preco);
-    }
+  // atualizar subtotal ao alterar quantidade ou preço
+  $('saleQty').addEventListener('input', updateSaleSubtotal);
+  $('salePrice').addEventListener('input', updateSaleSubtotal);
 
-    function renderCarrinho(){
-      carrinhoUL.innerHTML = '';
-      carrinho.forEach((item, i)=>{
-        const li = document.createElement('li');
-        li.className = 'flex justify-between items-center border rounded p-2';
-        li.innerHTML = `<div>
-                          <strong>${item.nome}</strong>
-                          <div class="text-sm text-gray-600">${item.qtd} kg x ${formatBRL(item.precoPorKg)} / kg</div>
-                        </div>
-                        <div class="text-right">
-                          <div>${formatBRL(item.subtotal)}</div>
-                          <div class="flex gap-2 mt-2 justify-end">
-                            <button data-i="${i}" class="btnRemoverItem text-sm bg-red-500 text-white px-2 py-1 rounded">Remover</button>
-                          </div>
-                        </div>`;
-        carrinhoUL.appendChild(li);
-      });
+  // evento adicionar ao carrinho
+  $('addToCartBtn').addEventListener('click', addToCartFromForm);
+  $('clearSaleBtn').addEventListener('click', () => {
+    $('searchSaleProduct').value = '';
+    $('saleQty').value = 1;
+    $('salePrice').value = '';
+    updateSaleSubtotal();
+  });
 
-      document.querySelectorAll('.btnRemoverItem').forEach(b=>{
-        b.addEventListener('click', (e)=>{
-          const i = Number(e.currentTarget.dataset.i);
-          carrinho.splice(i,1);
-          atualizarTotal();
-          renderCarrinho();
-        });
-      });
+  // editar/excluir carrinho
+  $('clearCartBtn').addEventListener('click', clearCartConfirm);
+  // delivery, coupon, totals
+  $('deliveryFee').addEventListener('input', calcTotals);
+  $('applyCouponBtn').addEventListener('click', applyCouponCode);
+  $('deliveryType').addEventListener('change', e => {
+    if (e.target.value === 'Entrega') $('clientAddress').classList.remove('hidden');
+    else $('clientAddress').classList.add('hidden');
+  });
 
-      atualizarTotal();
-    }
+  // enviar WhatsApp / PDF
+  $('sendWhatsapp').addEventListener('click', sendWhatsApp);
+  $('exportPDF').addEventListener('click', exportPDF);
 
-    function atualizarTotal(){
-      const total = carrinho.reduce((s, it)=> s + it.subtotal, 0);
-      totalDiv.textContent = formatBRL(total);
-    }
+  // salvar cart on unload
+  window.addEventListener('beforeunload', () => saveCart());
+});
 
-    // Eventos
-    btnAddProduto.addEventListener('click', ()=>{
-      const nome = produtoNome.value.trim();
-      const preco = parseFloat(produtoPreco.value.replace(',', '.'));
-      if(!nome || isNaN(preco) || preco <= 0){
-        alert('Informe nome e preço válido (ex: 4.99)');
-        return;
-      }
-      produtos.push({ nome, precoPorKg: preco });
-      produtoNome.value = '';
-      produtoPreco.value = '';
-      atualizarSelect();
-      renderListaProdutos();
-    });
+/* ----------------- Funções auxiliares expostas (para inline onclick) ----------------- */
+// Expor algumas funções globais para uso em atributos onclick gerados
+window.startEditProduct = startEditProduct;
+window.deleteProduct = deleteProduct;
+window.editCartItem = editCartItem;
+window.removeCartItem = removeCartItem;
 
-    selectProduto.addEventListener('change', atualizarPrecoCalculado);
-    quantidadeInput.addEventListener('input', atualizarPrecoCalculado);
+/* ----------------- Atualização UI de subtotal de item ----------------- */
+function updateSaleSubtotal() {
+  const q = parseFloat($('saleQty').value) || 0;
+  const p = parsePrice($('salePrice').value);
+  $('saleSubtotal').textContent = money(q * p);
+}
 
-    btnAdicionarCarrinho.addEventListener('click', ()=>{
-      const idx = selectProduto.value;
-      const q = parseFloat(quantidadeInput.value || 0);
-      if(idx === '' || isNaN(q) || q <= 0){
-        alert('Selecione um produto e informe quantidade válida.');
-        return;
-      }
-      const p = produtos[idx];
-      const subtotal = +(p.precoPorKg * q);
-      carrinho.push({ nome: p.nome, qtd: q, precoPorKg: p.precoPorKg, subtotal });
-      quantidadeInput.value = '';
-      precoCalculadoDiv.textContent = formatBRL(0);
-      renderCarrinho();
-    });
-
-    btnLimpar.addEventListener('click', ()=>{
-      if(confirm('Limpar o carrinho?')){
-        carrinho.length = 0;
-        renderCarrinho();
-      }
-    });
-
-    btnEnviarWhats.addEventListener('click', ()=>{
-      if(carrinho.length === 0){
-        alert('Carrinho vazio. Adicione itens antes de enviar.');
-        return;
-      }
-      const total = carrinho.reduce((s, it)=> s + it.subtotal, 0);
-      let mensagem = 'Pedido%20Hortimanik%0A%0A';
-      carrinho.forEach(it=>{
-        const linha = `${it.nome} - ${it.qtd.toString().replace('.',',')}kg x R$ ${it.precoPorKg.toFixed(2).replace('.',',')} = R$ ${it.subtotal.toFixed(2).replace('.',',')}`;
-        mensagem += encodeURIComponent(linha) + '%0A';
-      });
-      mensagem += '%0A' + encodeURIComponent('Total: R$ ' + total.toFixed(2).replace('.',','));
-
-      const tel = telefoneWhats.value.trim();
-      let url = '';
-      if(tel){
-        const apenasDigitos = tel.replace(/\D/g,'');
-        url = `https://wa.me/${apenasDigitos}?text=${mensagem}`;
-      } else {
-        url = `https://wa.me/?text=${mensagem}`;
-      }
-
-      window.open(url, '_blank');
-    });
-
-    // Inicialização com os produtos fixos
-    const produtosIniciais = [
-      { nome: 'TOMATE PRIMEIRA', precoPorKg: 6.00 },
-      { nome: 'CEBOLA PRIMEIRA', precoPorKg: 5.00 },
-      { nome: 'BATATAINHA PRIMEIRA', precoPorKg: 5.00 },
-      { nome: 'CENOURA PRIMEIRA', precoPorKg: 6.00 },
-      { nome: 'UVA ITALIA', precoPorKg: 12.00 },
-      { nome: 'UVA VITÓRIA', precoPorKg: 12.00 },
-      { nome: 'MELÃO', precoPorKg: 5.00 },
-      { nome: 'MANGA TOMY', precoPorKg: 2.50 },
-      { nome: 'MANGA ESPADA', precoPorKg: 1.25 },
-      { nome: 'MANGA ROSA', precoPorKg: 2.50 },
-      { nome: 'MAMÃO FORMOSA', precoPorKg: 5.00 },
-      { nome: 'MAÇÃ AGRANEL', precoPorKg: 1.00 },
-      { nome: 'MAÇÃ NACIONAL', precoPorKg: 1.66 },
-      { nome: 'PERA', precoPorKg: 2.50 },
-      { nome: 'MACAXEIRA', precoPorKg: 5.00 },
-      { nome: 'MAÇÃ FUJI', precoPorKg: 1.66 },
-      { nome: 'MARACUJÁ', precoPorKg: 1.66 },
-      { nome: 'LARANJA PERA', precoPorKg: 1.00 },
-      { nome: 'LARANJA POKAM', precoPorKg: 1.25 },
-      { nome: 'BATATA DOCE', precoPorKg: 4.00 },
-      { nome: 'CARÁ', precoPorKg: 5.00 },
-      { nome: 'ABACAXI', precoPorKg: 5.00 }
-    ];
-
-    produtos.push(...produtosIniciais);
-    atualizarSelect();
-    renderListaProdutos();
-    renderCarrinho();
-  </script>
+/* ----------------- renderCart inicial (usada no load) ----------------- */
+function renderCart() {
+  // função definida acima, reimplementar para garantir escopo
+  const list = $('cartList');
+  list.innerHTML = '';
+  cart.forEach((c, i) => {
+    const d = document.createElement('div');
+    d.className = 'p-2 border rounded flex justify-between items-center text-sm';
+    d.innerHTML = `<div>
+      <div class="font-semibold">${c.name} <span class="text-[var(--text2)] text-xs">(${c.unit})</span></div>
+      <div class="text-[var(--text2)] text-xs">${c.qty} x ${money(c.price)} = ${money(c.sub)}</div>
+    </div>
+    <div class="flex gap-2">
+      <button class="text-yellow-300 small-btn" onclick="editCartItem(${i})">Editar</button>
+      <button class="text-red-400 small-btn" onclick="removeCartItem(${i})">Excluir</button>
+    </div>`;
+    list.appendChild(d);
+  });
+  calcTotals();
+}
+</script>
 </body>
 </html>
-p
