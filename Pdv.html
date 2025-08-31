@@ -1,268 +1,226 @@
-<!doctype html>
+<!doctype html> 
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Caixa - Enviar pedido para WhatsApp</title>
+  <title>PDV HORTIMANIK — Caixa Registradora</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root{
+      --horti-red:#e11d2b;--horti-dark:#9b141b;
+      --bg:#1b263b;--panel:#24344d;--surface:#2d3e59;--border:#3b4a66;--text:#f1f5f9;--text2:#cbd5e1;
+    }
+    .horti-btn{background:linear-gradient(180deg,var(--horti-red),var(--horti-dark));color:#fff}
+    #productsList > div, #cartList > div{background: var(--surface);border-color: var(--border);color: var(--text);}
+    details summary{color:var(--text); outline: none;}
+  </style>
 </head>
-<body class="bg-blue-50 p-6">
-  <div class="max-w-4xl mx-auto">
-    <h1 class="text-2xl font-bold mb-4 text-blue-700">Caixa — Registrar produto e enviar pedido por WhatsApp</h1>
-
-    <!-- Registrar produto -->
-    <section class="bg-white p-4 rounded-lg shadow mb-6 border border-blue-200">
-      <h2 class="font-semibold mb-3 text-blue-600">1) Registrar produto</h2>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <input id="produtoNome" class="border p-2 rounded border-blue-300" placeholder="Nome (ex: Tomate)" />
-        <input id="produtoPreco" class="border p-2 rounded border-blue-300" placeholder="Preço (ex: 4.99)" inputmode="decimal" />
-        <select id="produtoTipo" class="border p-2 rounded border-blue-300">
-          <option value="kg">KG</option>
-          <option value="un">UN</option>
-        </select>
-        <button id="btnAddProduto" class="bg-blue-600 text-white px-4 py-2 rounded">Adicionar produto</button>
+<body class="bg-[var(--bg)] text-gray-100">
+  <div class="max-w-[98%] mx-auto p-2">
+    <!-- Cabeçalho -->
+    <header class="flex items-center gap-4 mb-2 bg-[var(--panel)] p-3 rounded-lg shadow">
+      <img src="logo.png" alt="Logo Hortimanik" class="h-12 w-12 object-contain rounded-md bg-white p-1" />
+      <div>
+        <h1 class="text-2xl font-extrabold text-white">HORTIMANIK — PDV</h1>
+        <p class="text-sm text-[var(--text2)]">Caixa registradora — Exportar para PDF ou WhatsApp</p>
       </div>
-      <p class="text-sm text-gray-500 mt-2">Os produtos adicionados ficam disponíveis abaixo e podem ser editados.</p>
-
-      <ul id="listaProdutos" class="mt-3 space-y-2"></ul>
-    </section>
-
-    <!-- Caixa -->
-    <section class="bg-white p-4 rounded-lg shadow mb-6 border border-blue-200">
-      <h2 class="font-semibold mb-3 text-blue-600">2) Registrar venda</h2>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-        <div>
-          <label class="block text-sm text-gray-600">Produto</label>
-          <select id="selectProduto" class="border p-2 rounded w-full border-blue-300">
-            <option value="">-- selecione --</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm text-gray-600">Quantidade</label>
-          <input id="quantidade" type="number" step="0.01" min="0" class="border p-2 rounded w-full border-blue-300" placeholder="0.50" />
-        </div>
-        <div>
-          <label class="block text-sm text-gray-600">Preço calculado</label>
-          <div id="precoCalculado" class="border p-2 rounded border-blue-300 bg-blue-50">R$ 0,00</div>
-        </div>
-        <div>
-          <button id="btnAdicionarCarrinho" class="bg-blue-700 text-white px-4 py-2 rounded w-full">Adicionar ao carrinho</button>
-        </div>
+      <div class="ml-auto text-right">
+        <div class="text-sm text-[var(--text2)]">Telefone WhatsApp</div>
+        <input id="phoneInput" class="mt-1 border border-[var(--border)] rounded px-2 py-1 text-sm bg-[var(--surface)] text-white placeholder-gray-400" placeholder="Ex.: 55819XXXXXXXX" />
       </div>
+    </header>
 
-      <h3 class="mt-4 font-medium text-blue-600">Itens do carrinho</h3>
-      <ul id="carrinho" class="mt-2 space-y-2"></ul>
+    <main class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- Cadastro -->
+      <section class="lg:col-span-1 max-h-[90vh] overflow-auto">
+        <details open class="mb-4 bg-[var(--panel)] p-4 rounded shadow">
+          <summary class="cursor-pointer font-semibold">Cadastrar produto</summary>
+          <form id="productForm" class="mt-3 grid grid-cols-1 gap-2">
+            <input id="pName" placeholder="Nome do produto" class="border border-[var(--border)] bg-[var(--surface)] text-white placeholder-gray-400 p-2 rounded" required />
+            <div class="flex gap-2">
+              <select id="pUnit" class="border border-[var(--border)] bg-[var(--surface)] text-white p-2 rounded w-1/2">
+                <option value="UN">Un</option>
+                <option value="KG">Kg</option>
+              </select>
+              <input id="pPrice" type="number" min="0" step="0.01" placeholder="Preço (R$)" class="border border-[var(--border)] bg-[var(--surface)] text-white placeholder-gray-400 p-2 rounded w-1/2" required />
+            </div>
+            <div class="flex gap-2">
+              <button class="horti-btn px-3 py-2 rounded" id="saveProductBtn" type="submit">Salvar produto</button>
+              <button id="clearProductBtn" type="button" class="border border-[#475569] text-gray-200 px-3 py-2 rounded bg-[var(--surface)]">Limpar</button>
+            </div>
+          </form>
+        </details>
 
-      <div class="mt-4 flex justify-between items-center">
-        <div>
-          <label class="block text-sm text-gray-600">Telefone WhatsApp (opcional, com DDD)</label>
-          <input id="telefoneWhats" class="border p-2 rounded border-blue-300" placeholder="5581991234567" />
+        <details open class="bg-[var(--panel)] p-4 rounded shadow">
+          <summary class="cursor-pointer font-semibold">Produtos cadastrados</summary>
+          <div class="mt-3">
+            <input id="searchProducts" placeholder="Buscar produto..." class="w-full border border-[var(--border)] bg-[var(--surface)] text-white placeholder-gray-400 p-2 rounded mb-2" />
+            <div id="productsList" class="space-y-2 max-h-96 overflow-auto"></div>
+            <div class="flex gap-2 mt-3">
+              <button id="exportBtn" class="border border-[#475569] text-gray-200 px-3 py-2 rounded bg-[var(--surface)]">Exportar JSON</button>
+              <label class="border border-[#475569] text-gray-200 px-3 py-2 rounded bg-[var(--surface)] cursor-pointer">
+                <input id="importFile" type="file" accept="application/json" class="hidden" />Importar JSON
+              </label>
+              <button id="resetAll" class="border border-red-700 text-red-400 px-3 py-2 rounded bg-[var(--surface)]">Zerar tudo</button>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- Caixa -->
+      <section class="lg:col-span-2">
+        <div class="bg-[var(--panel)] p-4 rounded shadow h-[90vh] flex flex-col">
+          <h2 class="font-semibold text-lg mb-2 text-white">Caixa Registradora</h2>
+          <div class="flex flex-col lg:flex-row gap-4 flex-1">
+            
+            <!-- Registrar venda -->
+            <div class="flex-1 flex flex-col">
+              <div class="space-y-2">
+                <input id="searchSaleProduct" placeholder="Buscar produto..." class="w-full border border-[var(--border)] bg-[var(--surface)] text-white placeholder-gray-400 p-2 rounded" />
+                <div class="grid grid-cols-2 gap-2">
+                  <input id="saleQty" type="number" min="0.01" step="0.01" value="1" class="border border-[var(--border)] bg-[var(--surface)] text-white placeholder-gray-400 p-2 rounded" />
+                  <input id="salePrice" type="number" min="0" step="0.01" placeholder="Preço unitário" class="border border-[var(--border)] bg-[var(--surface)] text-white placeholder-gray-400 p-2 rounded" />
+                </div>
+                <div class="flex items-center justify-between text-[var(--text2)]">
+                  <div>Subtotal: <span id="saleSubtotal">R$0.00</span></div>
+                  <div class="flex gap-2">
+                    <button id="addToCartBtn" class="horti-btn px-3 py-1 rounded">Adicionar</button>
+                    <button id="clearSaleBtn" class="border border-[#475569] text-gray-200 px-3 py-1 rounded bg-[var(--surface)]">Limpar</button>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 flex-1 overflow-auto border border-[var(--border)] rounded p-2 bg-[var(--surface)]">
+                <div class="flex justify-between items-center mb-2">
+                  <h3 class="font-semibold text-white">Carrinho</h3>
+                  <button id="clearCartBtn" class="text-red-400 text-sm border border-red-600 px-2 py-1 rounded">Limpar carrinho</button>
+                </div>
+                <div id="cartList" class="space-y-2"></div>
+              </div>
+            </div>
+
+            <!-- Totais -->
+            <div class="w-full lg:w-1/3 flex flex-col border border-[var(--border)] rounded p-2 bg-[var(--surface)]">
+              <div class="flex-1 overflow-auto">
+                <label class="text-sm text-[var(--text2)]">Taxa de entrega (R$)</label>
+                <input id="deliveryFee" type="number" min="0" step="0.01" value="0" class="border border-[var(--border)] bg-[var(--panel)] text-white p-2 rounded w-full" />
+              </div>
+              <div class="border-t border-[var(--border)] pt-2 mt-2 text-[var(--text2)]">
+                <div>Total itens: R$ <span id="totalItems">0.00</span></div>
+                <div>Desconto: R$ <span id="totalDiscount">0.00</span></div>
+                <div>Entrega: R$ <span id="totalDelivery">0.00</span></div>
+                <div class="font-bold text-lg text-white">Total: R$ <span id="grandTotal">0.00</span></div>
+              </div>
+              <div class="mt-2 space-y-2">
+                <button id="sendWhatsapp" class="horti-btn w-full py-2 rounded">Enviar WhatsApp</button>
+                <button id="exportPDF" class="horti-btn w-full py-2 rounded">Exportar PDF</button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="text-right">
-          <div class="text-sm text-gray-600">Total</div>
-          <div id="total" class="text-xl font-bold text-blue-700">R$ 0,00</div>
-        </div>
-      </div>
-
-      <div class="mt-4 flex gap-2">
-        <button id="btnEnviarWhats" class="bg-green-600 text-white px-4 py-2 rounded">Enviar pedido por WhatsApp</button>
-        <button id="btnLimpar" class="bg-gray-300 px-4 py-2 rounded">Limpar carrinho</button>
-      </div>
-    </section>
-
-    <footer class="text-sm text-gray-500">Feito para Hortimanik — ajuste conforme precisar.</footer>
+      </section>
+    </main>
   </div>
 
   <script>
-    const produtos = [];
-    const carrinho = [];
+    const $ = id => document.getElementById(id);
+    const formatMoney = v => Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 
-    const produtoNome = document.getElementById('produtoNome');
-    const produtoPreco = document.getElementById('produtoPreco');
-    const produtoTipo = document.getElementById('produtoTipo');
-    const btnAddProduto = document.getElementById('btnAddProduto');
-    const listaProdutos = document.getElementById('listaProdutos');
-    const selectProduto = document.getElementById('selectProduto');
-    const quantidadeInput = document.getElementById('quantidade');
-    const precoCalculadoDiv = document.getElementById('precoCalculado');
-    const btnAdicionarCarrinho = document.getElementById('btnAdicionarCarrinho');
-    const carrinhoUL = document.getElementById('carrinho');
-    const totalDiv = document.getElementById('total');
-    const btnEnviarWhats = document.getElementById('btnEnviarWhats');
-    const telefoneWhats = document.getElementById('telefoneWhats');
-    const btnLimpar = document.getElementById('btnLimpar');
+    const KEY_PRODUCTS='horti_products', KEY_CART='horti_cart';
+    let products=JSON.parse(localStorage.getItem(KEY_PRODUCTS)||'[]');
+    let cart=JSON.parse(localStorage.getItem(KEY_CART)||'[]');
+    let editProductIndex=null, editCartIndex=null;
 
-    function formatBRL(valor){
-      return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    function saveState(){
+      localStorage.setItem(KEY_PRODUCTS,JSON.stringify(products));
+      localStorage.setItem(KEY_CART,JSON.stringify(cart));
     }
 
-    function atualizarSelect(){
-      selectProduto.innerHTML = '<option value="">-- selecione --</option>';
-      produtos.forEach((p, idx) => {
-        const opt = document.createElement('option');
-        opt.value = idx;
-        opt.textContent = `${p.nome} — ${formatBRL(p.precoPorKg)} / ${p.tipo.toUpperCase()}`;
-        selectProduto.appendChild(opt);
-      });
-    }
-
-    function renderListaProdutos(){
-      listaProdutos.innerHTML = '';
-      produtos.forEach((p, idx) => {
-        const li = document.createElement('li');
-        li.className = 'flex justify-between items-center border rounded p-2';
-        li.innerHTML = `
-          <div>
-            <strong>${p.nome}</strong> 
-            <div class="text-sm text-gray-600">${formatBRL(p.precoPorKg)} / ${p.tipo.toUpperCase()}</div>
-          </div>
+    // ---------- Produtos ----------
+    function renderProducts(f=''){
+      const list=$('productsList'); list.innerHTML='';
+      products.filter(p=>p.name.toLowerCase().includes(f.toLowerCase()))
+      .forEach((p,i)=>{
+        const d=document.createElement('div');
+        d.className='p-2 border rounded flex justify-between items-center';
+        d.innerHTML=`<div><div class="font-semibold">${p.name}</div>
+          <div class="text-sm text-gray-300">${p.unit} — ${formatMoney(p.price)}</div></div>
           <div class="flex gap-2">
-            <button data-idx="${idx}" class="btnEditar bg-yellow-500 text-white px-2 py-1 rounded">Editar</button>
-            <button data-idx="${idx}" class="btnRemover bg-red-500 text-white px-2 py-1 rounded">Remover</button>
+            <button onclick="editProduct(${i})" class="text-blue-400 text-sm">Editar</button>
+            <button onclick="deleteProduct(${i})" class="text-red-400 text-sm">Excluir</button>
           </div>`;
-        listaProdutos.appendChild(li);
-      });
-
-      document.querySelectorAll('.btnRemover').forEach(btn=>{
-        btn.addEventListener('click', (e)=>{
-          const idx = Number(e.currentTarget.dataset.idx);
-          produtos.splice(idx,1);
-          atualizarSelect();
-          renderListaProdutos();
-        });
-      });
-
-      document.querySelectorAll('.btnEditar').forEach(btn=>{
-        btn.addEventListener('click', (e)=>{
-          const idx = Number(e.currentTarget.dataset.idx);
-          const p = produtos[idx];
-          const novoNome = prompt("Novo nome:", p.nome);
-          const novoPreco = parseFloat(prompt("Novo preço:", p.precoPorKg));
-          if(novoNome && !isNaN(novoPreco)){
-            produtos[idx].nome = novoNome;
-            produtos[idx].precoPorKg = novoPreco;
-            atualizarSelect();
-            renderListaProdutos();
-          }
-        });
+        list.appendChild(d);
       });
     }
+    function productFormSubmit(e){
+      e.preventDefault();
+      const prod={name:$('pName').value.trim(),unit:$('pUnit').value,price:parseFloat($('pPrice').value)||0};
+      if(editProductIndex!==null){products[editProductIndex]=prod; editProductIndex=null;}
+      else{products.push(prod);}
+      saveState(); renderProducts(); e.target.reset();
+    }
+    function editProduct(i){
+      const p=products[i];
+      $('pName').value=p.name; $('pUnit').value=p.unit; $('pPrice').value=p.price;
+      editProductIndex=i;
+    }
+    function deleteProduct(i){products.splice(i,1);saveState();renderProducts();}
+    $('resetAll').onclick=()=>{if(confirm("Zerar todos os produtos?")){products=[];saveState();renderProducts();}};
 
-    function atualizarPrecoCalculado(){
-      const idx = selectProduto.value;
-      const q = parseFloat(quantidadeInput.value || 0);
-      if(idx === '' || isNaN(q) || q <= 0){
-        precoCalculadoDiv.textContent = formatBRL(0);
-        return;
-      }
-      const preco = produtos[idx].precoPorKg * q;
-      precoCalculadoDiv.textContent = formatBRL(preco);
+    // ---------- Carrinho ----------
+    function renderCart(){
+      const list=$('cartList'); list.innerHTML='';
+      cart.forEach((c,i)=>{
+        const d=document.createElement('div');
+        d.className='p-2 border rounded flex justify-between items-center';
+        d.innerHTML=`<div><div class="font-semibold">${c.name} (${c.unit})</div>
+          <div class="text-sm text-gray-300">${c.qty} x ${formatMoney(c.price)} = ${formatMoney(c.sub)}</div></div>
+          <div class="flex gap-2">
+            <button onclick="editCartItem(${i})" class="text-blue-400 text-sm">Editar</button>
+            <button onclick="deleteCartItem(${i})" class="text-red-400 text-sm">Excluir</button>
+          </div>`;
+        list.appendChild(d);
+      });
+      calculateTotals();
+    }
+    function addToCart(){
+      const name=$('searchSaleProduct').value.trim();
+      const qty=parseFloat($('saleQty').value)||0;
+      const price=parseFloat($('salePrice').value)||0;
+      if(!name||qty<=0||price<=0) return;
+      const sub=qty*price;
+      const item={name,unit:'UN',qty,price,sub};
+      if(editCartIndex!==null){cart[editCartIndex]=item;editCartIndex=null;}
+      else{cart.push(item);}
+      saveState(); renderCart();
+    }
+    function editCartItem(i){
+      const c=cart[i];
+      $('searchSaleProduct').value=c.name;
+      $('saleQty').value=c.qty;
+      $('salePrice').value=c.price;
+      editCartIndex=i;
+    }
+    function deleteCartItem(i){cart.splice(i,1);saveState();renderCart();}
+    $('clearCartBtn').onclick=()=>{if(confirm("Limpar carrinho?")){cart=[];saveState();renderCart();}};
+
+    function calculateTotals(){
+      const total=cart.reduce((s,i)=>s+i.sub,0);
+      const delivery=parseFloat($('deliveryFee').value)||0;
+      $('totalItems').textContent=total.toFixed(2);
+      $('totalDelivery').textContent=delivery.toFixed(2);
+      $('grandTotal').textContent=(total+delivery).toFixed(2);
     }
 
-    function renderCarrinho(){
-      carrinhoUL.innerHTML = '';
-      carrinho.forEach((item, i)=>{
-        const li = document.createElement('li');
-        li.className = 'flex justify-between items-center border rounded p-2';
-        li.innerHTML = `<div>
-                          <strong>${item.nome}</strong>
-                          <div class="text-sm text-gray-600">${item.qtd} ${item.tipo.toUpperCase()} x ${formatBRL(item.precoPorKg)} / ${item.tipo.toUpperCase()}</div>
-                        </div>
-                        <div class="text-right">
-                          <div>${formatBRL(item.subtotal)}</div>
-                          <div class="flex gap-2 mt-2 justify-end">
-                            <button data-i="${i}" class="btnRemoverItem text-sm bg-red-500 text-white px-2 py-1 rounded">Remover</button>
-                          </div>
-                        </div>`;
-        carrinhoUL.appendChild(li);
-      });
-
-      document.querySelectorAll('.btnRemoverItem').forEach(b=>{
-        b.addEventListener('click', (e)=>{
-          const i = Number(e.currentTarget.dataset.i);
-          carrinho.splice(i,1);
-          atualizarTotal();
-          renderCarrinho();
-        });
-      });
-
-      atualizarTotal();
-    }
-
-    function atualizarTotal(){
-      const total = carrinho.reduce((s, it)=> s + it.subtotal, 0);
-      totalDiv.textContent = formatBRL(total);
-    }
-
-    btnAddProduto.addEventListener('click', ()=>{
-      const nome = produtoNome.value.trim();
-      const preco = parseFloat(produtoPreco.value.replace(',', '.'));
-      const tipo = produtoTipo.value;
-      if(!nome || isNaN(preco) || preco <= 0){
-        alert('Informe nome e preço válido.');
-        return;
-      }
-      produtos.push({ nome, precoPorKg: preco, tipo });
-      produtoNome.value = '';
-      produtoPreco.value = '';
-      atualizarSelect();
-      renderListaProdutos();
+    // Init
+    document.addEventListener('DOMContentLoaded',()=>{
+      renderProducts();renderCart();
+      $('productForm').onsubmit=productFormSubmit;
+      $('searchProducts').oninput=e=>renderProducts(e.target.value);
+      $('addToCartBtn').onclick=addToCart;
+      $('clearSaleBtn').onclick=()=>{$('searchSaleProduct').value='';$('saleQty').value=1;$('salePrice').value='';};
+      $('deliveryFee').oninput=calculateTotals;
     });
-
-    selectProduto.addEventListener('change', atualizarPrecoCalculado);
-    quantidadeInput.addEventListener('input', atualizarPrecoCalculado);
-
-    btnAdicionarCarrinho.addEventListener('click', ()=>{
-      const idx = selectProduto.value;
-      const q = parseFloat(quantidadeInput.value || 0);
-      if(idx === '' || isNaN(q) || q <= 0){
-        alert('Selecione um produto e informe quantidade válida.');
-        return;
-      }
-      const p = produtos[idx];
-      const subtotal = +(p.precoPorKg * q);
-      carrinho.push({ nome: p.nome, qtd: q, precoPorKg: p.precoPorKg, tipo: p.tipo, subtotal });
-      quantidadeInput.value = '';
-      precoCalculadoDiv.textContent = formatBRL(0);
-      renderCarrinho();
-    });
-
-    btnLimpar.addEventListener('click', ()=>{
-      if(confirm('Limpar o carrinho?')){
-        carrinho.length = 0;
-        renderCarrinho();
-      }
-    });
-
-    btnEnviarWhats.addEventListener('click', ()=>{
-      if(carrinho.length === 0){
-        alert('Carrinho vazio.');
-        return;
-      }
-      const total = carrinho.reduce((s, it)=> s + it.subtotal, 0);
-      let mensagem = 'Pedido%20Hortimanik%0A%0A';
-      carrinho.forEach(it=>{
-        const linha = `${it.nome} - ${it.qtd.toString().replace('.',',')}${it.tipo.toUpperCase()} x R$ ${it.precoPorKg.toFixed(2).replace('.',',')} = R$ ${it.subtotal.toFixed(2).replace('.',',')}`;
-        mensagem += encodeURIComponent(linha) + '%0A';
-      });
-      mensagem += '%0A' + encodeURIComponent('Total: R$ ' + total.toFixed(2).replace('.',','));
-      const tel = telefoneWhats.value.trim();
-      let url = '';
-      if(tel){
-        const apenasDigitos = tel.replace(/\D/g,'');
-        url = `https://wa.me/${apenasDigitos}?text=${mensagem}`;
-      } else {
-        url = `https://wa.me/?text=${mensagem}`;
-      }
-      window.open(url, '_blank');
-    });
-
-    // Exemplo inicial
-    produtos.push({ nome: 'Tomate', precoPorKg: 6.00, tipo: 'kg' });
-    produtos.push({ nome: 'Cenoura', precoPorKg: 5.00, tipo: 'kg' });
-    atualizarSelect();
-    renderListaProdutos();
-    renderCarrinho();
   </script>
 </body>
 </html>
