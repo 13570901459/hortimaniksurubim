@@ -1,629 +1,255 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>PDV HORTIMANIK — Caixa</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<style>
-:root{
-  --horti-red:#e11d2b;
-  --horti-dark:#9b141b;
-  --bg:#1b263b;
-  --panel:#24344d;
-  --surface:#2d3e59;
-  --border:#3b4a66;
-  --text:#f1f5f9;
-  --text2:#cbd5e1;
-}
-.horti-btn{background:linear-gradient(180deg,var(--horti-red),var(--horti-dark));color:#fff}
-#productsList>div,#cartList>div{background:var(--surface);border-color:var(--border);color:var(--text);}
-.autocomplete-suggestions{background:var(--surface);border:1px solid var(--border);max-height:180px;overflow:auto;position:absolute;width:100%;z-index:50;border-radius:6px;}
-.autocomplete-suggestion{padding:8px;cursor:pointer;font-size:0.95rem;}
-.autocomplete-suggestion:hover{background:#2d3e59;}
-.small-btn{font-size:0.8rem;padding:6px 8px;border-radius:6px;}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDV Hortifruti</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[var(--bg)] text-gray-100">
-<div class="max-w-[98%] mx-auto p-2">
+<body class="bg-[#1b263b] text-white min-h-screen">
+  <div class="container mx-auto p-4">
 
-  <!-- Header -->
-  <header class="flex items-center gap-4 mb-2 bg-[var(--panel)] p-3 rounded-lg shadow flex-wrap">
-    <img src="logo.png" alt="Logo Hortimanik" class="h-12 w-12 object-contain rounded-md bg-white p-1" />
-    <div>
-      <h1 class="text-2xl font-extrabold text-white">HORTIMANIK — PDV</h1>
-      <p class="text-sm text-[var(--text2)]">Caixa registradora — Exportar para PDF ou WhatsApp</p>
+    <!-- Cadastro de Produtos -->
+    <h1 class="text-2xl font-bold mb-4">Cadastrar Produto</h1>
+    <div class="flex flex-col md:flex-row gap-2 mb-4">
+      <input id="productName" type="text" placeholder="Nome do produto" class="p-2 rounded text-black w-full">
+      <input id="productUnit" type="text" placeholder="Unidade (ex: KG, UN)" class="p-2 rounded text-black w-full md:w-32">
+      <input id="productPrice" type="text" placeholder="Preço (ex: 5,99)" class="p-2 rounded text-black w-full md:w-32">
+      <button onclick="addProduct()" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">Cadastrar</button>
     </div>
 
-    <div class="ml-auto text-right">
-      <div class="text-sm text-[var(--text2)]">Telefone WhatsApp</div>
-      <input id="phoneInput" class="mt-1 border border-[var(--border)] rounded px-2 py-1 text-sm bg-[var(--surface)] text-white placeholder-gray-400" placeholder="Ex.: 55819XXXXXXXX" />
+    <!-- Importar/Exportar JSON -->
+    <div class="flex gap-2 mb-4">
+      <input type="file" id="importFile" accept="application/json" onchange="importProducts(event)" class="p-2 rounded bg-gray-700">
+      <button onclick="exportProducts()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">Exportar JSON</button>
     </div>
-  </header>
 
-  <main class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- Buscar Produto -->
+    <input type="text" id="searchProduct" placeholder="Buscar produto..." onkeyup="searchProduct()" class="p-2 rounded text-black w-full mb-4">
 
-    <!-- Left: cadastro & lista -->
-    <section class="lg:col-span-1 max-h-[90vh] overflow-auto">
+    <!-- Lista de Produtos -->
+    <h2 class="text-xl font-semibold mb-2">Produtos Cadastrados</h2>
+    <div id="productList" class="space-y-2"></div>
 
-      <!-- Formulário single product -->
-      <details open class="mb-4 bg-[var(--panel)] p-4 rounded shadow">
-        <summary class="cursor-pointer font-semibold">Cadastrar produto (um a um)</summary>
-        <form id="productForm" class="mt-3 grid gap-2">
-          <input id="pName" placeholder="Nome do produto" class="p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white" required />
-          <div class="flex gap-2">
-            <select id="pUnit" class="p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white w-1/2">
-              <option value="UN">Un</option>
-              <option value="KG">Kg</option>
-            </select>
-            <input id="pPrice" type="text" inputmode="decimal" placeholder="Preço (ex: 7.99)" class="p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white w-1/2" required />
-          </div>
-          <div class="flex gap-2">
-            <button id="saveProductBtn" class="horti-btn px-3 py-2 rounded">Salvar produto</button>
-            <button id="cancelEditBtn" type="button" class="border border-[var(--border)] text-[var(--text2)] px-3 py-2 rounded hidden">Cancelar</button>
-          </div>
-        </form>
-      </details>
+    <hr class="my-6 border-gray-600">
 
-      <!-- Cadastro em lote -->
-      <details class="mb-4 bg-[var(--panel)] p-4 rounded shadow">
-        <summary class="cursor-pointer font-semibold">Cadastrar produtos em lote (1 por linha)</summary>
-        <form id="multiProductForm" class="mt-3 grid gap-2">
-          <label class="text-sm text-[var(--text2)]">Formato por linha: <code>Nome;Unidade;Preço</code></label>
-          <textarea id="multiProducts" rows="6" class="w-full p-2 rounded text-black" placeholder="Exemplo:
-Tomate;KG;7.99
-Banana;KG;4.50
-Maçã;UN;2.50"></textarea>
-          <div class="flex gap-2">
-            <button class="horti-btn px-3 py-2 rounded">Cadastrar todos</button>
-            <button id="batchAndExport" type="button" class="border border-[var(--border)] text-[var(--text2)] px-3 py-2 rounded">Cadastrar e exportar JSON</button>
-          </div>
-        </form>
-      </details>
-
-      <!-- Produtos cadastrados -->
-      <details open class="bg-[var(--panel)] p-4 rounded shadow">
-        <summary class="cursor-pointer font-semibold">Produtos cadastrados</summary>
-        <div class="mt-3">
-          <div class="flex gap-2 mb-2">
-            <input id="searchProducts" placeholder="Buscar produto..." class="flex-1 p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white" />
-            <button id="exportProductsBtn" class="border border-[var(--border)] px-3 py-2 rounded text-[var(--text2)] small-btn">Exportar JSON</button>
-            <label class="border border-[var(--border)] px-3 py-2 rounded text-[var(--text2)] cursor-pointer small-btn">
-              <input id="importFile" type="file" accept="application/json" class="hidden" />Importar
-            </label>
-          </div>
-          <div id="productsList" class="space-y-2 max-h-96 overflow-auto"></div>
-        </div>
-      </details>
-    </section>
-
-    <!-- Right: PDV / Caixa -->
-    <section class="lg:col-span-2">
-      <div class="bg-[var(--panel)] p-4 rounded shadow h-[90vh] flex flex-col">
-        <h2 class="font-semibold text-lg mb-2 text-white">Caixa Registradora</h2>
-
-        <div class="flex flex-col lg:flex-row gap-4 flex-1">
-
-          <!-- Registrar venda -->
-          <div class="flex-1 flex flex-col relative">
-            <input id="searchSaleProduct" placeholder="Buscar produto..." autocomplete="off" class="p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white" />
-            <div id="autocomplete" class="autocomplete-suggestions hidden"></div>
-
-            <div class="grid grid-cols-2 gap-2 mt-2">
-              <input id="saleQty" type="number" step="0.01" value="1" class="p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white" />
-              <input id="salePrice" type="text" inputmode="decimal" placeholder="Preço unitário" class="p-2 rounded bg-[var(--surface)] border border-[var(--border)] text-white" />
-            </div>
-
-            <div class="mt-2 flex justify-between text-sm text-[var(--text2)]">
-              <div>Subtotal: <span id="saleSubtotal">R$0,00</span></div>
-              <div class="flex gap-2">
-                <button id="addToCartBtn" class="horti-btn px-3 py-1 rounded">Adicionar</button>
-                <button id="clearSaleBtn" class="border border-[var(--border)] px-3 py-1 rounded text-[var(--text2)]">Limpar</button>
-              </div>
-            </div>
-
-            <div class="mt-4 flex-1 overflow-auto border border-[var(--border)] rounded p-2 bg-[var(--surface)]">
-              <div class="flex justify-between items-center mb-2">
-                <h3 class="font-semibold text-white">Carrinho</h3>
-                <button id="clearCartBtn" class="text-red-400 text-sm border border-red-600 px-2 py-1 rounded">Limpar carrinho</button>
-              </div>
-              <div id="cartList" class="space-y-2"></div>
-            </div>
-          </div>
-
-          <!-- Totais e finalização -->
-          <div class="w-full lg:w-1/3 flex flex-col border border-[var(--border)] rounded p-2 bg-[var(--surface)]">
-            <div class="flex-1 overflow-auto">
-              <div class="mb-2">
-                <label class="text-sm text-[var(--text2)]">Taxa de entrega (R$)</label>
-                <input id="deliveryFee" type="number" step="0.01" value="0" class="border border-[var(--border)] bg-[var(--panel)] text-white p-2 rounded w-full" />
-              </div>
-
-              <div class="mt-2 flex gap-2">
-                <input id="couponCode" placeholder="Cupom" class="p-2 rounded bg-[var(--panel)] text-white flex-1" />
-                <button id="applyCouponBtn" class="horti-btn px-2 rounded">Aplicar</button>
-              </div>
-
-              <div class="mt-2">
-                <label class="text-sm text-[var(--text2)]">Cliente</label>
-                <input id="clientName" class="border border-[var(--border)] bg-[var(--panel)] text-white p-2 rounded w-full" />
-              </div>
-
-              <div class="mt-2">
-                <label class="text-sm text-[var(--text2)]">Entrega</label>
-                <select id="deliveryType" class="border border-[var(--border)] bg-[var(--panel)] text-white p-2 rounded w-full">
-                  <option value="Retirada">Retirada</option>
-                  <option value="Entrega">Entrega</option>
-                </select>
-                <input id="clientAddress" placeholder="Endereço de entrega" class="hidden mt-2 p-2 rounded bg-[var(--panel)] text-white w-full" />
-              </div>
-
-              <div class="mt-2">
-                <label class="text-sm text-[var(--text2)]">Forma de pagamento</label>
-                <select id="paymentMethod" class="border border-[var(--border)] bg-[var(--panel)] text-white p-2 rounded w-full">
-                  <option>Pix</option>
-                  <option>Dinheiro</option>
-                  <option>Cartão</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="border-t border-[var(--border)] pt-2 mt-2 text-[var(--text2)]">
-              <div>Total itens: R$ <span id="totalItems">0.00</span></div>
-              <div>Desconto: R$ <span id="totalDiscount">0.00</span></div>
-              <div>Entrega: R$ <span id="totalDelivery">0.00</span></div>
-              <div class="font-bold text-lg text-white">Total: R$ <span id="grandTotal">0.00</span></div>
-            </div>
-
-            <div class="mt-2 space-y-2">
-              <button id="sendWhatsapp" class="horti-btn w-full py-2 rounded">Enviar WhatsApp</button>
-              <button id="exportPDF" class="horti-btn w-full py-2 rounded">Exportar PDF</button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-  </main>
-</div>
-
-<script>
-/* ----------------- Utilitários ----------------- */
-const $ = id => document.getElementById(id);
-const money = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-const parsePrice = s => {
-  if (s === undefined || s === null) return 0;
-  return parseFloat(String(s).replace(/\./g, '').replace(',', '.')) || 0;
-};
-
-/* ----------------- Estado ----------------- */
-const KEY_PRODUCTS = 'horti_products_v2';
-const KEY_CART = 'horti_cart_v2';
-let products = JSON.parse(localStorage.getItem(KEY_PRODUCTS) || '[]');
-let cart = JSON.parse(localStorage.getItem(KEY_CART) || '[]');
-let editProductIndex = null;
-let discount = 0;
-
-/* ----------------- Persistência ----------------- */
-function saveProducts() {
-  localStorage.setItem(KEY_PRODUCTS, JSON.stringify(products));
-}
-function saveCart() {
-  localStorage.setItem(KEY_CART, JSON.stringify(cart));
-}
-
-/* ----------------- Exportar JSON (download) ----------------- */
-function downloadProductsJSON(filename = null) {
-  const ts = new Date();
-  const name = filename || `products-${ts.getFullYear()}${String(ts.getMonth()+1).padStart(2,'0')}${String(ts.getDate()).padStart(2,'0')}-${String(ts.getHours()).padStart(2,'0')}${String(ts.getMinutes()).padStart(2,'0')}.json`;
-  const dataStr = JSON.stringify(products, null, 2);
-  const blob = new Blob([dataStr], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = name;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
-}
-
-/* ----------------- Render produtos ----------------- */
-function renderProducts(filter = '') {
-  const list = $('productsList');
-  list.innerHTML = '';
-  const f = String(filter || '').toLowerCase();
-  products
-    .filter(p => p.name.toLowerCase().includes(f))
-    .forEach((p, i) => {
-      const d = document.createElement('div');
-      d.className = 'p-2 border rounded flex justify-between items-center text-sm';
-      d.innerHTML = `<div><div class="font-semibold">${p.name}</div><div class="text-[var(--text2)] text-xs">${p.unit} — ${money(p.price)}</div></div>
-      <div class="flex gap-2">
-        <button class="text-blue-300 small-btn" onclick="startEditProduct(${i})">Editar</button>
-        <button class="text-red-400 small-btn" onclick="deleteProduct(${i})">Excluir</button>
-      </div>`;
-      list.appendChild(d);
-    });
-}
-
-/* ----------------- Cadastro único (form) ----------------- */
-function resetProductForm() {
-  $('pName').value = '';
-  $('pUnit').value = 'UN';
-  $('pPrice').value = '';
-  editProductIndex = null;
-  $('saveProductBtn').textContent = 'Salvar produto';
-  $('cancelEditBtn').classList.add('hidden');
-}
-function startEditProduct(i) {
-  const p = products[i];
-  editProductIndex = i;
-  $('pName').value = p.name;
-  $('pUnit').value = p.unit;
-  $('pPrice').value = p.price;
-  $('saveProductBtn').textContent = 'Atualizar produto';
-  $('cancelEditBtn').classList.remove('hidden');
-  // scroll to top so user sees the form (mobile)
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-function deleteProduct(i) {
-  const p = products[i];
-  if (!confirm(`Excluir "${p.name}"?\nIsto também removerá do carrinho os itens com esse nome.`)) return;
-  // remove produto
-  products.splice(i, 1);
-  // remover itens do carrinho que tenham exatamente esse nome (case-insens.)
-  cart = cart.filter(ci => ci.name.toLowerCase() !== p.name.toLowerCase());
-  saveProducts(); saveCart(); renderProducts($('searchProducts').value); renderCart();
-}
-
-/* ----------------- Batch cadastro ----------------- */
-function handleBatchRegister(shouldExport = false) {
-  const txt = $('multiProducts').value.trim();
-  if (!txt) return alert('Campo vazio.');
-  const lines = txt.split(/\r?\n/).map(l => l.trim()).filter(l => l);
-  let added = 0;
-  lines.forEach(line => {
-    // aceita: Nome;Unit;Price  -> se usar vírgula em preço, converte
-    const parts = line.split(';').map(p => p.trim());
-    if (parts.length >= 3) {
-      const name = parts[0];
-      const unit = parts[1].toUpperCase();
-      const price = parsePrice(parts.slice(2).join(';'));
-      if (!name || !unit || price <= 0) return;
-      // evita duplicata pelo nome (insensível)
-      if (!products.some(p => p.name.toLowerCase() === name.toLowerCase())) {
-        products.push({ name, unit, price });
-        added++;
-      }
-    }
-  });
-  if (added === 0) alert('Nenhum produto novo encontrado / validado.');
-  saveProducts(); renderProducts($('searchProducts').value);
-  $('multiProducts').value = '';
-  if (shouldExport) downloadProductsJSON();
-  alert(`Produtos adicionados: ${added}`);
-}
-
-/* ----------------- Carrinho ----------------- */
-function renderCart() {
-  const list = $('cartList');
-  list.innerHTML = '';
-  cart.forEach((c, i) => {
-    const d = document.createElement('div');
-    d.className = 'p-2 border rounded flex justify-between items-center text-sm';
-    d.innerHTML = `<div>
-      <div class="font-semibold">${c.name} <span class="text-[var(--text2)] text-xs">(${c.unit})</span></div>
-      <div class="text-[var(--text2)] text-xs">${c.qty} x ${money(c.price)} = ${money(c.sub)}</div>
+    <!-- Carrinho -->
+    <h2 class="text-xl font-semibold mb-2">Carrinho</h2>
+    <div class="flex gap-2 mb-4">
+      <input id="cartProduct" type="text" placeholder="Produto" class="p-2 rounded text-black w-full">
+      <input id="cartQuantity" type="number" placeholder="Quantidade" class="p-2 rounded text-black w-32">
+      <button onclick="addToCart()" class="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded">Adicionar</button>
     </div>
+    <div id="cartList" class="space-y-2"></div>
+    <p id="cartTotal" class="font-bold mt-2">Total: R$ 0,00</p>
+
+    <!-- Cupom -->
+    <div class="flex gap-2 mt-4">
+      <input id="coupon" type="text" placeholder="Cupom de desconto" class="p-2 rounded text-black w-full">
+      <button onclick="applyCoupon()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded">Aplicar</button>
+    </div>
+
+    <hr class="my-6 border-gray-600">
+
+    <!-- Cliente -->
+    <h2 class="text-xl font-semibold mb-2">Dados do Cliente</h2>
+    <input id="clientName" type="text" placeholder="Nome do Cliente" class="p-2 rounded text-black w-full mb-2">
+    <select id="deliveryOption" onchange="toggleAddress()" class="p-2 rounded text-black w-full mb-2">
+      <option value="retirada">Retirar na Loja</option>
+      <option value="entrega">Entrega</option>
+    </select>
+    <input id="clientAddress" type="text" placeholder="Endereço de Entrega" class="p-2 rounded text-black w-full mb-2 hidden">
+
+    <!-- Pagamento -->
+    <select id="paymentMethod" class="p-2 rounded text-black w-full mb-4">
+      <option value="Pix">Pix</option>
+      <option value="Dinheiro">Dinheiro</option>
+      <option value="Cartão">Cartão</option>
+    </select>
+
+    <!-- Finalizar Pedido -->
     <div class="flex gap-2">
-      <button class="text-yellow-300 small-btn" onclick="editCartItem(${i})">Editar</button>
-      <button class="text-red-400 small-btn" onclick="removeCartItem(${i})">Excluir</button>
-    </div>`;
-    list.appendChild(d);
-  });
-  calcTotals();
-}
-function addToCartFromForm() {
-  const term = $('searchSaleProduct').value.trim();
-  if (!term) return alert('Escolha um produto ou digite um nome.');
-  const qty = parseFloat($('saleQty').value) || 0;
-  let price = parsePrice($('salePrice').value);
-  const prod = products.find(p => p.name.toLowerCase() === term.toLowerCase());
-  const unit = prod ? prod.unit : 'UN';
-  if (prod) price = prod.price;
-  if (qty <= 0 || price <= 0) return alert('Quantidade ou preço inválido.');
-  cart.push({ name: term, unit, qty, price, sub: qty * price });
-  saveCart(); renderCart();
-  // limpa campo para novo item
-  $('searchSaleProduct').value = '';
-  $('saleQty').value = 1;
-  $('salePrice').value = '';
-  updateSaleSubtotal();
-}
-function editCartItem(i) {
-  const c = cart[i];
-  const newQty = parseFloat(prompt('Editar quantidade (use ponto para decimais):', String(c.qty)));
-  if (newQty === null) return;
-  if (isNaN(newQty) || newQty <= 0) return alert('Quantidade inválida.');
-  c.qty = newQty;
-  c.sub = c.qty * c.price;
-  cart[i] = c;
-  saveCart(); renderCart();
-}
-function removeCartItem(i) {
-  if (!confirm('Remover item do carrinho?')) return;
-  cart.splice(i, 1);
-  saveCart(); renderCart();
-}
-function clearCartConfirm() {
-  if (!confirm('Limpar todo o carrinho?')) return;
-  cart = [];
-  saveCart(); renderCart();
-}
+      <button onclick="exportPDF()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">Exportar PDF</button>
+      <button onclick="sendWhatsApp()" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">Enviar WhatsApp</button>
+    </div>
+  </div>
 
-/* ----------------- Totais, cupom, entrega ----------------- */
-function calcTotals() {
-  const total = cart.reduce((s, it) => s + it.sub, 0);
-  const delivery = parseFloat($('deliveryFee').value) || 0;
-  const grand = total - discount + delivery;
-  $('totalItems').textContent = total.toFixed(2);
-  $('totalDiscount').textContent = discount.toFixed(2);
-  $('totalDelivery').textContent = delivery.toFixed(2);
-  $('grandTotal').textContent = grand.toFixed(2);
-}
-function applyCouponCode() {
-  const code = $('couponCode').value.trim().toUpperCase();
-  discount = 0;
-  const total = cart.reduce((s, i) => s + i.sub, 0);
-  if (code === 'HORTI10') discount = total * 0.10;
-  else if (code === 'HORTI5') discount = total * 0.05;
-  else if (code === '') discount = 0;
-  else alert('Cupom inválido');
-  calcTotals();
-}
+  <script>
+    let products = [];
+    let cart = [];
+    let discount = 0;
 
-/* ----------------- Autocomplete (inteligente) ----------------- */
-function buildSuggestions(term) {
-  const box = $('autocomplete');
-  box.innerHTML = '';
-  if (!term) { box.classList.add('hidden'); return; }
-  const s = term.toLowerCase();
-  const suggestions = products.filter(p => p.name.toLowerCase().includes(s)).slice(0, 50);
-  if (suggestions.length === 0) { box.classList.add('hidden'); return; }
-  suggestions.forEach(p => {
-    const r = document.createElement('div');
-    r.className = 'autocomplete-suggestion';
-    r.innerHTML = `<strong>${p.name}</strong> <span class="text-[var(--text2)] text-xs"> — ${p.unit} — ${money(p.price)}</span>`;
-    r.onclick = () => {
-      $('searchSaleProduct').value = p.name;
-      $('salePrice').value = p.price;
-      $('saleQty').value = p.unit === 'KG' ? 0.5 : 1;
-      updateSaleSubtotal();
-      box.classList.add('hidden');
-    };
-    box.appendChild(r);
-  });
-  box.classList.remove('hidden');
-}
+    // Cadastro produto
+    function addProduct() {
+      const name = document.getElementById("productName").value;
+      const unit = document.getElementById("productUnit").value;
+      let price = parseFloat(document.getElementById("productPrice").value.replace(",", "."));
 
-/* ----------------- WhatsApp e PDF ----------------- */
-function sendWhatsApp() {
-  if (cart.length === 0) return alert('Carrinho vazio');
-  const phone = $('phoneInput').value.replace(/\D/g, '');
-  if (!phone) return alert('Informe o telefone para WhatsApp.');
-  const client = $('clientName').value || 'Cliente';
-  const type = $('deliveryType').value;
-  const addr = (type === 'Entrega') ? $('clientAddress').value || '-' : 'Retirada na loja';
-  const payment = $('paymentMethod').value;
-  const items = cart.map(i => `- ${i.name} ${i.qty} ${i.unit} x ${money(i.price)} = ${money(i.sub)}`).join('\n');
-  const msg = `Pedido HORTIMANIK\nCliente: ${client}\n${type}: ${addr}\nPagamento: ${payment}\n\nItens:\n${items}\n\nTotal: R$ ${$('grandTotal').textContent}`;
-  const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
-  window.open(url, '_blank');
-}
-
-async function exportPDF() {
-  if (cart.length === 0) return alert('Carrinho vazio');
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: 'pt' });
-  doc.setFontSize(12);
-  doc.text('HORTIMANIK - Pedido', 40, 40);
-  doc.setFontSize(10);
-  doc.text(`Cliente: ${$('clientName').value || 'Cliente'}`, 40, 60);
-  const type = $('deliveryType').value;
-  if (type === 'Entrega') doc.text(`Entrega: ${$('clientAddress').value || '-'}`, 40, 80);
-  doc.text(`Pagamento: ${$('paymentMethod').value}`, 40, 100);
-
-  let y = 130;
-  doc.setFontSize(9);
-  cart.forEach((c, idx) => {
-    const line = `${idx + 1}. ${c.name} (${c.unit}) — ${c.qty} x R$${c.price.toFixed(2)} = R$${c.sub.toFixed(2)}`;
-    doc.text(line, 40, y);
-    y += 16;
-    if (y > 750) { doc.addPage(); y = 40; }
-  });
-
-  y += 12;
-  doc.text(`Total: R$${$('grandTotal').textContent}`, 40, y);
-  doc.save(`pedido-hortimanik-${Date.now()}.pdf`);
-}
-
-/* ----------------- Eventos e inicialização ----------------- */
-document.addEventListener('DOMContentLoaded', () => {
-  // render inicial
-  renderProducts();
-  renderCart();
-
-  // product form submit (single)
-  $('productForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const name = $('pName').value.trim();
-    const unit = $('pUnit').value;
-    const price = parsePrice($('pPrice').value);
-    if (!name || price <= 0) return alert('Informe nome e preço válidos.');
-
-    if (editProductIndex === null) {
-      // adicionar novo produto, evitando duplicata pelo nome
-      if (products.some(p => p.name.toLowerCase() === name.toLowerCase())) {
-        if (!confirm('Produto já existe com este nome. Deseja adicionar mesmo assim?')) return;
+      if (!name || isNaN(price)) {
+        alert("Preencha corretamente os campos!");
+        return;
       }
+
       products.push({ name, unit, price });
-      saveProducts();
-      renderProducts($('searchProducts').value);
-      downloadProductsJSON(); // gera JSON automaticamente após cadastro único
-      alert('Produto cadastrado e JSON exportado.');
-      resetProductForm();
-    } else {
-      // editar produto: atualizar produto e atualizar itens do carrinho que tinham o mesmo nome antigo
-      const old = products[editProductIndex];
-      const oldName = old.name;
-      products[editProductIndex] = { name, unit, price };
-      // atualizar carrinho onde nome case-insensitive bate com oldName
-      cart = cart.map(ci => {
-        if (ci.name.toLowerCase() === oldName.toLowerCase()) {
-          return { ...ci, name, unit, price, sub: ci.qty * price };
-        }
-        return ci;
+      renderProducts();
+    }
+
+    function renderProducts(filtered = products) {
+      const list = document.getElementById("productList");
+      list.innerHTML = "";
+      filtered.forEach((p, i) => {
+        const div = document.createElement("div");
+        div.className = "p-2 bg-gray-800 rounded flex justify-between items-center";
+        div.innerHTML = `
+          <div>
+            <strong>${p.name}</strong><br>
+            ${p.unit} — ${(p.price).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+          </div>
+          <div>
+            <button onclick="editProduct(${i})" class="text-blue-400 mr-2">Editar</button>
+            <button onclick="deleteProduct(${i})" class="text-red-400">Excluir</button>
+          </div>
+        `;
+        list.appendChild(div);
       });
-      saveProducts(); saveCart();
-      renderProducts($('searchProducts').value);
-      renderCart();
-      downloadProductsJSON(); // exporta json após atualização
-      alert('Produto atualizado e JSON exportado.');
-      resetProductForm();
     }
-  });
 
-  // cancelar edição
-  $('cancelEditBtn').addEventListener('click', () => resetProductForm());
+    function editProduct(index) {
+      const p = products[index];
+      document.getElementById("productName").value = p.name;
+      document.getElementById("productUnit").value = p.unit;
+      document.getElementById("productPrice").value = p.price.toString().replace(".", ",");
+      products.splice(index, 1);
+      renderProducts();
+    }
 
-  // batch cadastro (form submit)
-  $('multiProductForm').addEventListener('submit', e => {
-    e.preventDefault();
-    handleBatchRegister(false);
-  });
-  // cadastrar e exportar JSON
-  $('batchAndExport').addEventListener('click', () => handleBatchRegister(true));
+    function deleteProduct(index) {
+      products.splice(index, 1);
+      renderProducts();
+    }
 
-  // buscar produtos na lista
-  $('searchProducts').addEventListener('input', e => renderProducts(e.target.value));
+    function searchProduct() {
+      const term = document.getElementById("searchProduct").value.toLowerCase();
+      const filtered = products.filter(p => p.name.toLowerCase().includes(term));
+      renderProducts(filtered);
+    }
 
-  // exportar JSON botão
-  $('exportProductsBtn').addEventListener('click', () => downloadProductsJSON());
-
-  // import JSON
-  $('importFile').addEventListener('change', e => {
-    const f = e.target.files[0];
-    if (!f) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const parsed = JSON.parse(reader.result);
-        if (!Array.isArray(parsed)) throw new Error('JSON inválido');
-        // merge por nome (não duplica)
-        let added = 0;
-        parsed.forEach(p => {
-          if (!p.name) return;
-          if (!products.some(q => q.name.toLowerCase() === p.name.toLowerCase())) {
-            // garantir campos
-            const unit = (p.unit || 'UN').toUpperCase();
-            const price = parsePrice(p.price);
-            products.push({ name: p.name, unit, price });
-            added++;
-          }
+    // Importar JSON
+    function importProducts(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imported = JSON.parse(e.target.result);
+        imported.forEach(p => {
+          p.price = parseFloat(String(p.price).replace(",", "."));
+          products.push(p);
         });
-        saveProducts(); renderProducts();
-        alert(`Import concluído. Novos produtos adicionados: ${added}`);
-      } catch (err) {
-        alert('Erro ao importar JSON: ' + err.message);
-      }
-    };
-    reader.readAsText(f);
-    // limpar input
-    e.target.value = '';
-  });
-
-  // Autocomplete searchSaleProduct
-  $('searchSaleProduct').addEventListener('input', e => {
-    const term = e.target.value.trim();
-    buildSuggestions(term);
-  });
-  // Se pressionar Enter dentro do campo de busca, tenta selecionar primeiro resultado
-  $('searchSaleProduct').addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const box = $('autocomplete');
-      const first = box.querySelector('.autocomplete-suggestion');
-      if (first) first.click();
+        renderProducts();
+      };
+      reader.readAsText(file);
     }
-  });
 
-  // atualizar subtotal ao alterar quantidade ou preço
-  $('saleQty').addEventListener('input', updateSaleSubtotal);
-  $('salePrice').addEventListener('input', updateSaleSubtotal);
+    function exportProducts() {
+      const blob = new Blob([JSON.stringify(products, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "produtos.json";
+      a.click();
+    }
 
-  // evento adicionar ao carrinho
-  $('addToCartBtn').addEventListener('click', addToCartFromForm);
-  $('clearSaleBtn').addEventListener('click', () => {
-    $('searchSaleProduct').value = '';
-    $('saleQty').value = 1;
-    $('salePrice').value = '';
-    updateSaleSubtotal();
-  });
+    // Carrinho
+    function addToCart() {
+      const name = document.getElementById("cartProduct").value;
+      const qty = parseFloat(document.getElementById("cartQuantity").value.replace(",", "."));
+      const product = products.find(p => p.name.toLowerCase() === name.toLowerCase());
 
-  // editar/excluir carrinho
-  $('clearCartBtn').addEventListener('click', clearCartConfirm);
-  // delivery, coupon, totals
-  $('deliveryFee').addEventListener('input', calcTotals);
-  $('applyCouponBtn').addEventListener('click', applyCouponCode);
-  $('deliveryType').addEventListener('change', e => {
-    if (e.target.value === 'Entrega') $('clientAddress').classList.remove('hidden');
-    else $('clientAddress').classList.add('hidden');
-  });
+      if (!product || isNaN(qty)) {
+        alert("Produto ou quantidade inválidos!");
+        return;
+      }
 
-  // enviar WhatsApp / PDF
-  $('sendWhatsapp').addEventListener('click', sendWhatsApp);
-  $('exportPDF').addEventListener('click', exportPDF);
+      cart.push({ ...product, qty });
+      renderCart();
+    }
 
-  // salvar cart on unload
-  window.addEventListener('beforeunload', () => saveCart());
-});
+    function renderCart() {
+      const list = document.getElementById("cartList");
+      list.innerHTML = "";
+      let total = 0;
+      cart.forEach((c, i) => {
+        const subtotal = c.price * c.qty;
+        total += subtotal;
+        const div = document.createElement("div");
+        div.className = "p-2 bg-gray-700 rounded flex justify-between items-center";
+        div.innerHTML = `
+          <div>
+            ${c.qty} ${c.unit} — ${c.name}<br>
+            ${(subtotal).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+          </div>
+          <div>
+            <button onclick="removeFromCart(${i})" class="text-red-400">Excluir</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+      total -= discount;
+      document.getElementById("cartTotal").textContent = "Total: " + total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
 
-/* ----------------- Funções auxiliares expostas (para inline onclick) ----------------- */
-// Expor algumas funções globais para uso em atributos onclick gerados
-window.startEditProduct = startEditProduct;
-window.deleteProduct = deleteProduct;
-window.editCartItem = editCartItem;
-window.removeCartItem = removeCartItem;
+    function removeFromCart(i) {
+      cart.splice(i, 1);
+      renderCart();
+    }
 
-/* ----------------- Atualização UI de subtotal de item ----------------- */
-function updateSaleSubtotal() {
-  const q = parseFloat($('saleQty').value) || 0;
-  const p = parsePrice($('salePrice').value);
-  $('saleSubtotal').textContent = money(q * p);
-}
+    function applyCoupon() {
+      const code = document.getElementById("coupon").value;
+      if (code === "DESCONTO10") {
+        discount = 10;
+        alert("Cupom aplicado: R$ 10,00 de desconto!");
+      } else {
+        discount = 0;
+        alert("Cupom inválido!");
+      }
+      renderCart();
+    }
 
-/* ----------------- renderCart inicial (usada no load) ----------------- */
-function renderCart() {
-  // função definida acima, reimplementar para garantir escopo
-  const list = $('cartList');
-  list.innerHTML = '';
-  cart.forEach((c, i) => {
-    const d = document.createElement('div');
-    d.className = 'p-2 border rounded flex justify-between items-center text-sm';
-    d.innerHTML = `<div>
-      <div class="font-semibold">${c.name} <span class="text-[var(--text2)] text-xs">(${c.unit})</span></div>
-      <div class="text-[var(--text2)] text-xs">${c.qty} x ${money(c.price)} = ${money(c.sub)}</div>
-    </div>
-    <div class="flex gap-2">
-      <button class="text-yellow-300 small-btn" onclick="editCartItem(${i})">Editar</button>
-      <button class="text-red-400 small-btn" onclick="removeCartItem(${i})">Excluir</button>
-    </div>`;
-    list.appendChild(d);
-  });
-  calcTotals();
-}
-</script>
+    // Cliente
+    function toggleAddress() {
+      const option = document.getElementById("deliveryOption").value;
+      document.getElementById("clientAddress").classList.toggle("hidden", option !== "entrega");
+    }
+
+    // Exportar PDF
+    function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.text("Pedido Hortifruti", 10, 10);
+
+      const rows = cart.map(c => [c.name, c.qty + " " + c.unit, c.price.toFixed(2), (c.price * c.qty).toFixed(2)]);
+      doc.autoTable({
+        head: [["Produto", "Qtd", "Preço", "Subtotal"]],
+        body: rows
+      });
+
+      doc.save("pedido.pdf");
+    }
+
+    // WhatsApp
+    function sendWhatsApp() {
+      let msg = "Pedido Hortifruti:%0A";
+      cart.forEach(c => {
+        msg += `${c.qty} ${c.unit} - ${c.name}: R$ ${(c.price * c.qty).toFixed(2)}%0A`;
+      });
+      msg += document.getElementById("cartTotal").textContent;
+      const url = `https://wa.me/?text=${msg}`;
+      window.open(url, "_blank");
+    }
+  </script>
 </body>
 </html>
+
