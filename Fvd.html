@@ -1,220 +1,128 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Caixa de Pedidos</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #0d1b2a;
-      color: #fff;
-      margin: 0;
-      padding: 0;
-    }
-
-    header {
-      background-color: #1b263b;
-      padding: 15px;
-      text-align: center;
-      font-size: 1.4em;
-      font-weight: bold;
-    }
-
-    .container {
-      padding: 20px;
-    }
-
-    .form-box {
-      background: #1b263b;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-
-    .form-box input, .form-box select, .form-box button {
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 5px;
-      border: none;
-      font-size: 1em;
-    }
-
-    .form-box button {
-      background: #415a77;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .produtos {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 15px;
-    }
-
-    .card {
-      background: #1b263b;
-      padding: 15px;
-      border-radius: 8px;
-      text-align: center;
-    }
-
-    .card h3 {
-      margin: 0 0 5px;
-    }
-
-    .card p {
-      margin: 3px 0;
-    }
-
-    .card button {
-      margin-top: 8px;
-      background: #415a77;
-      color: white;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .carrinho {
-      margin-top: 25px;
-      background: #1b263b;
-      padding: 15px;
-      border-radius: 8px;
-    }
-
-    .carrinho h2 {
-      margin: 0 0 10px;
-    }
-
-    .carrinho ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .carrinho li {
-      padding: 8px;
-      border-bottom: 1px solid #415a77;
-    }
-
-    .whatsapp-btn {
-      margin-top: 15px;
-      width: 100%;
-      padding: 12px;
-      font-size: 1.1em;
-      background: #25d366;
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plataforma de Jogos Online</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .slot {
+    font-size: 3rem;
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+    text-align: center;
+    line-height: 60px;
+    border: 2px solid #000;
+    margin: 5px;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+  }
+</style>
 </head>
-<body>
-  <header>Caixa de Pedidos</header>
-  <div class="container">
+<body class="bg-gray-100 flex flex-col items-center min-h-screen">
 
-    <!-- Formulário -->
-    <div class="form-box">
-      <input type="text" id="nomeProduto" placeholder="Nome do produto">
-      <input type="number" id="precoProduto" placeholder="Preço (R$)" step="0.01">
-      <select id="tipoProduto">
-        <option value="Kg">Kg</option>
-        <option value="Un">Un</option>
-      </select>
-      <button onclick="adicionarProduto()">Adicionar Produto</button>
-    </div>
+<!-- Header -->
+<header class="w-full bg-red-500 text-white p-4 text-center text-2xl font-bold">
+  Plataforma de Jogos Online
+</header>
 
-    <!-- Lista de Produtos -->
-    <div class="produtos" id="listaProdutos"></div>
+<!-- Login -->
+<section id="loginSection" class="mt-10 w-full max-w-md p-6 bg-white shadow-md rounded-md">
+  <h2 class="text-xl font-semibold mb-4">Login</h2>
+  <input type="text" id="username" placeholder="Nome de usuário" class="w-full p-2 mb-4 border rounded">
+  <button onclick="login()" class="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600">Entrar</button>
+</section>
 
-    <!-- Carrinho -->
-    <div class="carrinho">
-      <h2>Carrinho</h2>
-      <ul id="carrinhoLista"></ul>
-      <button class="whatsapp-btn" onclick="enviarWhatsApp()">Enviar para WhatsApp</button>
-    </div>
+<!-- Game Section -->
+<section id="gameSection" class="hidden mt-10 w-full max-w-md p-6 bg-white shadow-md rounded-md">
+  <h2 class="text-xl font-semibold mb-4">Slot Machine</h2>
+
+  <!-- Saldo -->
+  <div class="mb-4">
+    <span class="font-bold">Saldo:</span> R$ <span id="balance">100</span>
   </div>
 
-  <script>
-    let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
-    let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+  <!-- Slot display -->
+  <div class="flex justify-center mb-4">
+    <div class="slot" id="slot1">🍒</div>
+    <div class="slot" id="slot2">🍋</div>
+    <div class="slot" id="slot3">🍊</div>
+  </div>
 
-    function salvarDados() {
-      localStorage.setItem("produtos", JSON.stringify(produtos));
-      localStorage.setItem("carrinho", JSON.stringify(carrinho));
+  <!-- Aposta -->
+  <div class="mb-4">
+    <label class="font-bold">Aposta:</label>
+    <input type="number" id="bet" value="10" min="1" class="border p-1 rounded w-full">
+  </div>
+
+  <!-- Botão girar -->
+  <button onclick="spin()" class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 mb-4">Girar</button>
+
+  <!-- Resultado -->
+  <div id="result" class="text-center font-bold text-lg mb-4"></div>
+
+  <!-- Histórico -->
+  <div>
+    <h3 class="font-semibold mb-2">Histórico de Rodadas</h3>
+    <ul id="history" class="list-disc list-inside max-h-40 overflow-y-auto"></ul>
+  </div>
+</section>
+
+<script>
+  let balance = 100;
+  const symbols = ["🍒","🍋","🍊","🍉","⭐","7️⃣"];
+
+  function login() {
+    const username = document.getElementById("username").value;
+    if(username.trim() === "") {
+      alert("Digite um nome de usuário!");
+      return;
+    }
+    document.getElementById("loginSection").classList.add("hidden");
+    document.getElementById("gameSection").classList.remove("hidden");
+    alert(`Bem-vindo(a), ${username}!`);
+  }
+
+  function spin() {
+    const bet = parseInt(document.getElementById("bet").value);
+    if(bet > balance) {
+      alert("Saldo insuficiente!");
+      return;
     }
 
-    function adicionarProduto() {
-      const nome = document.getElementById("nomeProduto").value;
-      const preco = document.getElementById("precoProduto").value;
-      const tipo = document.getElementById("tipoProduto").value;
+    // Gerar slots aleatórios
+    const slot1 = symbols[Math.floor(Math.random() * symbols.length)];
+    const slot2 = symbols[Math.floor(Math.random() * symbols.length)];
+    const slot3 = symbols[Math.floor(Math.random() * symbols.length)];
 
-      if (!nome || !preco) {
-        alert("Preencha o nome e preço do produto!");
-        return;
-      }
+    document.getElementById("slot1").textContent = slot1;
+    document.getElementById("slot2").textContent = slot2;
+    document.getElementById("slot3").textContent = slot3;
 
-      const produto = { nome, preco, tipo };
-      produtos.push(produto);
-      salvarDados();
-      renderizarProdutos();
-      document.getElementById("nomeProduto").value = "";
-      document.getElementById("precoProduto").value = "";
+    let win = 0;
+    if(slot1 === slot2 && slot2 === slot3) {
+      win = bet * 5;
+      balance += win;
+      document.getElementById("result").textContent = `Parabéns! Você ganhou R$${win}`;
+    } else if(slot1 === slot2 || slot2 === slot3 || slot1 === slot3) {
+      win = bet * 2;
+      balance += win;
+      document.getElementById("result").textContent = `Você ganhou R$${win}`;
+    } else {
+      balance -= bet;
+      document.getElementById("result").textContent = `Você perdeu R$${bet}`;
     }
 
-    function renderizarProdutos() {
-      const lista = document.getElementById("listaProdutos");
-      lista.innerHTML = "";
-      produtos.forEach((p, i) => {
-        lista.innerHTML += `
-          <div class="card">
-            <h3>${p.nome}</h3>
-            <p>Preço: R$ ${p.preco}</p>
-            <p>Tipo: ${p.tipo}</p>
-            <button onclick="adicionarCarrinho(${i})">Adicionar ao Carrinho</button>
-          </div>
-        `;
-      });
-    }
+    document.getElementById("balance").textContent = balance;
 
-    function adicionarCarrinho(i) {
-      carrinho.push(produtos[i]);
-      salvarDados();
-      renderizarCarrinho();
-    }
+    // Atualizar histórico
+    const history = document.getElementById("history");
+    const li = document.createElement("li");
+    li.textContent = `Slots: ${slot1} ${slot2} ${slot3} | Resultado: ${win>0 ? "Ganhou R$"+win : "Perdeu R$"+bet}`;
+    history.prepend(li);
+  }
+</script>
 
-    function renderizarCarrinho() {
-      const lista = document.getElementById("carrinhoLista");
-      lista.innerHTML = "";
-      carrinho.forEach((p, i) => {
-        lista.innerHTML += `<li>${p.nome} - R$ ${p.preco} (${p.tipo})</li>`;
-      });
-    }
-
-    function enviarWhatsApp() {
-      if (carrinho.length === 0) {
-        alert("O carrinho está vazio!");
-        return;
-      }
-      let mensagem = "Pedido:%0A";
-      carrinho.forEach(p => {
-        mensagem += `- ${p.nome} (${p.tipo}) R$ ${p.preco}%0A`;
-      });
-
-      let numero = "5581991152441"; // seu número
-      let url = `https://wa.me/${numero}?text=${mensagem}`;
-      window.open(url, "_blank");
-    }
-
-    // Renderizar ao carregar
-    renderizarProdutos();
-    renderizarCarrinho();
-  </script>
 </body>
 </html>
