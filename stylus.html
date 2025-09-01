@@ -115,14 +115,15 @@
 
 
   <!-- Espaço para compensar header fixo -->
-<div class="h-36"></div>
+<div class="h-6"></div> <!-- ~80px -->
+
 
 <!-- Conteúdo principal -->
 <main class="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="productList">
   
   <!-- Produto exemplo -->
   <div class="bg-[#1a1a1a] p-4 rounded-xl shadow-lg relative categoria-Polpas border border-gray-700 hover:border-[#0ff] hover:shadow-[0_0_15px_#0ff] transition-all">
-    <img src="imagens/polpamaracuja.jpg" alt="Polpa de Maracujá 300g UN" class="w-full h-40 object-contain rounded">
+    <img src="imagens/maca.jpg.png" alt="Polpa de Maracujá 300g UN" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2 text-[#0ff] drop-shadow-[0_0_5px_#0ff]">Polpa de Maracujá 300g UN</h2>
     <p class="text-sm text-gray-400">Descrição do produto.</p>
     <p class="text-pink-500 font-bold text-lg">R$ 6,99</p>
@@ -1977,6 +1978,197 @@ function finalizarPedido() {
                 }
             });
         }
+
+
+        
+  // === Carrinho (LocalStorage) ===
+  const CART_KEY = 'hortimanik_cart';
+
+  function getCart() {
+    try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
+    catch { return []; }
+  }
+
+  function saveCart(cart) {
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  }
+
+  function updateCartCount() {
+    const cart = getCart();
+    const totalItens = cart.reduce((sum, item) => sum + Number(item.qtd || 0), 0);
+    const badge = document.getElementById('cartCount');
+    if (badge) badge.textContent = totalItens;
+  }
+
+  function formatBRL(v) {
+    return Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  // === Adicionar ao carrinho ===
+  // Use no form: onsubmit="addToCart(event, 'Nome do Produto', 6.99)"
+  function addToCart(ev, nome, preco) {
+    ev.preventDefault();
+
+    const form = ev.target;
+
+    // Lê campos do form (todos opcionais, mas "quantidade" recomendado)
+    const qtd = parseFloat(form.quantidade?.value) || 1;
+    const unidadeValor = form.peso?.value ?? '';
+    const unidadeTexto = form.peso ? form.peso.options[form.peso.selectedIndex].text : '';
+    const comentario = (form.comentario?.value || '').trim();
+
+    // ID base (nome + unidade) para agrupar itens iguais
+    const itemId = `${nome}|${unidadeValor}`.toLowerCase();
+
+    // Monta item
+    const novoItem = {
+      id: itemId,
+      nome,
+      preco: Number(preco),
+      qtd,
+      unidade: unidadeTexto, // Ex.: "1 un" ou "500 g"
+      comentario // Mantém, mas não diferencia o item
+    };
+
+    // Atualiza carrinho (agrega por id)
+    const cart = getCart();
+    const idx = cart.findIndex(i => i.id === novoItem.id);
+    if (idx >= 0) {
+      cart[idx].qtd += novoItem.qtd;
+      // opcional: se quiser somar comentários, pode concatenar
+      if (novoItem.comentario) {
+        cart[idx].comentario = cart[idx].comentario
+          ? `${cart[idx].comentario}; ${novoItem.comentario}`
+          : novoItem.comentario;
+      }
+    } else {
+      cart.push(novoItem);
+    }
+    saveCart(cart);
+    updateCartCount();
+
+    // Feedback visual (tema escuro combina com seu tema rock)
+    if (window.Swal) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Adicionado!',
+        text: `${nome} ${unidadeTexto ? `(${unidadeTexto}) ` : ''}x${qtd} foi para o carrinho.`,
+        timer: 1500,
+        showConfirmButton: false,
+        background: '#1a1a1a',
+        color: '#f1f1f1'
+      });
+    }
+
+    // Reseta apenas quantidade/comentário (mantém unidade, se preferir)
+    form.quantidade && (form.quantidade.value = 1);
+    form.comentario && (form.comentario.value = '');
+  }
+
+  // === Ver carrinho (ícone do cabeçalho) ===
+  function toggleCart() {
+    const cart = getCart();
+
+    if (!cart.length) {
+      if (window.Swal) {
+        Swal.fire({
+          icon: 'info',
+          title: 'Seu carrinho está vazio',
+          timer: 1200,
+          showConfirmButton: false,
+          background: '#1a1a1a',
+          color: '#f1f1f1'
+        });
+      }
+      return;
+    }
+
+    const total = cart.reduce((sum, i) => sum + (i.preco * i.qtd), 0);
+
+    // Monta HTML simples do carrinho
+    const linhas = cart.map(i => `
+      <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:8px">
+        <div style="flex:1">
+          <div style="font-weight:700">${i.nome} ${i.unidade ? `<span style="opacity:.8">(${i.unidade})</span>` : ''}</div>
+          <div style="font-size:12px;opacity:.8">${i.comentario ? i.comentario : ''}</div>
+          <div style="font-size:12px;opacity:.8">Qtd: ${i.qtd} × ${formatBRL(i.preco)}</div>
+        </div>
+        <div style="font-weight:700">${formatBRL(i.preco * i.qtd)}</div>
+      </div>
+    `).join('');
+
+    const html = `
+      <div style="text-align:left">
+        ${linhas}
+        <hr style="border-color:#333;margin:10px 0" />
+        <div style="display:flex;justify-content:space-between;font-weight:800">
+          <span>Total</span><span>${formatBRL(total)}</span>
+        </div>
+      </div>
+    `;
+
+    if (window.Swal) {
+      Swal.fire({
+        title: 'Carrinho',
+        html,
+        showCancelButton: true,
+        confirmButtonText: 'Limpar carrinho',
+        cancelButtonText: 'Fechar',
+        background: '#0f0f0f',
+        color: '#f1f1f1',
+        confirmButtonColor: '#ff004c',
+        cancelButtonColor: '#0ff',
+        customClass: {
+          popup: 'rock-cart'
+        }
+      }).then(res => {
+        if (res.isConfirmed) {
+          saveCart([]);
+          updateCartCount();
+          Swal.fire({
+            icon: 'success',
+            title: 'Carrinho limpo!',
+            timer: 1000,
+            showConfirmButton: false,
+            background: '#0f0f0f',
+            color: '#f1f1f1'
+          });
+        }
+      });
+    }
+  }
+
+  // === Busca por nome (opcional; mantém se já tiver) ===
+  function searchProduct() {
+    const term = (document.getElementById('search')?.value || '').toLowerCase();
+    const cards = document.querySelectorAll('#productList > div');
+    cards.forEach(card => {
+      const txt = (card.querySelector('h2')?.textContent || '').toLowerCase();
+      card.style.display = txt.includes(term) ? '' : 'none';
+    });
+  }
+
+  // === Filtro por categoria (opcional; mantém se já tiver) ===
+  function filterCategory(cat) {
+    const cards = document.querySelectorAll('#productList > div');
+    cards.forEach(card => {
+      const isCat = [...card.classList].some(c => c.toLowerCase().startsWith('categoria-'));
+      if (!isCat || cat === 'todos') {
+        card.style.display = '';
+      } else {
+        // classes do tipo categoria-Polpas, categoria-frutas etc.
+        const ok = [...card.classList].some(c =>
+          c.toLowerCase() === ('categoria-' + cat).toLowerCase()
+        );
+        card.style.display = ok ? '' : 'none';
+      }
+    });
+  }
+
+  // Atualiza badge ao carregar
+  document.addEventListener('DOMContentLoaded', updateCartCount);
+
+
   </script>
 
   <!-- Rodapé -->
