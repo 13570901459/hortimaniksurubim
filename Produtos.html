@@ -1090,7 +1090,7 @@
     <h2 class="text-lg font-bold mt-2">3 Maracujá por R$ 4,99</h2>
     <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
     <p class="text-green-700 font-bold">R$ 4,99</p>
-    <form onsubmit="addToCart(event, '3 Maracujá por R$ 4,99<', 4.99)" class="mt-2 space-y-2">
+    <form onsubmit="addToCart(event, '3 Maracujá por R$ 4,99', 4.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
          <option value="1">1 un</option>
       </select>
@@ -1123,8 +1123,23 @@
     <img src="imagens/melancia.jpg" alt="melancia" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Melancia 1/4 fatia</h2>
     <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
-    <p class="text-green-700 font-bold">R$ 3,99</p>
-    <form onsubmit="addToCart(event, 'Melancia 1/4 fatia', 3.99)" class="mt-2 space-y-2">
+    <p class="text-green-700 font-bold">R$ 2,99</p>
+    <form onsubmit="addToCart(event, 'Melancia 1/4 fatia', 2.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
+  <!-- Produto: Melancia un -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
+    <img src="imagens/melanciacodama.jpg" alt="melancia" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Melancia Codoma inteira </h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 4,99</p>
+    <form onsubmit="addToCart(event, 'Melancia Codoma inteira', 4.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
         <option value="1">1 un</option>
       </select>
@@ -1134,12 +1149,12 @@
     </form>
   </div>
   <!-- Produto: Melão kg -->
- <!--  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
     <img src="imagens/melao.jpg" alt="melao" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Melão KG</h2>
     <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
-    <p class="text-green-700 font-bold">R$ 3,35</p>
-    <form onsubmit="addToCart(event, 'Melão KG', 3.35)" class="mt-2 space-y-2">
+    <p class="text-green-700 font-bold">R$ 4,59</p>
+    <form onsubmit="addToCart(event, 'Melão KG', 4.59)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
         <option value="1">1kg</option>
         <option value="0.5">500g</option>
@@ -1148,11 +1163,11 @@
       <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
       <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
     </form>
-  </div>  -->
+  </div>  
 <!-- Produto:Melão Espanhol  un -->
 <div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
-  <img src="imagens/melao.jpg" alt="melao" class="w-full h-40 object-contain rounded">
-  <h2 class="text-lg font-bold mt-2">Melão Espanhol UN - Pequeno</h2>
+  <img src="imagens/melaodoce.jpg" alt="melao" class="w-full h-40 object-contain rounded">
+  <h2 class="text-lg font-bold mt-2">Melão  - Pequeno</h2>
   <p class="text-sm text-gray-500">Produto selecionado e novinho.</p>
   <p class="text-green-700 font-bold">R$ 2,99</p>
   <form onsubmit="addToCart(event, 'Melão UN', 2.99)" class="mt-2 space-y-2">
@@ -1212,7 +1227,21 @@
       <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
     </form>
   </div>
-  
+  <!-- Produto: Morango UN -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
+    <img src="imagens/morango200g.jpg" alt="morango" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Morango Peterfrut 200g UN</h2>
+    <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <p class="text-green-700 font-bold">R$ 4,99</p>
+    <form onsubmit="addToCart(event, 'Morango Peterfrut 200g UN', 4.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div>
   <!-- Produto: MILHO VERDE UN 
   <div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
     <img src="imagens/milhoverde.jpg" alt="manga_tommy" class="w-full h-40 object-contain rounded">
@@ -1308,6 +1337,23 @@
     <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
     <p class="text-green-700 font-bold">R$ 13,99</p>
     <form onsubmit="addToCart(event, 'Uva Roxa KG', 13.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1kg</option>
+        <option value="0.5">500g</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
+  </div> 
+
+   <!-- Produto: Uva Roxa kg -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas">
+    <img src="imagens/uvavitoria.jpg" alt="Uva Roxa" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">Uva Roxa vitória sem semente KG</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <p class="text-green-700 font-bold">R$ 13,99</p>
+    <form onsubmit="addToCart(event, 'Uva Roxa vitória sem semente KG', 13.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
         <option value="1">1kg</option>
         <option value="0.5">500g</option>
@@ -2066,6 +2112,7 @@ function finalizarPedido() {
   </footer>
 </body>
 </html>
+
 
 
 
