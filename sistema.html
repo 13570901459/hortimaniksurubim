@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard de Vendas - HORTIMANIK</title>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800">
+  <div class="min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="w-80 bg-white border-r p-6">
+      <h1 class="text-2xl font-bold mb-4">HORTIMANIK</h1>
+      <nav class="space-y-2 text-sm">
+        <button class="w-full text-left tab-btn py-2 px-3 rounded hover:bg-slate-100" data-tab="dashboard">Dashboard</button>
+        <button class="w-full text-left tab-btn py-2 px-3 rounded hover:bg-slate-100" data-tab="compras">Registrar Compras</button>
+        <button class="w-full text-left tab-btn py-2 px-3 rounded hover:bg-slate-100" data-tab="vendas">Registrar Vendas</button>
+        <button class="w-full text-left tab-btn py-2 px-3 rounded hover:bg-slate-100" data-tab="despesas">Registrar Despesas</button>
+        <button class="w-full text-left tab-btn py-2 px-3 rounded hover:bg-slate-100" data-tab="relatorios">Relatórios</button>
+        <button class="w-full text-left tab-btn py-2 px-3 rounded hover:bg-slate-100" data-tab="config">Config / Export</button>
+      </nav>
+      <hr class="my-4" />
+      <div class="text-xs text-slate-500">Armazenamento: <span id="storageSize">-</span></div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 p-6">
+      <!-- Tabs content -->
+      <section id="dashboard" class="tab-content">
+        <div class="flex items-start justify-between">
+          <div>
+            <h2 class="text-xl font-semibold">Dashboard</h2>
+            <p class="text-sm text-slate-500">Visão rápida: hoje, semana (Seg-Sáb) e metas</p>
+          </div>
+          <div class="space-x-2">
+            <label class="text-sm">Meta diária (R$)</label>
+            <input id="metaDiaria" type="number" class="border rounded px-2 py-1 w-36" />
+            <label class="text-sm ml-3">Meta semanal (R$)</label>
+            <input id="metaSemanal" type="number" class="border rounded px-2 py-1 w-36" />
+            <button id="salvarMetas" class="ml-3 bg-sky-600 text-white px-3 py-1 rounded">Salvar</button>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-4 mt-6">
+          <div class="bg-white p-4 rounded shadow">
+            <div class="text-sm text-slate-500">Vendas (hoje)</div>
+            <div id="vendasHoje" class="text-2xl font-bold">R$ 0,00</div>
+            <div class="text-xs text-slate-400">Métodos: PIX / Cartão / Dinheiro</div>
+          </div>
+
+          <div class="bg-white p-4 rounded shadow">
+            <div class="text-sm text-slate-500">Despesas (hoje)</div>
+            <div id="despesasHoje" class="text-2xl font-bold">R$ 0,00</div>
+          </div>
+
+          <div class="bg-white p-4 rounded shadow">
+            <div class="text-sm text-slate-500">Lucro estimado (hoje)</div>
+            <div id="lucroHoje" class="text-2xl font-bold">R$ 0,00</div>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4 mt-6">
+          <div class="bg-white p-4 rounded shadow">
+            <canvas id="chartVendas"></canvas>
+          </div>
+          <div class="bg-white p-4 rounded shadow">
+            <canvas id="chartDespesas"></canvas>
+          </div>
+        </div>
+
+        <div class="mt-6 bg-white p-4 rounded shadow">
+          <h3 class="font-semibold">Projeção vs Metas</h3>
+          <div class="mt-3" id="projecoesResumo">Sem dados.</div>
+        </div>
+      </section>
+
+      <!-- Compras -->
+      <section id="compras" class="hidden tab-content">
+        <h2 class="text-xl font-semibold">Registrar Compra</h2>
+        <p class="text-sm text-slate-500">Preencha os dados da compra. A margem é em % (ex: 30 para 30%). O lucro estimado será calculado como: (preço de venda estimado - (valor + frete)).</p>
+        <form id="formCompra" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 bg-white p-4 rounded shadow">
+          <input type="text" id="compraDescricao" placeholder="Descrição" class="border rounded px-2 py-2" />
+          <input type="date" id="compraData" class="border rounded px-2 py-2" />
+          <input type="number" id="compraValor" placeholder="Valor (R$)" class="border rounded px-2 py-2" step="0.01" />
+          <input type="number" id="compraFrete" placeholder="Frete (R$)" class="border rounded px-2 py-2" step="0.01" />
+          <input type="number" id="compraMargem" placeholder="Margem %" class="border rounded px-2 py-2" step="0.1" />
+          <div class="flex items-center">
+            <button type="button" id="adicionarCompra" class="bg-green-600 text-white px-4 py-2 rounded">Adicionar</button>
+            <button type="button" id="exportComprasCsv" class="ml-2 border px-3 py-2 rounded">Export CSV</button>
+          </div>
+        </form>
+
+        <div class="mt-4 bg-white p-4 rounded shadow">
+          <h3 class="font-semibold">Compras registradas</h3>
+          <div class="overflow-x-auto mt-2">
+            <table class="w-full text-sm" id="tabelaCompras">
+              <thead class="text-left text-xs text-slate-500"><tr><th>Data</th><th>Desc</th><th>Valor</th><th>Frete</th><th>Margem%</th><th>Preço venda</th><th>Lucro estim.</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Vendas -->
+      <section id="vendas" class="hidden tab-content">
+        <h2 class="text-xl font-semibold">Registrar Venda</h2>
+        <form id="formVenda" class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 bg-white p-4 rounded shadow">
+          <input type="date" id="vendaData" class="border rounded px-2 py-2" />
+          <input type="number" id="vendaValor" placeholder="Valor (R$)" class="border rounded px-2 py-2" step="0.01" />
+          <select id="vendaMetodo" class="border rounded px-2 py-2">
+            <option value="PIX">PIX</option>
+            <option value="Cartão">Cartão</option>
+            <option value="Dinheiro">Dinheiro</option>
+          </select>
+          <div class="md:col-span-3 flex items-center">
+            <button type="button" id="adicionarVenda" class="bg-green-600 text-white px-4 py-2 rounded">Adicionar Venda</button>
+            <button type="button" id="exportVendasCsv" class="ml-2 border px-3 py-2 rounded">Export CSV</button>
+          </div>
+        </form>
+
+        <div class="mt-4 bg-white p-4 rounded shadow">
+          <h3 class="font-semibold">Vendas registradas</h3>
+          <div class="overflow-x-auto mt-2">
+            <table class="w-full text-sm" id="tabelaVendas">
+              <thead class="text-left text-xs text-slate-500"><tr><th>Data</th><th>Valor</th><th>Método</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Despesas -->
+      <section id="despesas" class="hidden tab-content">
+        <h2 class="text-xl font-semibold">Registrar Despesa</h2>
+        <form id="formDespesa" class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 bg-white p-4 rounded shadow">
+          <input type="date" id="despesaData" class="border rounded px-2 py-2" />
+          <input type="number" id="despesaValor" placeholder="Valor (R$)" class="border rounded px-2 py-2" step="0.01" />
+          <input type="text" id="despesaDescricao" placeholder="Descrição" class="border rounded px-2 py-2" />
+          <div class="md:col-span-3 flex items-center">
+            <button type="button" id="adicionarDespesa" class="bg-green-600 text-white px-4 py-2 rounded">Adicionar Despesa</button>
+            <button type="button" id="exportDespesasCsv" class="ml-2 border px-3 py-2 rounded">Export CSV</button>
+          </div>
+        </form>
+
+        <div class="mt-4 bg-white p-4 rounded shadow">
+          <h3 class="font-semibold">Despesas registradas</h3>
+          <div class="overflow-x-auto mt-2">
+            <table class="w-full text-sm" id="tabelaDespesas">
+              <thead class="text-left text-xs text-slate-500"><tr><th>Data</th><th>Valor</th><th>Descrição</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Relatórios -->
+      <section id="relatorios" class="hidden tab-content">
+        <h2 class="text-xl font-semibold">Relatórios</h2>
+        <div class="mt-4 grid md:grid-cols-2 gap-4">
+          <div class="bg-white p-4 rounded shadow">
+            <h3 class="font-semibold">Relatório Diário</h3>
+            <label class="text-sm">Data</label>
+            <input type="date" id="relData" class="border rounded px-2 py-2 mt-2" />
+            <button id="gerarRelDiario" class="mt-3 bg-sky-600 text-white px-3 py-1 rounded">Gerar</button>
+            <div id="relDiarioResultado" class="mt-3 text-sm"></div>
+          </div>
+
+          <div class="bg-white p-4 rounded shadow">
+            <h3 class="font-semibold">Relatório Semanal (Seg-Sáb)</h3>
+            <label class="text-sm">Data de referência (qualquer dia da semana)</label>
+            <input type="date" id="relSemanaData" class="border rounded px-2 py-2 mt-2" />
+            <button id="gerarRelSemanal" class="mt-3 bg-sky-600 text-white px-3 py-1 rounded">Gerar</button>
+            <div id="relSemanalResultado" class="mt-3 text-sm"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Config / Export -->
+      <section id="config" class="hidden tab-content">
+        <h2 class="text-xl font-semibold">Configurações & Export</h2>
+        <div class="mt-4 bg-white p-4 rounded shadow">
+          <button id="limparDados" class="bg-red-600 text-white px-3 py-1 rounded">Limpar todos os dados</button>
+          <p class="text-xs text-slate-500 mt-2">Os dados ficam salvos no seu navegador (localStorage). Faça export CSV regularmente.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // --- Helpers ---
+    const qs = s => document.querySelector(s);
+    const qsa = s => document.querySelectorAll(s);
+
+    // Keys
+    const KEY_PUR = 'hortimanik_purchases';
+    const KEY_SALES = 'hortimanik_sales';
+    const KEY_EXP = 'hortimanik_expenses';
+    const KEY_SET = 'hortimanik_settings';
+
+    // Initialize
+    let purchases = [];
+    let sales = [];
+    let expenses = [];
+    let settings = { metaDiaria: 0, metaSemanal: 0 };
+
+    function loadData(){
+      purchases = JSON.parse(localStorage.getItem(KEY_PUR)||'[]');
+      sales = JSON.parse(localStorage.getItem(KEY_SALES)||'[]');
+      expenses = JSON.parse(localStorage.getItem(KEY_EXP)||'[]');
+      settings = JSON.parse(localStorage.getItem(KEY_SET)||JSON.stringify(settings));
+      qs('#metaDiaria').value = settings.metaDiaria || '';
+      qs('#metaSemanal').value = settings.metaSemanal || '';
+      updateStorageSize();
+    }
+
+    function saveAll(){
+      localStorage.setItem(KEY_PUR, JSON.stringify(purchases));
+      localStorage.setItem(KEY_SALES, JSON.stringify(sales));
+      localStorage.setItem(KEY_EXP, JSON.stringify(expenses));
+      localStorage.setItem(KEY_SET, JSON.stringify(settings));
+      updateStorageSize();
+    }
+
+    function updateStorageSize(){
+      try{
+        const used = new Blob([localStorage.getItem(KEY_PUR)||'', localStorage.getItem(KEY_SALES)||'', localStorage.getItem(KEY_EXP)||'', localStorage.getItem(KEY_SET)||'']).size;
+        qs('#storageSize').textContent = Math.round(used/1024) + ' KB';
+      }catch(e){qs('#storageSize').textContent = '-'}
+    }
+
+    // --- Add handlers ---
+    qs('#adicionarCompra').addEventListener('click', ()=>{
+      const desc = qs('#compraDescricao').value.trim();
+      const data = qs('#compraData').value || new Date().toISOString().slice(0,10);
+      const valor = parseFloat(qs('#compraValor').value) || 0;
+      const frete = parseFloat(qs('#compraFrete').value) || 0;
+      const margem = parseFloat(qs('#compraMargem').value) || 0;
+      const precoVenda = (valor + frete) * (1 + margem/100);
+      const lucroEstim = precoVenda - (valor + frete);
+      const item = { id: Date.now(), desc, data, valor, frete, margem, precoVenda: round(precoVenda), lucroEstim: round(lucroEstim) };
+      purchases.push(item); saveAll(); renderCompras(); renderDashboard(); clearCompraForm();
+    });
+
+    qs('#adicionarVenda').addEventListener('click', ()=>{
+      const data = qs('#vendaData').value || new Date().toISOString().slice(0,10);
+      const valor = parseFloat(qs('#vendaValor').value) || 0;
+      const metodo = qs('#vendaMetodo').value;
+      const item = { id: Date.now(), data, valor, metodo };
+      sales.push(item); saveAll(); renderVendas(); renderDashboard(); clearVendaForm();
+    });
+
+    qs('#adicionarDespesa').addEventListener('click', ()=>{
+      const data = qs('#despesaData').value || new Date().toISOString().slice(0,10);
+      const valor = parseFloat(qs('#despesaValor').value) || 0;
+      const desc = qs('#despesaDescricao').value || '';
+      const item = { id: Date.now(), data, valor, desc };
+      expenses.push(item); saveAll(); renderDespesas(); renderDashboard(); clearDespesaForm();
+    });
+
+    qs('#salvarMetas').addEventListener('click', ()=>{
+      settings.metaDiaria = parseFloat(qs('#metaDiaria').value) || 0;
+      settings.metaSemanal = parseFloat(qs('#metaSemanal').value) || 0;
+      saveAll(); renderDashboard(); alert('Metas salvas.');
+    });
+
+    qs('#limparDados').addEventListener('click', ()=>{
+      if(confirm('Apagar todos os dados locais?')){localStorage.removeItem(KEY_PUR); localStorage.removeItem(KEY_SALES); localStorage.removeItem(KEY_EXP); localStorage.removeItem(KEY_SET); purchases=[]; sales=[]; expenses=[]; settings={metaDiaria:0,metaSemanal:0}; saveAll(); renderAll();}
+    });
+
+    // --- Render functions ---
+    function renderCompras(){
+      const tbody = qs('#tabelaCompras tbody'); tbody.innerHTML='';
+      purchases.slice().reverse().forEach(p=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="py-1">${p.data}</td><td class="py-1">${escapeHtml(p.desc)}</td><td class="py-1">R$ ${fmt(p.valor)}</td><td class="py-1">R$ ${fmt(p.frete)}</td><td class="py-1">${fmt(p.margem)}%</td><td class="py-1">R$ ${fmt(p.precoVenda)}</td><td class="py-1">R$ ${fmt(p.lucroEstim)}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderVendas(){
+      const tbody = qs('#tabelaVendas tbody'); tbody.innerHTML='';
+      sales.slice().reverse().forEach(s=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="py-1">${s.data}</td><td class="py-1">R$ ${fmt(s.valor)}</td><td class="py-1">${s.metodo}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderDespesas(){
+      const tbody = qs('#tabelaDespesas tbody'); tbody.innerHTML='';
+      expenses.slice().reverse().forEach(d=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="py-1">${d.data}</td><td class="py-1">R$ ${fmt(d.valor)}</td><td class="py-1">${escapeHtml(d.desc)}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // --- Reports & dashboard ---
+    function sumByDate(list, date){
+      return list.filter(i=>i.data===date).reduce((s,n)=>s + (n.valor||n.precoVenda||0),0);
+    }
+
+    function getRangeDates(start, end){
+      const arr=[]; let cur=new Date(start); const last=new Date(end);
+      while(cur<=last){ arr.push(cur.toISOString().slice(0,10)); cur.setDate(cur.getDate()+1);} return arr;
+    }
+
+    function renderDashboard(){
+      const today = new Date().toISOString().slice(0,10);
+      const vendasHoje = sales.filter(s=>s.data===today).reduce((s,n)=>s+n.valor,0);
+      const despesasHoje = expenses.filter(e=>e.data===today).reduce((s,n)=>s+n.valor,0);
+      // lucro estimado: vendas - despesas - custo das compras realizadas hoje (aprox)
+      const custoComprasHoje = purchases.filter(p=>p.data===today).reduce((s,n)=>s+(n.valor + n.frete),0);
+      const lucroHoje = vendasHoje - despesasHoje - custoComprasHoje;
+      qs('#vendasHoje').textContent = 'R$ '+fmt(vendasHoje);
+      qs('#despesasHoje').textContent = 'R$ '+fmt(despesasHoje);
+      qs('#lucroHoje').textContent = 'R$ '+fmt(lucroHoje);
+
+      // Charts: last 7 days
+      const labels = [];
+      for(let i=6;i>=0;i--){ const d = new Date(); d.setDate(d.getDate()-i); labels.push(d.toISOString().slice(0,10)); }
+      const vendasData = labels.map(l=> sales.filter(s=>s.data===l).reduce((a,b)=>a+b.valor,0));
+      const despesasData = labels.map(l=> expenses.filter(e=>e.data===l).reduce((a,b)=>a+b.valor,0));
+      updateChart('chartVendas', labels, vendasData, 'Vendas (7d)');
+      updateChart('chartDespesas', labels, despesasData, 'Despesas (7d)');
+
+      // Projeção vs metas
+      const somaSemana = sales.reduce((s,n)=> s + (isInThisWeek(n.data)? n.valor : 0),0);
+      const projDiaria = sales.reduce((s,n)=> s + (isInThisWeek(n.data)? n.valor : 0),0) / Math.max(1,daysPassedThisWeek());
+      const projResumo = `Semana (Seg-Sáb): R$ ${fmt(somaSemana)} / Meta Semanal: R$ ${fmt(settings.metaSemanal||0)}. Projeção média diária: R$ ${fmt(projDiaria)} / Meta diária: R$ ${fmt(settings.metaDiaria||0)}.`;
+      qs('#projecoesResumo').textContent = projResumo;
+    }
+
+    // Utility: is date in Mon-Sat of current week
+    function isInThisWeek(dateStr){ if(!dateStr) return false; const d = new Date(dateStr); const now = new Date(); // week starting Monday
+      const day = now.getDay(); const diffToMon = (day===0? -6 : 1 - day); const monday = new Date(now); monday.setDate(now.getDate()+diffToMon); monday.setHours(0,0,0,0);
+      const saturday = new Date(monday); saturday.setDate(monday.getDate()+5); saturday.setHours(23,59,59,999);
+      return d>=monday && d<=saturday;
+    }
+
+    function daysPassedThisWeek(){ const now = new Date(); const day = now.getDay(); // 0 Sun ...
+      const passed = day===0? 6 : Math.min(day-1,5); // if sunday consider 6 passed
+      return Math.max(1, passed+1);
+    }
+
+    // Charts controller
+    let chartInstances = {};
+    function updateChart(id, labels, data, label){
+      const ctx = document.getElementById(id).getContext('2d');
+      if(chartInstances[id]) chartInstances[id].destroy();
+      chartInstances[id] = new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets: [{ label, data }] },
+        options: { responsive:true, maintainAspectRatio:false }
+      });
+    }
+
+    // --- Reports generation ---
+    qs('#gerarRelDiario').addEventListener('click', ()=>{
+      const date = qs('#relData').value || new Date().toISOString().slice(0,10);
+      const vendasDia = sales.filter(s=>s.data===date).reduce((a,b)=>a+b.valor,0);
+      const despesasDia = expenses.filter(e=>e.data===date).reduce((a,b)=>a+b.valor,0);
+      const custoCompras = purchases.filter(p=>p.data===date).reduce((a,b)=>a+(b.valor + b.frete),0);
+      const lucroEst = vendasDia - despesasDia - custoCompras;
+      qs('#relDiarioResultado').innerHTML = `<strong>${date}</strong><br>Vendas: R$ ${fmt(vendasDia)}<br>Despesas: R$ ${fmt(despesasDia)}<br>Custo compras: R$ ${fmt(custoCompras)}<br>Lucro estimado: R$ ${fmt(lucroEst)}`;
+    });
+
+    qs('#gerarRelSemanal').addEventListener('click', ()=>{
+      const anyDate = qs('#relSemanaData').value || new Date().toISOString().slice(0,10);
+      const d = new Date(anyDate);
+      const day = d.getDay(); const diffToMon = (day===0? -6 : 1 - day);
+      const monday = new Date(d); monday.setDate(d.getDate()+diffToMon); monday.setHours(0,0,0,0);
+      const saturday = new Date(monday); saturday.setDate(monday.getDate()+5); saturday.setHours(23,59,59,999);
+      const dates = getRangeDates(monday.toISOString().slice(0,10), saturday.toISOString().slice(0,10));
+      const vendasSemana = sales.filter(s=>dates.includes(s.data)).reduce((a,b)=>a+b.valor,0);
+      const despesasSemana = expenses.filter(e=>dates.includes(e.data)).reduce((a,b)=>a+b.valor,0);
+      const custoCompras = purchases.filter(p=>dates.includes(p.data)).reduce((a,b)=>a+(b.valor + b.frete),0);
+      const lucroEst = vendasSemana - despesasSemana - custoCompras;
+      qs('#relSemanalResultado').innerHTML = `<strong>${monday.toISOString().slice(0,10)} → ${saturday.toISOString().slice(0,10)}</strong><br>Vendas: R$ ${fmt(vendasSemana)}<br>Despesas: R$ ${fmt(despesasSemana)}<br>Custo compras: R$ ${fmt(custoCompras)}<br>Lucro estimado: R$ ${fmt(lucroEst)}`;
+    });
+
+    // --- CSV export ---
+    function downloadCsv(filename, rows){
+      const csv = rows.map(r => r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url);
+    }
+    qs('#exportComprasCsv').addEventListener('click', ()=>{
+      const rows = [['data','descricao','valor','frete','margem','precoVenda','lucroEstim']].concat(purchases.map(p=>[p.data,p.desc,p.valor,p.frete,p.margem,p.precoVenda,p.lucroEstim]));
+      downloadCsv('compras.csv', rows);
+    });
+    qs('#exportVendasCsv').addEventListener('click', ()=>{
+      const rows = [['data','valor','metodo']].concat(sales.map(s=>[s.data,s.valor,s.metodo]));
+      downloadCsv('vendas.csv', rows);
+    });
+    qs('#exportDespesasCsv').addEventListener('click', ()=>{
+      const rows = [['data','valor','descricao']].concat(expenses.map(e=>[e.data,e.valor,e.desc]));
+      downloadCsv('despesas.csv', rows);
+    });
+
+    // --- Utilities & small helpers ---
+    function fmt(v){ return Number(v||0).toFixed(2); }
+    function round(v){ return Math.round((v+Number.EPSILON)*100)/100; }
+    function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function clearCompraForm(){ qs('#compraDescricao').value=''; qs('#compraValor').value=''; qs('#compraFrete').value=''; qs('#compraMargem').value=''; qs('#compraData').value=''; }
+    function clearVendaForm(){ qs('#vendaValor').value=''; qs('#vendaData').value=''; }
+    function clearDespesaForm(){ qs('#despesaValor').value=''; qs('#despesaDescricao').value=''; qs('#despesaData').value=''; }
+
+    // --- Tabs ---
+    qsa('.tab-btn').forEach(b=> b.addEventListener('click', ()=>{ qsa('.tab-content').forEach(t=>t.classList.add('hidden')); qs('#'+b.dataset.tab).classList.remove('hidden'); }));
+
+    // Initial render
+    function renderAll(){ renderCompras(); renderVendas(); renderDespesas(); renderDashboard(); }
+    loadData(); renderAll();
+
+    // --- Small safety: confirm before unload if unsaved? not necessary since localStorage autosaves ---
+
+  </script>
+</body>
+</html>
