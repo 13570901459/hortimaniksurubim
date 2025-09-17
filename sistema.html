@@ -1,129 +1,670 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>HORTIMANIK - Dashboard</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>HORTIMANIK - SPA (Local)</title>
+
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
-    body { background: #0f1724; }
-    .card { background: linear-gradient(180deg,#0b1220 0%, #07101a 100%); border: 1px solid rgba(255,255,255,0.03); }
+    body { background: #0f1724; color: #e6edf3; }
+    .card { background: linear-gradient(180deg,#071021 0%, #04101a 100%); border: 1px solid rgba(255,255,255,0.04); }
     .btn-red { background: linear-gradient(180deg,#ef4444,#dc2626); }
-    .btn-red:hover { filter: brightness(0.9); }
+    .btn-red:hover{ filter:brightness(0.92) }
+    .small-btn{ font-size:12px; padding:6px 10px; }
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .modal-bg { background: rgba(2,6,23,0.6); }
   </style>
 </head>
-<body class="text-slate-200 font-sans">
-  <div class="min-h-screen flex flex-col md:flex-row">
-    
-    <!-- Topbar Mobile -->
-    <header class="md:hidden flex items-center justify-between bg-slate-900 p-4 border-b border-slate-800">
-      <h1 class="text-xl font-bold text-red-500">HORTIMANIK</h1>
-      <button id="menuBtn" class="text-slate-200 focus:outline-none">☰</button>
-    </header>
+<body class="min-h-screen antialiased">
 
-    <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 md:w-80 p-6 bg-slate-900 border-r border-slate-800 hidden md:block fixed md:relative inset-y-0 left-0 z-20">
-      <h1 class="text-2xl font-bold text-red-500">HORTIMANIK</h1>
-      <p class="text-sm text-slate-400 mb-4">Sistema de vendas & controle — Seg a Sáb</p>
-      <nav class="space-y-2">
-        <button data-tab="dashboard" class="tab-btn w-full text-left px-3 py-2 rounded card">Dashboard</button>
-        <button data-tab="compras" class="tab-btn w-full text-left px-3 py-2 rounded card">Registrar Compras</button>
-        <button data-tab="vendas" class="tab-btn w-full text-left px-3 py-2 rounded card">Registrar Vendas</button>
-        <button data-tab="despesas" class="tab-btn w-full text-left px-3 py-2 rounded card">Registrar Despesas</button>
-        <button data-tab="relatorios" class="tab-btn w-full text-left px-3 py-2 rounded card">Relatórios</button>
-        <button data-tab="config" class="tab-btn w-full text-left px-3 py-2 rounded card">Config / Export</button>
-      </nav>
+  <!-- Topbar -->
+  <header class="flex items-center justify-between md:justify-start gap-4 p-4 md:p-6 bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
+    <div class="flex items-center gap-3">
+      <button id="menuBtn" class="md:hidden text-xl p-2 rounded-md bg-slate-800">☰</button>
+      <div>
+        <div class="text-xl font-bold text-red-400">HORTIMANIK</div>
+        <div class="text-xs text-slate-400">Sistema de vendas & controle — Seg a Sáb</div>
+      </div>
+    </div>
+
+    <!-- desktop nav -->
+    <nav id="navDesktop" class="hidden md:flex gap-2 ml-6">
+      <button data-tab="dashboard" class="tab-btn px-3 py-2 rounded card">Dashboard</button>
+      <button data-tab="compras" class="tab-btn px-3 py-2 rounded card">Registrar Compras</button>
+      <button data-tab="vendas" class="tab-btn px-3 py-2 rounded card">Registrar Vendas</button>
+      <button data-tab="despesas" class="tab-btn px-3 py-2 rounded card">Registrar Despesas</button>
+      <button data-tab="relatorios" class="tab-btn px-3 py-2 rounded card">Relatórios</button>
+      <button data-tab="config" class="tab-btn px-3 py-2 rounded card">Config / Export</button>
+    </nav>
+
+    <!-- right controls -->
+    <div class="ml-auto flex items-center gap-2">
+      <div id="statusBadge" class="text-xs px-2 py-1 rounded bg-sky-700 text-slate-900 hidden">Status</div>
+      <button id="exportCsvBtn" class="hidden md:inline-block btn-red px-3 py-2 rounded text-white">Exportar CSV</button>
+      <button id="limparDados" class="hidden md:inline-block px-3 py-2 rounded bg-rose-700">Limpar dados</button>
+    </div>
+  </header>
+
+  <div class="flex">
+
+    <!-- mobile menu -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-64 transform -translate-x-full md:translate-x-0 transition-transform md:static md:block">
+      <div class="h-full p-4 md:p-6 card border-r border-slate-800">
+        <div class="hidden md:block mb-4">
+          <div class="text-lg font-bold text-red-400">HORTIMANIK</div>
+          <div class="text-xs text-slate-400">Sistema de vendas & controle</div>
+        </div>
+        <nav class="flex flex-col gap-2">
+          <button data-tab="dashboard" class="tab-btn w-full text-left px-3 py-2 rounded card">Dashboard</button>
+          <button data-tab="compras" class="tab-btn w-full text-left px-3 py-2 rounded card">Registrar Compras</button>
+          <button data-tab="vendas" class="tab-btn w-full text-left px-3 py-2 rounded card">Registrar Vendas</button>
+          <button data-tab="despesas" class="tab-btn w-full text-left px-3 py-2 rounded card">Registrar Despesas</button>
+          <button data-tab="relatorios" class="tab-btn w-full text-left px-3 py-2 rounded card">Relatórios</button>
+          <button data-tab="config" class="tab-btn w-full text-left px-3 py-2 rounded card">Config / Export</button>
+        </nav>
+
+        <div class="mt-4 text-xs text-slate-400">Dados armazenados localmente no seu navegador.</div>
+      </div>
     </aside>
 
-    <!-- Main -->
-    <main class="flex-1 p-4 md:p-6 md:ml-80">
-      <!-- Dashboard -->
+    <!-- main -->
+    <main class="flex-1 p-4 md:pl-80">
+
+      <!-- DASHBOARD -->
       <section id="dashboard" class="tab-content">
-        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <div class="flex flex-col md:flex-row md:justify-between gap-4 items-start">
           <div>
-            <h2 class="text-2xl font-bold">Dashboard profissional</h2>
-            <p class="text-sm text-slate-400">Visão rápida: compras, projeção, meta e despesas.</p>
+            <h1 class="text-2xl font-semibold">Dashboard profissional</h1>
+            <p class="text-sm text-slate-400">Resumo rápido: compras, vendas, metas e despesas.</p>
           </div>
-          <div class="space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">
-            <div class="flex items-center">
-              <label class="text-sm text-slate-400 mr-2">Meta diária (R$)</label>
-              <input id="metaDiaria" type="text" inputmode="decimal" class="px-2 py-1 rounded bg-slate-800 text-slate-200 w-full md:w-28 text-right" />
-            </div>
-            <div class="flex items-center">
-              <label class="text-sm text-slate-400 mr-2">Meta semanal (R$)</label>
-              <input id="metaSemanal" type="text" inputmode="decimal" class="px-2 py-1 rounded bg-slate-800 text-slate-200 w-full md:w-28 text-right" />
-            </div>
-            <button id="salvarMetas" class="px-3 py-1 rounded btn-red text-white w-full md:w-auto">Salvar</button>
+
+          <div class="flex gap-2 items-center w-full md:w-auto">
+            <div class="text-sm text-slate-400">Meta diária (R$)</div>
+            <input id="metaDiaria" type="text" inputmode="decimal" placeholder="0.00" class="px-3 py-1 rounded bg-slate-800 text-slate-100 text-right w-28" />
+            <div class="text-sm text-slate-400 ml-2">Meta semanal (R$)</div>
+            <input id="metaSemanal" type="text" inputmode="decimal" placeholder="0.00" class="px-3 py-1 rounded bg-slate-800 text-slate-100 text-right w-32" />
+            <button id="salvarMetas" class="ml-2 px-3 py-1 rounded btn-red text-white">Salvar</button>
           </div>
         </div>
 
-        <!-- Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mt-6">
+        <!-- top cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mt-6">
           <div class="p-4 rounded card shadow">
             <div class="text-xs text-slate-400">Total compras</div>
-            <div id="totalCompras" class="text-xl md:text-2xl font-bold text-slate-100">R$ 0,00</div>
+            <div id="totalCompras" class="text-2xl font-bold">R$ 0,00</div>
+            <div class="text-xs text-slate-400 mt-1">(soma geral)</div>
           </div>
 
           <div class="p-4 rounded card shadow">
-            <div class="text-xs text-slate-400">Venda estimada</div>
-            <div id="valorVendaEstimado" class="text-xl md:text-2xl font-bold text-red-400">R$ 0,00</div>
+            <div class="text-xs text-slate-400">Valor venda estimado</div>
+            <div id="valorVendaEstimado" class="text-2xl font-bold text-red-400">R$ 0,00</div>
+            <div class="text-xs text-slate-400 mt-1">(compras + margem)</div>
           </div>
 
           <div class="p-4 rounded card shadow">
             <div class="text-xs text-slate-400">Projeção diária</div>
-            <div id="projecaoDiaria" class="text-xl md:text-2xl font-bold text-sky-400">R$ 0,00</div>
+            <div id="projecaoDiaria" class="text-2xl font-bold text-sky-400">R$ 0,00</div>
+            <div class="text-xs text-slate-400 mt-1">Seg → Sáb</div>
           </div>
 
           <div class="p-4 rounded card shadow">
             <div class="text-xs text-slate-400">Vendas (hoje)</div>
-            <div id="vendasHoje" class="text-xl md:text-2xl font-bold text-green-400">R$ 0,00</div>
-            <div id="metaStatus" class="text-xs text-slate-400">Meta: R$ 0,00</div>
+            <div id="vendasHoje" class="text-2xl font-bold text-green-400">R$ 0,00</div>
+            <div id="metaStatus" class="text-sm text-slate-400 mt-1">Meta: R$ 0,00 — Faltam: R$ 0,00</div>
           </div>
 
           <div class="p-4 rounded card shadow">
             <div class="text-xs text-slate-400">Gastos (hoje)</div>
-            <div id="gastosHoje" class="text-xl md:text-2xl font-bold text-yellow-400">R$ 0,00</div>
+            <div id="gastosHoje" class="text-2xl font-bold text-yellow-400">R$ 0,00</div>
+            <div class="text-xs text-slate-400 mt-1">(despesas hoje)</div>
           </div>
 
           <div class="p-4 rounded card shadow">
-            <div class="text-xs text-slate-400">Lucro estimado</div>
-            <div id="lucroBrutoEstim" class="text-xl md:text-2xl font-bold text-indigo-300">R$ 0,00</div>
+            <div class="text-xs text-slate-400">Lucro bruto estimado</div>
+            <div id="lucroBrutoEstim" class="text-2xl font-bold text-indigo-300">R$ 0,00</div>
+            <div class="text-xs text-slate-400 mt-1">(venda estimada - custo)</div>
           </div>
         </div>
 
-        <!-- Cards semanais -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+        <!-- semana -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
           <div class="p-4 rounded card shadow">
-            <div class="text-xs text-slate-400">Vendas (semana)</div>
-            <div id="vendasSemana" class="text-xl md:text-2xl font-bold text-green-400">R$ 0,00</div>
-            <div id="metaSemanaStatus" class="text-xs text-slate-400">Meta semanal: R$ 0,00</div>
+            <div class="text-xs text-slate-400">Total vendas (semana)</div>
+            <div id="vendasSemana" class="text-2xl font-bold text-green-400">R$ 0,00</div>
+            <div id="metaSemanaStatus" class="text-sm text-slate-400 mt-1">Meta semanal: R$ 0,00 — Faltam: R$ 0,00</div>
           </div>
           <div class="p-4 rounded card shadow">
             <div class="text-xs text-slate-400">Despesas (semana)</div>
-            <div id="gastosSemana" class="text-xl md:text-2xl font-bold text-yellow-400">R$ 0,00</div>
+            <div id="gastosSemana" class="text-2xl font-bold text-yellow-400">R$ 0,00</div>
+          </div>
+          <div class="p-4 rounded card shadow">
+            <div class="text-xs text-slate-400">Lucro líquido (semana)</div>
+            <div id="lucroSemana" class="text-2xl font-bold text-indigo-200">R$ 0,00</div>
+            <div class="text-xs text-slate-400 mt-1">(vendas - compras - despesas)</div>
           </div>
         </div>
 
-        <!-- Chart e Resumo -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        <div class="grid md:grid-cols-2 gap-4 mt-6">
           <div class="p-4 rounded card shadow h-72">
             <canvas id="chartSemana" class="w-full h-full"></canvas>
           </div>
           <div class="p-4 rounded card shadow">
-            <h3 class="text-lg font-semibold">Resumo financeiro</h3>
-            <p class="text-sm text-slate-400 mt-2">Lucro líquido do dia: <span id="lucroLiquido" class="font-bold">R$ 0,00</span></p>
+            <h3 class="text-lg font-semibold">Resumo financeiro (hoje)</h3>
+            <div class="mt-3 text-sm text-slate-400">Vendas: <strong id="vendasHojeResumo">R$ 0,00</strong></div>
+            <div class="text-sm text-slate-400">Despesas: <strong id="despesasHojeResumo">R$ 0,00</strong></div>
+            <div class="text-sm text-slate-400">Custo compras do dia: <strong id="custoComprasHoje">R$ 0,00</strong></div>
+            <div class="text-xl font-bold mt-3">Lucro líquido (hoje): <span id="lucroLiquido">R$ 0,00</span></div>
+            <div class="mt-3 text-sm text-slate-400">Lucro líquido estimado (venda estimada - compras - despesas totais): <strong id="lucroLiquidoEstim">R$ 0,00</strong></div>
           </div>
+        </div>
+      </section>
+
+      <!-- COMPRAS -->
+      <section id="compras" class="hidden tab-content mt-6">
+        <h2 class="text-xl font-semibold">Registrar Compras</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3">
+          <input id="fornecedor" placeholder="Fornecedor" class="p-2 rounded bg-slate-800 text-slate-100" />
+          <input id="valorCompraInput" placeholder="Valor (R$)" inputmode="decimal" class="p-2 rounded bg-slate-800 text-slate-100 text-right" />
+          <input id="compraDataInput" type="date" class="p-2 rounded bg-slate-800 text-slate-100" />
+          <button id="adicionarCompra" class="btn-red px-4 py-2 rounded text-white">Adicionar compra</button>
+        </div>
+
+        <div class="mt-4 p-4 rounded card">
+          <h3 class="font-semibold">Compras registradas</h3>
+          <div class="mt-2 overflow-auto max-h-64">
+            <table class="w-full text-sm">
+              <thead class="text-slate-400 text-xs"><tr><th class="p-1">Data</th><th>Fornecedor</th><th class="text-right">Valor</th><th></th></tr></thead>
+              <tbody id="tabelaCompras"></tbody>
+            </table>
+          </div>
+          <div class="mt-3 text-sm text-slate-400">Total compras: <strong id="somaCompras">R$ 0,00</strong></div>
+        </div>
+      </section>
+
+      <!-- VENDAS -->
+      <section id="vendas" class="hidden tab-content mt-6">
+        <h2 class="text-xl font-semibold">Registrar Vendas</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3">
+          <input id="vendaDataInput" type="date" class="p-2 rounded bg-slate-800 text-slate-100" />
+          <input id="vendaValorInput" placeholder="Valor (R$)" inputmode="decimal" class="p-2 rounded bg-slate-800 text-slate-100 text-right" />
+          <select id="vendaMetodoInput" class="p-2 rounded bg-slate-800 text-slate-100">
+            <option>PIX</option><option>Cartão</option><option>Dinheiro</option>
+          </select>
+          <button id="adicionarVenda" class="btn-red px-4 py-2 rounded text-white">Registrar venda</button>
+        </div>
+
+        <div class="mt-4 p-4 rounded card">
+          <h3 class="font-semibold">Vendas registradas</h3>
+          <div class="mt-2 overflow-auto max-h-64">
+            <table class="w-full text-sm">
+              <thead class="text-slate-400 text-xs"><tr><th class="p-1">Data</th><th class="text-right">Valor</th><th>Método</th><th></th></tr></thead>
+              <tbody id="tabelaVendas"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- DESPESAS -->
+      <section id="despesas" class="hidden tab-content mt-6">
+        <h2 class="text-xl font-semibold">Registrar Despesas</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3">
+          <input id="despesaDataInput" type="date" class="p-2 rounded bg-slate-800 text-slate-100" />
+          <input id="despesaValorInput" placeholder="Valor (R$)" inputmode="decimal" class="p-2 rounded bg-slate-800 text-slate-100 text-right" />
+          <input id="despesaDescInput" placeholder="Descrição" class="p-2 rounded bg-slate-800 text-slate-100" />
+          <button id="adicionarDespesa" class="btn-red px-4 py-2 rounded text-white">Registrar despesa</button>
+        </div>
+
+        <div class="mt-4 p-4 rounded card">
+          <h3 class="font-semibold">Despesas registradas</h3>
+          <div class="mt-2 overflow-auto max-h-64">
+            <table class="w-full text-sm">
+              <thead class="text-slate-400 text-xs"><tr><th class="p-1">Data</th><th class="text-right">Valor</th><th>Descrição</th><th></th></tr></thead>
+              <tbody id="tabelaDespesas"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- RELATÓRIOS -->
+      <section id="relatorios" class="hidden tab-content mt-6">
+        <h2 class="text-xl font-semibold">Relatórios & Export</h2>
+        <div class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+          <button id="exportCsvBtn2" class="btn-red px-4 py-2 rounded text-white">Exportar CSV</button>
+          <button id="limparDados2" class="px-4 py-2 rounded bg-rose-700">Limpar todos os dados</button>
+          <div class="text-slate-400">Os dados ficam somente no seu navegador (localStorage).</div>
+        </div>
+
+        <div class="mt-4 p-4 rounded card">
+          <h3 class="font-semibold">Resumo</h3>
+          <div id="relatorioResumo" class="text-sm text-slate-400 mt-2"></div>
+        </div>
+      </section>
+
+      <!-- CONFIG -->
+      <section id="config" class="hidden tab-content mt-6">
+        <h2 class="text-xl font-semibold">Configurações</h2>
+        <div class="mt-3 p-4 rounded card">
+          <div class="text-sm text-slate-400">Storage size: <span id="storageSize">-</span></div>
         </div>
       </section>
     </main>
   </div>
 
+  <!-- Edit Modal (simple) -->
+  <div id="modal" class="fixed inset-0 hidden items-center justify-center modal-bg z-50">
+    <div class="bg-white rounded p-4 w-11/12 max-w-lg">
+      <h3 id="modalTitle" class="text-slate-900 font-semibold"></h3>
+      <div id="modalBody" class="mt-3 text-slate-900"></div>
+      <div class="mt-4 flex justify-end gap-2">
+        <button id="modalCancel" class="px-3 py-1 rounded bg-slate-200">Cancelar</button>
+        <button id="modalSave" class="px-3 py-1 rounded btn-red text-white">Salvar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // Toggle menu mobile
-    document.getElementById('menuBtn').addEventListener('click', () => {
-      document.getElementById('sidebar').classList.toggle('hidden');
+    /********** Helpers **********/
+    const qs = s => document.querySelector(s);
+    const qsa = s => Array.from(document.querySelectorAll(s));
+    const pad = n => String(n).padStart(2,'0');
+    const formatCurrency = v => { const n = Number(v) || 0; return n.toLocaleString('pt-BR', { style:'currency', currency:'BRL' }); };
+    function parseNumber(input){
+      if(input===undefined||input===null) return 0;
+      if(typeof input === 'number') return input;
+      let s = String(input).trim();
+      if(s==='') return 0;
+      s = s.replace(/[^0-9,.-]/g,'');
+      const hasDot = s.indexOf('.') !== -1;
+      const hasComma = s.indexOf(',') !== -1;
+      if(hasDot && hasComma){ s = s.replace(/\./g,'').replace(/,/g,'.'); }
+      else { s = s.replace(/,/g,'.'); }
+      const n = parseFloat(s);
+      return isNaN(n) ? 0 : n;
+    }
+    function getLocalDateString(d = new Date()){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+    function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    /********** Storage keys & state **********/
+    const KEY_PUR = 'hortimanik_purchases_v6';
+    const KEY_SALES = 'hortimanik_sales_v6';
+    const KEY_EXP = 'hortimanik_expenses_v6';
+    const KEY_SET = 'hortimanik_settings_v6';
+
+    let purchases = [], sales = [], expenses = [], settings = { metaDiaria:0, metaSemanal:0, lastVendaEstim:0 };
+
+    function loadState(){
+      try{
+        purchases = JSON.parse(localStorage.getItem(KEY_PUR)) || [];
+        sales = JSON.parse(localStorage.getItem(KEY_SALES)) || [];
+        expenses = JSON.parse(localStorage.getItem(KEY_EXP)) || [];
+        settings = JSON.parse(localStorage.getItem(KEY_SET)) || settings;
+      }catch(e){
+        console.error('Erro localStorage:', e);
+        purchases = purchases || []; sales = sales || []; expenses = expenses || [];
+        settings = settings || { metaDiaria:0, metaSemanal:0, lastVendaEstim:0 };
+      }
+      settings.metaDiaria = parseNumber(settings.metaDiaria);
+      settings.metaSemanal = parseNumber(settings.metaSemanal);
+      if(qs('#metaDiaria')) qs('#metaDiaria').value = settings.metaDiaria ? Number(settings.metaDiaria).toFixed(2) : '';
+      if(qs('#metaSemanal')) qs('#metaSemanal').value = settings.metaSemanal ? Number(settings.metaSemanal).toFixed(2) : '';
+    }
+    function saveState(){
+      try{
+        localStorage.setItem(KEY_PUR, JSON.stringify(purchases));
+        localStorage.setItem(KEY_SALES, JSON.stringify(sales));
+        localStorage.setItem(KEY_EXP, JSON.stringify(expenses));
+        localStorage.setItem(KEY_SET, JSON.stringify(settings));
+      }catch(e){
+        console.warn('Não foi possível salvar localStorage:', e);
+      }
+      updateStorageSize();
+    }
+    function updateStorageSize(){
+      try{
+        const used = new Blob([localStorage.getItem(KEY_PUR)||'', localStorage.getItem(KEY_SALES)||'', localStorage.getItem(KEY_EXP)||'', localStorage.getItem(KEY_SET)||'']).size;
+        if(qs('#storageSize')) qs('#storageSize').textContent = Math.round(used/1024) + ' KB';
+      }catch(e){
+        if(qs('#storageSize')) qs('#storageSize').textContent = '-';
+      }
+    }
+
+    /********** CRUD + render **********/
+    function totalPurchases(){ return purchases.reduce((s,p)=> s + parseNumber(p.valor), 0); }
+    function vendasNoDia(date){ return sales.filter(s=> s.data === date).reduce((a,b)=> a + parseNumber(b.valor), 0); }
+    function despesasNoDia(date){ return expenses.filter(e=> e.data === date).reduce((a,b)=> a + parseNumber(b.valor), 0); }
+    function comprasNoDia(date){ return purchases.filter(p=> p.data === date).reduce((a,b)=> a + parseNumber(b.valor), 0); }
+
+    // add purchase
+    function addPurchase(){
+      const fornecedor = qs('#fornecedor').value.trim();
+      const valor = parseNumber(qs('#valorCompraInput').value);
+      const data = qs('#compraDataInput').value || getLocalDateString();
+      if(!fornecedor){ alert('Informe o fornecedor.'); return; }
+      if(valor <= 0){ alert('Informe um valor > 0'); return; }
+      purchases.push({ id: Date.now(), fornecedor, valor, data });
+      saveState(); renderAll(); qs('#fornecedor').value=''; qs('#valorCompraInput').value=''; qs('#compraDataInput').value='';
+    }
+    function removePurchase(id){ purchases = purchases.filter(p=> p.id !== Number(id)); saveState(); renderAll(); }
+    function editPurchase(id){
+      const item = purchases.find(p=> p.id === Number(id));
+      if(!item) return;
+      openModal('Editar compra', `
+        <div class="grid gap-2">
+          <label class="text-sm text-slate-700">Fornecedor</label>
+          <input id="m_fornecedor" class="p-2 rounded border" value="${escapeHtml(item.fornecedor)}" />
+          <label class="text-sm text-slate-700">Valor</label>
+          <input id="m_valor" class="p-2 rounded border text-right" value="${Number(item.valor).toFixed(2)}" />
+          <label class="text-sm text-slate-700">Data</label>
+          <input id="m_data" type="date" class="p-2 rounded border" value="${item.data}" />
+        </div>
+      `, ()=>{
+        const f = qs('#m_fornecedor').value.trim();
+        const v = parseNumber(qs('#m_valor').value);
+        const d = qs('#m_data').value || getLocalDateString();
+        if(!f || v <= 0){ alert('Fornecedor e valor válidos são necessários'); return; }
+        item.fornecedor = f; item.valor = v; item.data = d;
+        saveState(); closeModal(); renderAll();
+      });
+    }
+
+    function renderPurchases(){
+      const tbody = qs('#tabelaCompras');
+      tbody.innerHTML = '';
+      purchases.slice().reverse().forEach(p=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="p-1">${p.data}</td>
+                        <td class="p-1">${escapeHtml(p.fornecedor)}</td>
+                        <td class="p-1 text-right">${formatCurrency(p.valor)}</td>
+                        <td class="p-1 text-right">
+                          <button onclick="editPurchase(${p.id})" class="small-btn mr-1 rounded bg-sky-600 text-white">Editar</button>
+                          <button onclick="removePurchase(${p.id})" class="small-btn rounded bg-rose-700 text-white">Remover</button>
+                        </td>`;
+        tbody.appendChild(tr);
+      });
+      if(qs('#somaCompras')) qs('#somaCompras').textContent = formatCurrency(totalPurchases());
+    }
+
+    /* Sales */
+    function addSale(){
+      const data = qs('#vendaDataInput').value || getLocalDateString();
+      const valor = parseNumber(qs('#vendaValorInput').value);
+      const metodo = qs('#vendaMetodoInput').value;
+      if(valor <= 0){ alert('Informe um valor da venda válido'); return; }
+      sales.push({ id: Date.now(), data, valor, metodo });
+      saveState(); renderAll(); qs('#vendaValorInput').value=''; qs('#vendaDataInput').value='';
+    }
+    function removeSale(id){ sales = sales.filter(s=> s.id !== Number(id)); saveState(); renderAll(); }
+    function editSale(id){
+      const item = sales.find(s=> s.id === Number(id)); if(!item) return;
+      openModal('Editar venda', `
+        <div class="grid gap-2">
+          <label class="text-sm text-slate-700">Valor</label>
+          <input id="ms_valor" class="p-2 rounded border text-right" value="${Number(item.valor).toFixed(2)}" />
+          <label class="text-sm text-slate-700">Data</label>
+          <input id="ms_data" type="date" class="p-2 rounded border" value="${item.data}" />
+          <label class="text-sm text-slate-700">Método</label>
+          <select id="ms_metodo" class="p-2 rounded border"><option ${item.metodo==='PIX'?'selected':''}>PIX</option><option ${item.metodo==='Cartão'?'selected':''}>Cartão</option><option ${item.metodo==='Dinheiro'?'selected':''}>Dinheiro</option></select>
+        </div>`, ()=>{
+          const v = parseNumber(qs('#ms_valor').value);
+          const d = qs('#ms_data').value || getLocalDateString();
+          const m = qs('#ms_metodo').value;
+          if(v<=0){ alert('Valor inválido'); return; }
+          item.valor = v; item.data = d; item.metodo = m;
+          saveState(); closeModal(); renderAll();
+      });
+    }
+    function renderSales(){
+      const tbody = qs('#tabelaVendas'); tbody.innerHTML = '';
+      sales.slice().reverse().forEach(s=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="p-1">${s.data}</td>
+                        <td class="p-1 text-right">${formatCurrency(s.valor)}</td>
+                        <td class="p-1">${escapeHtml(s.metodo)}</td>
+                        <td class="p-1 text-right">
+                          <button onclick="editSale(${s.id})" class="small-btn mr-1 rounded bg-sky-600 text-white">Editar</button>
+                          <button onclick="removeSale(${s.id})" class="small-btn rounded bg-rose-700 text-white">Remover</button>
+                        </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* Expenses */
+    function addExpense(){
+      const data = qs('#despesaDataInput').value || getLocalDateString();
+      const valor = parseNumber(qs('#despesaValorInput').value);
+      const desc = qs('#despesaDescInput').value || '';
+      if(valor <= 0){ alert('Informe valor da despesa'); return; }
+      expenses.push({ id: Date.now(), data, valor, desc });
+      saveState(); renderAll(); qs('#despesaValorInput').value=''; qs('#despesaDescInput').value=''; qs('#despesaDataInput').value='';
+    }
+    function removeExpense(id){ expenses = expenses.filter(e=> e.id !== Number(id)); saveState(); renderAll(); }
+    function editExpense(id){
+      const item = expenses.find(e=> e.id === Number(id)); if(!item) return;
+      openModal('Editar despesa', `
+        <div class="grid gap-2">
+          <label class="text-sm text-slate-700">Valor</label>
+          <input id="me_valor" class="p-2 rounded border text-right" value="${Number(item.valor).toFixed(2)}" />
+          <label class="text-sm text-slate-700">Data</label>
+          <input id="me_data" type="date" class="p-2 rounded border" value="${item.data}" />
+          <label class="text-sm text-slate-700">Descrição</label>
+          <input id="me_desc" class="p-2 rounded border" value="${escapeHtml(item.desc)}" />
+        </div>`, ()=>{
+          const v = parseNumber(qs('#me_valor').value);
+          const d = qs('#me_data').value || getLocalDateString();
+          const desc = qs('#me_desc').value;
+          if(v<=0){ alert('Valor inválido'); return; }
+          item.valor = v; item.data = d; item.desc = desc;
+          saveState(); closeModal(); renderAll();
+      });
+    }
+    function renderExpenses(){
+      const tbody = qs('#tabelaDespesas'); tbody.innerHTML='';
+      expenses.slice().reverse().forEach(e=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="p-1">${e.data}</td>
+                        <td class="p-1 text-right">${formatCurrency(e.valor)}</td>
+                        <td class="p-1">${escapeHtml(e.desc)}</td>
+                        <td class="p-1 text-right">
+                          <button onclick="editExpense(${e.id})" class="small-btn mr-1 rounded bg-sky-600 text-white">Editar</button>
+                          <button onclick="removeExpense(${e.id})" class="small-btn rounded bg-rose-700 text-white">Remover</button>
+                        </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /********** Week helpers & Chart **********/
+    function weekRange(ref){ // Monday -> Saturday (6 days)
+      const now = ref ? new Date(ref) : new Date();
+      const day = now.getDay();
+      const diffToMon = (day === 0 ? -6 : 1 - day);
+      const monday = new Date(now);
+      monday.setDate(now.getDate() + diffToMon);
+      monday.setHours(0,0,0,0);
+      const arr = [];
+      for(let i=0;i<6;i++){ const d = new Date(monday); d.setDate(monday.getDate()+i); arr.push(d.toISOString().slice(0,10)); }
+      return arr;
+    }
+
+    let weekChart = null;
+    function updateWeekChart(labels, vendasData, metasData){
+      try{
+        const ctx = qs('#chartSemana').getContext('2d');
+        if(!ctx) return;
+        if(typeof Chart === 'undefined'){ console.warn('Chart.js não carregado'); return; }
+        if(weekChart){
+          weekChart.data.labels = labels;
+          weekChart.data.datasets[0].data = vendasData;
+          weekChart.data.datasets[1].data = metasData;
+          weekChart.update();
+          return;
+        }
+        weekChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [
+              { label: 'Vendas (R$)', data: vendasData, backgroundColor: 'rgba(16,185,129,0.9)' },
+              { label: 'Meta diária (R$)', data: metasData, type: 'line', borderColor: '#ef4444', borderWidth: 2, fill: false }
+            ]
+          },
+          options: { responsive:true, maintainAspectRatio:false, interaction:{ mode:'index', intersect:false }, scales:{ y:{ beginAtZero:true } } }
+        });
+      }catch(e){ console.error('Erro gráfico', e); }
+    }
+
+    /********** Render dashboard **********/
+    function renderDashboard(){
+      // totals
+      qs('#totalCompras').textContent = formatCurrency(totalPurchases());
+
+      // venda estimada from settings.lastVendaEstim or recompute
+      const margemInput = qs('#margemInput');
+      const margem = margemInput ? parseNumber(margemInput.value) : 0;
+      const vendaEstim = (settings.lastVendaEstim !== undefined && settings.lastVendaEstim>0) ? settings.lastVendaEstim : (totalPurchases() * (1 + (margem||0)/100));
+      qs('#valorVendaEstimado').textContent = formatCurrency(vendaEstim);
+      qs('#precoVendaEstim') && (qs('#precoVendaEstim').textContent = formatCurrency(vendaEstim));
+      qs('#projecaoDiaria').textContent = formatCurrency(vendaEstim / 6);
+
+      // today
+      const today = getLocalDateString();
+      const vendasHoje = vendasNoDia(today);
+      const despesasHoje = despesasNoDia(today);
+      const custoComprasHoje = comprasNoDia(today);
+      const lucroLiquido = vendasHoje - despesasHoje - custoComprasHoje;
+
+      qs('#vendasHoje').textContent = formatCurrency(vendasHoje);
+      qs('#vendasHojeResumo').textContent = formatCurrency(vendasHoje);
+      qs('#despesasHojeResumo').textContent = formatCurrency(despesasHoje);
+      qs('#custoComprasHoje').textContent = formatCurrency(custoComprasHoje);
+      qs('#lucroLiquido').textContent = formatCurrency(lucroLiquido);
+      qs('#gastosHoje').textContent = formatCurrency(despesasHoje);
+
+      // lucros estimados
+      const lucroBrutoEstim = vendaEstim - totalPurchases();
+      const totalExpensesAll = expenses.reduce((s,e)=> s + parseNumber(e.valor), 0);
+      const lucroLiquidoEstim = vendaEstim - totalPurchases() - totalExpensesAll;
+      qs('#lucroBrutoEstim').textContent = formatCurrency(lucroBrutoEstim);
+      qs('#lucroLiquidoEstim').textContent = formatCurrency(lucroLiquidoEstim);
+
+      // metas diárias
+      const metaDia = qs('#metaDiaria') ? parseNumber(qs('#metaDiaria').value) : 0;
+      const faltante = Math.max(0, metaDia - vendasHoje);
+      qs('#metaStatus').textContent = `Meta: ${formatCurrency(metaDia)} — Faltam: ${formatCurrency(faltante)}`;
+
+      // semanal
+      const dates = weekRange();
+      const vendasSemana = dates.reduce((s,d)=> s + vendasNoDia(d), 0);
+      const despesasSemana = dates.reduce((s,d)=> s + despesasNoDia(d), 0);
+      const comprasSemana = dates.reduce((s,d)=> s + comprasNoDia(d), 0);
+      const metaSemana = qs('#metaSemanal') ? parseNumber(qs('#metaSemanal').value) : 0;
+      const faltanteSemana = Math.max(0, metaSemana - vendasSemana);
+
+      qs('#vendasSemana').textContent = formatCurrency(vendasSemana);
+      qs('#metaSemanaStatus').textContent = `Meta semanal: ${formatCurrency(metaSemana)} — Faltam: ${formatCurrency(faltanteSemana)}`;
+      qs('#gastosSemana').textContent = formatCurrency(despesasSemana);
+      qs('#lucroSemana').textContent = formatCurrency(vendasSemana - comprasSemana - despesasSemana);
+
+      // chart
+      const labels = dates.map(d => { const [y,m,day] = d.split('-'); return `${m}/${day}`; });
+      const vendasData = dates.map(d => vendasNoDia(d));
+      const metasData = dates.map(_ => metaDia);
+      updateWeekChart(labels, vendasData, metasData);
+    }
+
+    /********** Export & Clear **********/
+    function exportCsv(){
+      const rows = [['tipo','data','valor','detalhes']];
+      purchases.forEach(p=> rows.push(['compra', p.data, p.valor, p.fornecedor]));
+      sales.forEach(s=> rows.push(['venda', s.data, s.valor, s.metodo]));
+      expenses.forEach(e=> rows.push(['despesa', e.data, e.valor, e.desc]));
+      const csv = rows.map(r => r.map(c=> `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type:'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'hortimanik_export.csv'; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function clearAll(){
+      if(!confirm('Apagar todos os dados locais?')) return;
+      purchases = []; sales = []; expenses = []; settings = { metaDiaria:0, metaSemanal:0, lastVendaEstim:0 };
+      saveState(); renderAll();
+      alert('Dados apagados.');
+    }
+
+    /********** Modal helpers **********/
+    function openModal(title, htmlContent, onSave){
+      qs('#modalTitle').textContent = title;
+      qs('#modalBody').innerHTML = htmlContent;
+      qs('#modal').classList.remove('hidden');
+      qs('#modal').classList.add('flex');
+      qs('#modalSave').onclick = onSave;
+      qs('#modalCancel').onclick = closeModal;
+    }
+    function closeModal(){ qs('#modal').classList.add('hidden'); qs('#modal').classList.remove('flex'); qs('#modalSave').onclick = null; }
+
+    /********** Init & Bindings **********/
+    document.addEventListener('DOMContentLoaded', ()=>{
+      // load
+      loadState();
+
+      // initial tab show
+      qsa('.tab-content').forEach(t=> t.classList.add('hidden'));
+      qs('#dashboard').classList.remove('hidden');
+
+      // sidebar toggle mobile
+      const sidebar = qs('#sidebar'), menuBtn = qs('#menuBtn');
+      menuBtn && menuBtn.addEventListener('click', ()=> {
+        if(sidebar.classList.contains('-translate-x-full')) sidebar.classList.remove('-translate-x-full');
+        else sidebar.classList.add('-translate-x-full');
+      });
+
+      // nav buttons
+      qsa('.tab-btn').forEach(b=> b.addEventListener('click', (ev)=>{
+        const target = b.getAttribute('data-tab');
+        if(!target) return;
+        qsa('.tab-content').forEach(t=> t.classList.add('hidden'));
+        qs('#'+target).classList.remove('hidden');
+        // close sidebar on mobile
+        if(window.innerWidth < 768 && !sidebar.classList.contains('-translate-x-full')) sidebar.classList.add('-translate-x-full');
+        if(target === 'dashboard') renderDashboard();
+      }));
+
+      // buttons
+      qs('#adicionarCompra').addEventListener('click', addPurchase);
+      qs('#adicionarVenda').addEventListener('click', addSale);
+      qs('#adicionarDespesa').addEventListener('click', addExpense);
+      qs('#exportCsvBtn').addEventListener('click', exportCsv);
+      qs('#exportCsvBtn2').addEventListener('click', exportCsv);
+      qs('#limparDados').addEventListener('click', clearAll);
+      qs('#limparDados2').addEventListener('click', clearAll);
+      qs('#salvarMetas').addEventListener('click', ()=> {
+        settings.metaDiaria = parseNumber(qs('#metaDiaria').value);
+        settings.metaSemanal = parseNumber(qs('#metaSemanal').value);
+        saveState(); renderDashboard(); alert('Metas salvas.');
+      });
+
+      // expose removers/editors globally for inline onclick attributes
+      window.removePurchase = removePurchase; window.editPurchase = editPurchase;
+      window.removeSale = removeSale; window.editSale = editSale;
+      window.removeExpense = removeExpense; window.editExpense = editExpense;
+
+      // initial render
+      renderAll();
+      updateStorageSize();
     });
+
+    function renderAll(){
+      renderPurchases(); renderSales(); renderExpenses(); renderDashboard();
+    }
+
   </script>
 </body>
 </html>
