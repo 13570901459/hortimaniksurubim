@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HORTIMANIK - Dashboard Profissional</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background: #0f1724; }
+    .card { background: linear-gradient(180deg,#0b1220 0%, #07101a 100%); border: 1px solid rgba(255,255,255,0.03); }
+    .btn-red { background: linear-gradient(180deg,#ef4444,#dc2626); }
+    .btn-red:hover { filter: brightness(0.9); }
+    .small-btn { font-size: 12px; padding: 4px 8px; }
+    input[type="text"], input[type="date"] { -moz-appearance: textfield; }
+  </style>
+</head>
+<body class="text-slate-200 font-sans">
+  <div class="min-h-screen flex flex-col md:flex-row">
+    <!-- Sidebar -->
+    <aside class="w-full md:w-80 p-6 bg-slate-900 border-b md:border-b-0 md:border-r border-slate-800">
+      <h1 class="text-2xl font-bold text-red-500 truncate">HORTIMANIK</h1>
+      <p class="text-sm text-slate-400 mb-4 hidden sm:block">Sistema de vendas & controle — Seg a Sáb</p>
+      <nav class="space-y-2">
+        <button data-tab="dashboard" class="tab-btn w-full text-left px-3 py-2 rounded card text-sm sm:text-base">Dashboard</button>
+        <button data-tab="compras" class="tab-btn w-full text-left px-3 py-2 rounded card text-sm sm:text-base">Registrar Compras</button>
+        <button data-tab="vendas" class="tab-btn w-full text-left px-3 py-2 rounded card text-sm sm:text-base">Registrar Vendas</button>
+        <button data-tab="despesas" class="tab-btn w-full text-left px-3 py-2 rounded card text-sm sm:text-base">Registrar Despesas</button>
+        <button data-tab="relatorios" class="tab-btn w-full text-left px-3 py-2 rounded card text-sm sm:text-base">Relatórios</button>
+        <button data-tab="config" class="tab-btn w-full text-left px-3 py-2 rounded card text-sm sm:text-base">Config / Export</button>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 p-4 md:p-6 overflow-y-auto">
+      <!-- Dashboard -->
+      <section id="dashboard" class="tab-content">
+        <div class="flex flex-col md:flex-row justify-between items-start gap-4">
+          <div>
+            <h2 class="text-2xl font-bold">Dashboard profissional</h2>
+            <p class="text-sm text-slate-400">Visão rápida: compras, projeção, meta diária, vendas x meta e despesas.</p>
+          </div>
+          <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mt-2 md:mt-0">
+            <label class="text-sm text-slate-400">Meta diária (R$)</label>
+            <input id="metaDiaria" type="text" inputmode="decimal" class="px-3 py-1 rounded bg-slate-800 text-slate-200 w-full sm:w-36 text-right" />
+            <label class="text-sm text-slate-400 mt-2 sm:mt-0">Meta semanal (R$)</label>
+            <input id="metaSemanal" type="text" inputmode="decimal" class="px-3 py-1 rounded bg-slate-800 text-slate-200 w-full sm:w-36 text-right" />
+            <button id="salvarMetas" class="px-3 py-1 rounded btn-red text-white mt-2 sm:mt-0">Salvar</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-6">
+          <div class="p-4 rounded card shadow col-span-1 sm:col-span-2">
+            <div class="text-xs text-slate-400">Total compras (fornecedores)</div>
+            <div id="totalCompras" class="text-2xl font-bold text-slate-100">R$ 0,00</div>
+            <div class="text-sm text-slate-400">(soma de todos os registros de compra)</div>
+          </div>
+          <div class="p-4 rounded card shadow">
+            <div class="text-xs text-slate-400">Valor venda estimado (com margem)</div>
+            <div id="valorVendaEstimado" class="text-2xl font-bold text-red-400">R$ 0,00</div>
+            <div class="text-sm text-slate-400">(total compras + margem)</div>
+          </div>
+          <div class="p-4 rounded card shadow">
+            <div class="text-xs text-slate-400">Projeção diária (Venda estimada ÷ 6)</div>
+            <div id="projecaoDiaria" class="text-2xl font-bold text-sky-400">R$ 0,00</div>
+            <div class="text-sm text-slate-400">Seg → Sáb</div>
+          </div>
+          <div class="p-4 rounded card shadow">
+            <div class="text-xs text-slate-400">Vendas (hoje)</div>
+            <div id="vendasHoje" class="text-2xl font-bold text-green-400">R$ 0,00</div>
+            <div id="metaStatus" class="text-sm text-slate-400 mt-1">Meta: R$ 0,00 — Faltam: R$ 0,00</div>
+          </div>
+          <div class="p-4 rounded card shadow">
+            <div class="text-xs text-slate-400">Gastos (hoje)</div>
+            <div id="gastosHoje" class="text-2xl font-bold text-yellow-400">R$ 0,00</div>
+            <div class="text-sm text-slate-400">(despesas registradas hoje)</div>
+          </div>
+          <div class="p-4 rounded card shadow">
+            <div class="text-xs text-slate-400">Lucro bruto estimado</div>
+            <div id="lucroBrutoEstim" class="text-2xl font-bold text-indigo-300">R$ 0,00</div>
+            <div class="text-sm text-slate-400">(venda estimada - custo das compras)</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <div class="p-4 rounded card shadow h-72 overflow-x-auto">
+            <canvas id="chartSemana" class="w-full h-full"></canvas>
+          </div>
+          <div class="p-4 rounded card shadow overflow-x-auto">
+            <h3 class="text-lg font-semibold">Resumo financeiro (hoje)</h3>
+            <div class="mt-3 text-sm text-slate-400">Vendas: <strong id="vendasHojeResumo">R$ 0,00</strong></div>
+            <div class="text-sm text-slate-400">Despesas: <strong id="despesasHojeResumo">R$ 0,00</strong></div>
+            <div class="text-sm text-slate-400">Custo compras do dia: <strong id="custoComprasHoje">R$ 0,00</strong></div>
+            <div class="text-xl font-bold mt-3">Lucro líquido (hoje): <span id="lucroLiquido">R$ 0,00</span></div>
+            <div class="mt-3 text-sm text-slate-400">Lucro líquido estimado (venda estimada - compras - despesas totais): <strong id="lucroLiquidoEstim">R$ 0,00</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Compras -->
+      <section id="compras" class="hidden tab-content mt-6">
+        <h2 class="text-xl font-bold mb-3 text-red-400">Registrar Compras</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+          <input id="fornecedor" placeholder="Nome do fornecedor" class="p-2 rounded bg-slate-800 text-slate-200 w-full" />
+          <input id="valorCompraInput" type="text" inputmode="decimal" placeholder="Valor da compra (R$)" class="p-2 rounded bg-slate-800 text-slate-200 text-right w-full" />
+          <input id="compraDataInput" type="date" class="p-2 rounded bg-slate-800 text-slate-200 w-full" />
+          <button id="adicionarCompra" class="btn-red px-4 py-2 rounded font-bold w-full">Adicionar compra</button>
+        </div>
+
+        <div class="mt-4 p-4 rounded card overflow-x-auto">
+          <h3 class="font-semibold">Compras registradas</h3>
+          <div class="mt-2 overflow-auto max-h-64">
+            <table class="w-full text-sm text-left">
+              <thead class="text-slate-400 text-xs"><tr><th>Data</th><th>Fornecedor</th><th>Valor</th><th></th></tr></thead>
+              <tbody id="tabelaCompras"></tbody>
+            </table>
+          </div>
+          <div class="mt-3 text-sm text-slate-400">Total compras: <strong id="somaCompras">R$ 0,00</strong></div>
+
+          <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <input id="margemInput" type="text" inputmode="decimal" step="0.1" placeholder="Margem % (ex: 30)" class="p-2 rounded bg-slate-800 text-slate-200 text-right w-full" />
+            <button id="calcularVendaEstim" class="px-4 py-2 rounded btn-red font-bold w-full sm:w-auto">Calcular venda estimada</button>
+            <div class="text-slate-400 p-2">Preço venda estimado: <strong id="precoVendaEstim">R$ 0,00</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Vendas -->
+      <section id="vendas" class="hidden tab-content mt-6">
+        <h2 class="text-xl font-bold mb-3 text-red-400">Registrar Vendas</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+          <input id="vendaDataInput" type="date" class="p-2 rounded bg-slate-800 text-slate-200 w-full" />
+          <input id="vendaValorInput" type="text" inputmode="decimal" placeholder="Valor vendido (R$)" class="p-2 rounded bg-slate-800 text-slate-200 text-right w-full" />
+          <select id="vendaMetodoInput" class="p-2 rounded bg-slate-800 text-slate-200 w-full">
+            <option>PIX</option><option>Cartão</option><option>Dinheiro</option>
+          </select>
+          <button id="adicionarVenda" class="btn-red px-4 py-2 rounded font-bold w-full">Registrar venda</button>
+        </div>
+
+        <div class="mt-4 p-4 rounded card overflow-x-auto">
+          <h3 class="font-semibold">Vendas registradas</h3>
+          <div class="mt-2 overflow-auto max-h-64">
+            <table class="w-full text-sm text-left">
+              <thead class="text-slate-400 text-xs"><tr><th>Data</th><th>Valor</th><th>Método</th><th></th></tr></thead>
+              <tbody id="tabelaVendas"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Despesas -->
+      <section id="despesas" class="hidden tab-content mt-6">
+        <h2 class="text-xl font-bold mb-3 text-red-400">Registrar Despesas</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+          <input id="despesaDataInput" type="date" class="p-2 rounded bg-slate-800 text-slate-200 w-full" />
+          <input id="despesaValorInput" type="text" inputmode="decimal" placeholder="Valor da despesa (R$)" class="p-2 rounded bg-slate-800 text-slate-200 text-right w-full" />
+          <input id="despesaDescricaoInput" type="text" placeholder="Descrição" class="p-2 rounded bg-slate-800 text-slate-200 w-full" />
+          <button id="adicionarDespesa" class="btn-red px-4 py-2 rounded font-bold w-full">Registrar despesa</button>
+        </div>
+
+        <div class="mt-4 p-4 rounded card overflow-x-auto">
+          <h3 class="font-semibold">Despesas registradas</h3>
+          <div class="mt-2 overflow-auto max-h-64">
+            <table class="w-full text-sm text-left">
+              <thead class="text-slate-400 text-xs"><tr><th>Data</th><th>Descrição</th><th>Valor</th><th></th></tr></thead>
+              <tbody id="tabelaDespesas"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Relatórios -->
+      <section id="relatorios" class="hidden tab-content mt-6">
+        <h2 class="text-xl font-bold mb-3 text-red-400">Relatórios</h2>
+        <p class="text-sm text-slate-400">Resumo diário, semanal e mensal de vendas, compras e despesas.</p>
+        <div class="mt-4 p-4 rounded card overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead class="text-slate-400 text-xs"><tr><th>Data</th><th>Tipo</th><th>Valor</th></tr></thead>
+            <tbody id="tabelaRelatorios"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Config / Export -->
+      <section id="config" class="hidden tab-content mt-6">
+        <h2 class="text-xl font-bold mb-3 text-red-400">Configurações & Exportação</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button class="btn-red px-4 py-2 rounded font-bold">Exportar compras</button>
+          <button class="btn-red px-4 py-2 rounded font-bold">Exportar vendas</button>
+          <button class="btn-red px-4 py-2 rounded font-bold">Exportar despesas</button>
+          <button class="btn-red px-4 py-2 rounded font-bold">Exportar relatório completo</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Tab navigation
+    const tabs = document.querySelectorAll(".tab-btn");
+    const contents = document.querySelectorAll(".tab-content");
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        contents.forEach(c => c.classList.add("hidden"));
+        document.getElementById(tab.dataset.tab).classList.remove("hidden");
+      });
+    });
+  </script>
+</body>
+</html>
