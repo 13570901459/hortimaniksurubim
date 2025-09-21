@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dashboard Financeiro - HORTIMANIK (Local)</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .card { @apply bg-white shadow rounded p-4; }
+  </style>
+</head>
+<body class="bg-slate-100">
+
+  <!-- Header -->
+  <header class="bg-green-700 text-white p-4 text-center font-bold text-xl">
+    Dashboard Financeiro - HORTIMANIK
+  </header>
+
+  <main class="p-4 space-y-6">
+
+    <!-- Cards Resumo -->
+    <section class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div class="card">
+        <div class="text-sm text-slate-500">Total de Compras</div>
+        <div id="totalCompras" class="mt-2 text-2xl font-semibold">R$ 0,00</div>
+      </div>
+
+      <div class="card">
+        <div class="text-sm text-slate-500">Vendas Estimadas</div>
+        <div id="vendasEstimadas" class="mt-2 text-2xl font-semibold">R$ 0,00</div>
+      </div>
+
+      <div class="card">
+        <div class="text-sm text-slate-500">Lucro Bruto Estimado</div>
+        <div id="lucroBruto" class="mt-2 text-2xl font-semibold">R$ 0,00</div>
+      </div>
+
+      <div class="card">
+        <div class="text-sm text-slate-500">Meta Diária</div>
+        <div id="metaDiaria" class="mt-2 text-2xl font-semibold">R$ 0,00</div>
+      </div>
+
+      <!-- Novo card: Gastos Totais -->
+      <div class="card">
+        <div class="text-sm text-slate-500">Gastos Totais (Compras + Despesas)</div>
+        <div id="gastosTotais" class="mt-2 text-2xl font-semibold">R$ 0,00</div>
+      </div>
+
+      <!-- Novo card: Progresso da Meta Total -->
+      <div class="card">
+        <div class="text-sm text-slate-500">Progresso Meta Total</div>
+        <div class="flex justify-between text-sm">
+          <span id="metaTotalAtual">R$ 0,00</span>
+          <span id="metaTotalFalta">Falta R$ 0,00</span>
+        </div>
+        <div class="w-full bg-slate-200 rounded h-3 mt-2">
+          <div id="barraMetaTotal" class="bg-green-600 h-3 rounded" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- Novo card: Progresso da Meta Diária -->
+      <div class="card">
+        <div class="text-sm text-slate-500">Progresso Meta Diária</div>
+        <div class="flex justify-between text-sm">
+          <span id="metaDiaAtual">R$ 0,00</span>
+          <span id="metaDiaFalta">Falta R$ 0,00</span>
+        </div>
+        <div class="w-full bg-slate-200 rounded h-3 mt-2">
+          <div id="barraMetaDia" class="bg-blue-600 h-3 rounded" style="width:0%"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Resumo Diário -->
+    <section class="card">
+      <h2 class="text-lg font-semibold mb-2">Resumo Diário</h2>
+      <input id="filtroData" type="date" class="border p-1 mb-2"/>
+      <div id="resumoDia" class="text-sm"></div>
+    </section>
+
+    <!-- Histórico -->
+    <section class="card">
+      <h2 class="text-lg font-semibold mb-2">Histórico de Transações</h2>
+      <div id="listaTransacoes" class="text-sm space-y-1"></div>
+    </section>
+
+  </main>
+
+  <script>
+    // Utils
+    const currency = v => v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+    const toNumber = v => parseFloat(v)||0;
+    const sumArray = arr => arr.reduce((t,o)=>t+toNumber(o.valor||o.total||0),0);
+
+    // LocalStorage
+    function getAllRecords() {
+      return {
+        compras: JSON.parse(localStorage.getItem("compras")||"[]"),
+        vendas: JSON.parse(localStorage.getItem("vendas")||"[]"),
+        despesas: JSON.parse(localStorage.getItem("despesas")||"[]")
+      }
+    }
+    function loadConfig() {
+      return JSON.parse(localStorage.getItem("config")||"{}");
+    }
+
+    // Render
+    function renderTransacoes(lista) {
+      const el = document.getElementById("listaTransacoes");
+      el.innerHTML = "";
+      lista.forEach(item=>{
+        const div=document.createElement("div");
+        div.textContent = `[${item.tipo}] ${item.nome||""} - ${currency(item.valor||item.total)}`;
+        el.appendChild(div);
+      })
+    }
+    function renderResumoDia(data) {
+      const { vendas } = getAllRecords();
+      const vendasDia = vendas.filter(v=>(v.data||"").slice(0,10)===data);
+      const total = sumArray(vendasDia);
+      document.getElementById("resumoDia").textContent = 
+        `Vendas em ${data}: ${currency(total)} (${vendasDia.length} transações)`;
+    }
+
+    // Principal
+    function calculateAndRender() {
+      const { compras, vendas, despesas } = getAllRecords();
+      const cfg = loadConfig();
+
+      const totalCompras = sumArray(compras);
+      const totalVendas = sumArray(vendas);
+      const totalDespesas = sumArray(despesas);
+      const gastosTotais = totalCompras + totalDespesas;
+
+      // Vendas estimadas
+      const vendasEstimadas = totalCompras * (1 + (toNumber(cfg.margem) / 100));
+      const lucroBruto = vendasEstimadas - totalCompras;
+
+      // Meta diária
+      const metaDiaria = cfg.dias && cfg.dias > 0 ? vendasEstimadas / cfg.dias : 0;
+
+      // Render cards básicos
+      document.getElementById('totalCompras').textContent = currency(totalCompras);
+      document.getElementById('vendasEstimadas').textContent = currency(vendasEstimadas);
+      document.getElementById('lucroBruto').textContent = currency(lucroBruto);
+      document.getElementById('metaDiaria').textContent = currency(metaDiaria);
+
+      // Render gastos totais
+      document.getElementById('gastosTotais').textContent = currency(gastosTotais);
+
+      // Progresso da meta total
+      const faltaTotal = Math.max(0, vendasEstimadas - totalVendas);
+      const percTotal = vendasEstimadas > 0 ? Math.min(100, (totalVendas / vendasEstimadas) * 100) : 0;
+      document.getElementById('metaTotalAtual').textContent = currency(totalVendas);
+      document.getElementById('metaTotalFalta').textContent = "Falta " + currency(faltaTotal);
+      document.getElementById('barraMetaTotal').style.width = percTotal + "%";
+
+      // Progresso da meta diária
+      const hoje = new Date().toISOString().slice(0,10);
+      const vendasHoje = vendas.filter(v => (v.data || '').slice(0,10) === hoje);
+      const totalVendasHoje = sumArray(vendasHoje);
+      const faltaDia = Math.max(0, metaDiaria - totalVendasHoje);
+      const percDia = metaDiaria > 0 ? Math.min(100, (totalVendasHoje / metaDiaria) * 100) : 0;
+      document.getElementById('metaDiaAtual').textContent = currency(totalVendasHoje);
+      document.getElementById('metaDiaFalta').textContent = "Falta " + currency(faltaDia);
+      document.getElementById('barraMetaDia').style.width = percDia + "%";
+
+      // Render listas
+      renderTransacoes([...compras.map(c => ({...c, tipo:'compra'})),
+                        ...vendas.map(v => ({...v, tipo:'venda'})),
+                        ...despesas.map(d => ({...d, tipo:'despesa'}))]
+                        .sort((a,b) => (b.createdAt||0)-(a.createdAt||0)));
+
+      // Resumo diário (pelo filtro)
+      const filtro = document.getElementById('filtroData').value || hoje;
+      renderResumoDia(filtro);
+    }
+
+    // Init
+    document.getElementById('filtroData').addEventListener("change",()=>calculateAndRender());
+    calculateAndRender();
+  </script>
+</body>
+</html>
