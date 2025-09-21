@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dashboard Financeiro - HORTIMANIK</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* Pequenos ajustes visuais */
+    .card { background: white; border-radius: 0.6rem; box-shadow: 0 6px 18px rgba(15,23,42,0.06); }
+    .glass { backdrop-filter: blur(6px); }
+    .badge { font-size: 0.75rem; padding: 0.18rem 0.5rem; border-radius: 9999px; }
+    @media (max-width: 640px) {
+      .hide-sm { display: none; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+  <div class="max-w-7xl mx-auto p-4 sm:p-6">
+    <!-- Header -->
+    <header class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+      <div class="flex items-center gap-4">
+        <div class="h-12 w-12 rounded-md bg-red-600 flex items-center justify-center text-white font-bold">H</div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-semibold">Painel Financeiro — HORTIMANIK</h1>
+          <p class="text-sm text-slate-500">LocalStorage · Desktop & Mobile</p>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <button id="openSettings" class="px-3 py-2 card text-sm">Configurações</button>
+        <button id="btnExport" class="px-3 py-2 card text-sm">Exportar CSV</button>
+        <button id="btnReset" class="px-3 py-2 card text-sm text-red-600">Limpar tudo</button>
+      </div>
+    </header>
+
+    <!-- Main grid -->
+    <main class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- Left column: resumo -->
+      <section class="lg:col-span-2 space-y-4">
+        <!-- Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div class="card p-4">
+            <div class="text-sm text-slate-500">Total Compras</div>
+            <div id="totalCompras" class="mt-2 text-2xl font-semibold">R$ 0,00</div>
+          </div>
+
+          <div class="card p-4">
+            <div class="text-sm text-slate-500">Vendas Estimadas</div>
+            <div id="vendasEstimadas" class="mt-2 text-2xl font-semibold">R$ 0,00</div>
+          </div>
+
+          <div class="card p-4">
+            <div class="text-sm text-slate-500">Lucro Bruto Estimado</div>
+            <div id="lucroBruto" class="mt-2 text-2xl font-semibold">R$ 0,00</div>
+          </div>
+
+          <div class="card p-4">
+            <div class="text-sm text-slate-500">Meta Diária</div>
+            <div id="metaDiaria" class="mt-2 text-2xl font-semibold">R$ 0,00</div>
+          </div>
+        </div>
+
+        <!-- Inputs para adicionar registro (compras / venda / despesa) -->
+        <div class="card p-4">
+          <h2 class="font-semibold">Adicionar registro</h2>
+          <form id="formAdd" class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <select id="tipo" class="p-2 border rounded" required>
+              <option value="compra">Compra</option>
+              <option value="venda">Venda</option>
+              <option value="despesa">Despesa</option>
+            </select>
+
+            <input id="descricao" class="p-2 border rounded" placeholder="Descrição (ex: tomates)" required />
+
+            <input id="valor" type="number" step="0.01" class="p-2 border rounded" placeholder="Valor (R$)" required />
+
+            <input id="fornecedor" class="p-2 border rounded" placeholder="Fornecedor (opcional)" />
+
+            <input id="data" type="date" class="p-2 border rounded" />
+
+            <button type="submit" class="col-span-1 sm:col-span-3 bg-red-600 text-white p-2 rounded">Adicionar</button>
+          </form>
+        </div>
+
+        <!-- Fornecedores e transações list -->
+        <div class="card p-4">
+          <h2 class="font-semibold mb-3">Fornecedores (agrupados)</h2>
+          <div id="fornecedoresList" class="space-y-2 text-sm text-slate-700">
+            <!-- preenchido via JS -->
+          </div>
+        </div>
+
+        <div class="card p-4">
+          <h2 class="font-semibold mb-3">Transações recentes</h2>
+          <div id="transacoesList" class="space-y-2 text-sm text-slate-700">
+            <!-- preenchido via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Right column: despesas, configurações rápidas -->
+      <aside class="space-y-4">
+        <div class="card p-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold">Resumo Diário</h3>
+            <div class="text-xs text-slate-500 hide-sm">Escolha data</div>
+          </div>
+          <div class="mt-3 grid grid-cols-1 gap-2">
+            <input id="filtroData" type="date" class="p-2 border rounded" />
+            <div class="text-sm text-slate-500 mt-1">Vendas do dia: <span id="vendasDia">R$ 0,00</span></div>
+            <div class="text-sm text-slate-500">Compras do dia: <span id="comprasDia">R$ 0,00</span></div>
+            <div class="text-sm text-slate-500">Despesas do dia: <span id="despesasDia">R$ 0,00</span></div>
+            <div class="text-sm font-semibold mt-2">Lucro Líquido do dia: <span id="lucroDia">R$ 0,00</span></div>
+          </div>
+        </div>
+
+        <div class="card p-4">
+          <h3 class="font-semibold">Configuração Rápida</h3>
+          <div class="mt-3 grid grid-cols-1 gap-2">
+            <label class="text-xs text-slate-500">Margem de Lucro (%)</label>
+            <input id="cfgMargem" type="number" step="0.1" class="p-2 border rounded" />
+            <label class="text-xs text-slate-500">Dias para meta</label>
+            <input id="cfgDias" type="number" class="p-2 border rounded" />
+            <button id="saveCfg" class="mt-2 bg-slate-800 text-white p-2 rounded">Salvar</button>
+            <button id="resetCfg" class="mt-2 border p-2 rounded text-sm">Restaurar padrão</button>
+          </div>
+        </div>
+
+        <div class="card p-4">
+          <h3 class="font-semibold">Ações rápidas</h3>
+          <div class="mt-3 space-y-2">
+            <button id="limparTransacoes" class="w-full p-2 border rounded text-sm">Limpar transações</button>
+            <button id="popularExemplo" class="w-full p-2 bg-green-600 text-white rounded text-sm">Popular com exemplo</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="mt-6 text-sm text-slate-500">Dados locais — salvo no seu navegador. Desenvolvido para uso offline.</footer>
+  </div>
+
+  <!-- Modal de Configurações (simples) -->
+  <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/40 p-4 z-50">
+    <div class="bg-white rounded-lg max-w-xl w-full p-6 card">
+      <h3 class="text-lg font-semibold">Configurações avançadas</h3>
+      <p class="text-sm text-slate-500 mt-1">Ajuste a margem e os dias usados nos cálculos.</p>
+
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs">Margem (%)</label>
+          <input id="modalMargem" type="number" step="0.1" class="p-2 border rounded w-full" />
+        </div>
+        <div>
+          <label class="text-xs">Dias</label>
+          <input id="modalDias" type="number" class="p-2 border rounded w-full" />
+        </div>
+      </div>
+
+      <div class="mt-4 flex justify-end gap-2">
+        <button id="closeModal" class="p-2 border rounded">Fechar</button>
+        <button id="saveModal" class="p-2 bg-red-600 text-white rounded">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/*
+  Painel Financeiro local com LocalStorage
+  - Chaves: hf_compras, hf_vendas, hf_despesas, hf_config
+  - Estrutura de registro:
+      { id, tipo: 'compra'|'venda'|'despesa', descricao, valor (number), fornecedor, data (YYYY-MM-DD), createdAt }
+*/
+
+// ---------- Helpers ----------
+const currency = (n) => {
+  const v = Number(n || 0);
+  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+};
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+
+// safe parse float (digit-by-digit care taken by using Number/parseFloat)
+const toNumber = (v) => {
+  if (v === null || v === undefined || v === '') return 0;
+  const n = parseFloat(String(v).replace(',', '.'));
+  return Number.isFinite(n) ? n : 0;
+};
+
+// ---------- Storage ----------
+const STORAGE = {
+  compras: 'hf_compras',
+  vendas: 'hf_vendas',
+  despesas: 'hf_despesas',
+  config: 'hf_config'
+};
+
+const defaults = {
+  margem: 30,   // %
+  dias: 30
+};
+
+function loadJSON(key) {
+  const raw = localStorage.getItem(key);
+  if (!raw) return [];
+  try { return JSON.parse(raw); } catch(e){ return []; }
+}
+function saveJSON(key, val) {
+  localStorage.setItem(key, JSON.stringify(val || []));
+}
+function loadConfig() {
+  const raw = localStorage.getItem(STORAGE.config);
+  if (!raw) return {...defaults};
+  try {
+    const obj = JSON.parse(raw);
+    return { margem: toNumber(obj.margem) || defaults.margem, dias: Math.max(1, Math.round(obj.dias || defaults.dias)) };
+  } catch(e) { return {...defaults}; }
+}
+function saveConfig(cfg) {
+  localStorage.setItem(STORAGE.config, JSON.stringify(cfg));
+}
+
+// ---------- Data getters ----------
+function getAllRecords() {
+  // unify as a single array for convenience
+  const compras = loadJSON(STORAGE.compras);
+  const vendas = loadJSON(STORAGE.vendas);
+  const despesas = loadJSON(STORAGE.despesas);
+  return { compras, vendas, despesas };
+}
+
+// ---------- Calculations ----------
+function sumArray(arr) {
+  return arr.reduce((s, r) => s + toNumber(r.valor), 0);
+}
+
+function calculateAndRender() {
+  const { compras, vendas, despesas } = getAllRecords();
+  const cfg = loadConfig();
+
+  const totalCompras = sumArray(compras);
+  // vendas estimadas = totalCompras * (1 + margem/100)
+  const vendasEstimadas = totalCompras * (1 + (toNumber(cfg.margem) / 100));
+  const lucroBruto = vendasEstimadas - totalCompras;
+
+  // Meta diária = vendasEstimadas / dias
+  const metaDiaria = cfg.dias && cfg.dias > 0 ? vendasEstimadas / cfg.dias : 0;
+
+  // render cards
+  document.getElementById('totalCompras').textContent = currency(totalCompras);
+  document.getElementById('vendasEstimadas').textContent = currency(vendasEstimadas);
+  document.getElementById('lucroBruto').textContent = currency(lucroBruto);
+  document.getElementById('metaDiaria').textContent = currency(metaDiaria);
+
+  // render lists
+  renderFornecedores(compras);
+  renderTransacoes([...compras.map(c => ({...c, tipo:'compra'})),
+                    ...vendas.map(v => ({...v, tipo:'venda'})),
+                    ...despesas.map(d => ({...d, tipo:'despesa'}))].sort((a,b) => (b.createdAt||0)-(a.createdAt||0)));
+
+  // render daily summary default to today or filtered date
+  const filtro = document.getElementById('filtroData').value || new Date().toISOString().slice(0,10);
+  renderResumoDia(filtro);
+}
+
+// ---------- Render fornecedores ----------
+function renderFornecedores(compras) {
+  const el = document.getElementById('fornecedoresList');
+  if (!compras || compras.length === 0) {
+    el.innerHTML = '<div class="text-sm text-slate-500">Nenhuma compra registrada.</div>';
+    return;
+  }
+  // agrupa por fornecedor (string)
+  const map = {};
+  compras.forEach(c => {
+    const f = (c.fornecedor || '— Sem fornecedor —').trim();
+    if (!map[f]) map[f] = { total: 0, items: [] };
+    map[f].total += toNumber(c.valor);
+    map[f].items.push(c);
+  });
+
+  const html = Object.keys(map).map(f => {
+    const item = map[f];
+    const rows = item.items.slice().map(it => `<div class="text-xs text-slate-600">• ${it.descricao || '—'} — ${currency(it.valor)} <span class="text-slate-400">(${it.data||'—'})</span></div>`).join('');
+    return `<div class="p-3 border rounded">
+      <div class="flex items-center justify-between">
+        <div class="font-medium">${escapeHtml(f)}</div>
+        <div class="text-sm font-semibold">${currency(item.total)}</div>
+      </div>
+      <div class="mt-2">${rows}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML = html;
+}
+
+// ---------- Render transações ----------
+function renderTransacoes(items) {
+  const el = document.getElementById('transacoesList');
+  if (!items || items.length === 0) {
+    el.innerHTML = '<div class="text-sm text-slate-500">Sem transações.</div>';
+    return;
+  }
+  const rows = items.slice(0,50).map(it => {
+    const tipoBadge = it.tipo === 'compra' ? '<span class="badge bg-slate-100">Compra</span>'
+                    : it.tipo === 'venda' ? '<span class="badge bg-green-100">Venda</span>'
+                    : '<span class="badge bg-yellow-100">Despesa</span>';
+    return `<div class="p-2 border rounded flex items-center justify-between">
+      <div>
+        <div class="text-sm font-medium">${escapeHtml(it.descricao || (it.tipo))} ${tipoBadge}</div>
+        <div class="text-xs text-slate-500">${escapeHtml(it.fornecedor||'')}</div>
+      </div>
+      <div class="text-sm font-semibold ${it.tipo==='venda' ? 'text-green-700' : (it.tipo==='despesa' ? 'text-yellow-700' : '')}">
+        ${currency(it.valor)} <div class="text-xs text-slate-400">${it.data||''}</div>
+      </div>
+    </div>`;
+  }).join('');
+  el.innerHTML = rows;
+}
+
+// ---------- Render resumo diário ----------
+function renderResumoDia(dateStr) {
+  const { compras, vendas, despesas } = getAllRecords();
+  const d = dateStr;
+  const vendasDia = vendas.filter(v => (v.data || '').slice(0,10) === d);
+  const comprasDia = compras.filter(c => (c.data || '').slice(0,10) === d);
+  const despesasDia = despesas.filter(x => (x.data || '').slice(0,10) === d);
+
+  const sV = sumArray(vendasDia), sC = sumArray(comprasDia), sD = sumArray(despesasDia);
+  const lucro = sV - sC - sD;
+
+  document.getElementById('vendasDia').textContent = currency(sV);
+  document.getElementById('comprasDia').textContent = currency(sC);
+  document.getElementById('despesasDia').textContent = currency(sD);
+  document.getElementById('lucroDia').textContent = currency(lucro);
+}
+
+// ---------- Form add ----------
+document.getElementById('formAdd').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const tipo = document.getElementById('tipo').value;
+  const descricao = document.getElementById('descricao').value.trim();
+  const valor = toNumber(document.getElementById('valor').value);
+  const fornecedor = document.getElementById('fornecedor').value.trim();
+  const data = document.getElementById('data').value || new Date().toISOString().slice(0,10);
+
+  if (valor <= 0) return alert('Valor precisa ser maior que zero.');
+
+  const rec = { id: uid(), tipo, descricao, valor, fornecedor, data, createdAt: Date.now() };
+
+  if (tipo === 'compra') {
+    const arr = loadJSON(STORAGE.compras);
+    arr.push(rec);
+    saveJSON(STORAGE.compras, arr);
+  } else if (tipo === 'venda') {
+    const arr = loadJSON(STORAGE.vendas);
+    arr.push(rec);
+    saveJSON(STORAGE.vendas, arr);
+  } else {
+    const arr = loadJSON(STORAGE.despesas);
+    arr.push(rec);
+    saveJSON(STORAGE.despesas, arr);
+  }
+
+  // limpar form
+  document.getElementById('descricao').value = '';
+  document.getElementById('valor').value = '';
+  document.getElementById('fornecedor').value = '';
+  document.getElementById('data').value = '';
+
+  calculateAndRender();
+});
+
+// ---------- Export CSV ----------
+function exportCSV() {
+  const { compras, vendas, despesas } = getAllRecords();
+  // Header
+  const rows = [
+    ['tipo','id','descricao','valor','fornecedor','data','createdAt']
+  ];
+  compras.forEach(r => rows.push(['compra', r.id, r.descricao, r.valor, r.fornecedor || '', r.data || '', r.createdAt || '']));
+  vendas.forEach(r => rows.push(['venda', r.id, r.descricao, r.valor, r.fornecedor || '', r.data || '', r.createdAt || '']));
+  despesas.forEach(r => rows.push(['despesa', r.id, r.descricao, r.valor, r.fornecedor || '', r.data || '', r.createdAt || '']));
+
+  const csvContent = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `hortimanik_export_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// ---------- Reset / limpar ----------
+function clearAll() {
+  if (!confirm('Tem certeza que deseja limpar TODOS os registros? Essa ação não pode ser desfeita.')) return;
+  localStorage.removeItem(STORAGE.compras);
+  localStorage.removeItem(STORAGE.vendas);
+  localStorage.removeItem(STORAGE.despesas);
+  calculateAndRender();
+}
+
+// ---------- UI: modal config ----------
+document.getElementById('openSettings').addEventListener('click', ()=>{
+  const cfg = loadConfig();
+  document.getElementById('modalMargem').value = cfg.margem;
+  document.getElementById('modalDias').value = cfg.dias;
+  document.getElementById('modal').classList.remove('hidden');
+  document.getElementById('modal').classList.add('flex');
+});
+document.getElementById('closeModal').addEventListener('click', ()=>{
+  document.getElementById('modal').classList.add('hidden');
+});
+document.getElementById('saveModal').addEventListener('click', ()=>{
+  const m = toNumber(document.getElementById('modalMargem').value) || defaults.margem;
+  const d = Math.max(1, Math.round(toNumber(document.getElementById('modalDias').value) || defaults.dias));
+  saveConfig({ margem: m, dias: d });
+  document.getElementById('modal').classList.add('hidden');
+  calculateAndRender();
+});
+
+// quick config save on sidebar
+document.getElementById('saveCfg').addEventListener('click', ()=>{
+  const m = toNumber(document.getElementById('cfgMargem').value) || defaults.margem;
+  const d = Math.max(1, Math.round(toNumber(document.getElementById('cfgDias').value) || defaults.dias));
+  saveConfig({ margem: m, dias: d });
+  calculateAndRender();
+});
+document.getElementById('resetCfg').addEventListener('click', ()=>{
+  if (!confirm('Restaurar configurações para padrão?')) return;
+  saveConfig({...defaults});
+  loadCfgToUI();
+  calculateAndRender();
+});
+
+function loadCfgToUI() {
+  const cfg = loadConfig();
+  document.getElementById('cfgMargem').value = cfg.margem;
+  document.getElementById('cfgDias').value = cfg.dias;
+}
+loadCfgToUI();
+
+// filtro data change
+document.getElementById('filtroData').addEventListener('change', (e)=>{
+  renderResumoDia(e.target.value);
+});
+
+// export and reset buttons
+document.getElementById('btnExport').addEventListener('click', exportCSV);
+document.getElementById('btnReset').addEventListener('click', clearAll);
+
+// limpar transacoes (apenas transações; mantém configurações)
+document.getElementById('limparTransacoes').addEventListener('click', ()=>{
+  if (!confirm('Limpar todas as compras, vendas e despesas?')) return;
+  localStorage.removeItem(STORAGE.compras);
+  localStorage.removeItem(STORAGE.vendas);
+  localStorage.removeItem(STORAGE.despesas);
+  calculateAndRender();
+});
+
+// popular exemplo (útil para testes)
+document.getElementById('popularExemplo').addEventListener('click', ()=>{
+  const hoje = new Date().toISOString().slice(0,10);
+  const compras = [
+    { id: uid(), descricao: 'Tomate 10kg', valor: 120.50, fornecedor: 'Feira XYZ', data: hoje, createdAt: Date.now() - 100000 },
+    { id: uid(), descricao: 'Alface 2kg', valor: 18.00, fornecedor: 'Feira XYZ', data: hoje, createdAt: Date.now() - 90000 },
+    { id: uid(), descricao: 'Banana 15kg', valor: 70.00, fornecedor: 'Fornecedor B', data: hoje, createdAt: Date.now() - 80000 },
+  ];
+  const vendas = [
+    { id: uid(), descricao: 'Vendas do dia', valor: 450.00, fornecedor: '', data: hoje, createdAt: Date.now() - 70000 }
+  ];
+  const despesas = [
+    { id: uid(), descricao: 'Transporte', valor: 50.00, fornecedor: '', data: hoje, createdAt: Date.now() - 60000 }
+  ];
+  saveJSON(STORAGE.compras, compras);
+  saveJSON(STORAGE.vendas, vendas);
+  saveJSON(STORAGE.despesas, despesas);
+  calculateAndRender();
+});
+
+// init render
+(function init() {
+  // set filtro data para hoje por padrão
+  document.getElementById('filtroData').value = new Date().toISOString().slice(0,10);
+  calculateAndRender();
+})();
+
+// ---------- Utility: escape HTML ----------
+function escapeHtml(s) {
+  if (!s && s !== 0) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+</body>
+</html>
