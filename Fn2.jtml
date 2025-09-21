@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dashboard Financeiro - HORTIMANIK</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Pequenos ajustes visuais */
+    .card { background: white; border-radius: 10px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+    .muted { color: #6b7280; } /* tailwind gray-500 */
+    .danger { color: #dc2626; } /* red-600 */
+    .success { color: #16a34a; } /* green-600 */
+    .small { font-size: 0.85rem; }
+    /* mobile adjustments */
+    @media (max-width: 640px) {
+      .grid-responsive { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen">
+
+  <div class="max-w-6xl mx-auto p-4">
+    <header class="mb-4">
+      <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-semibold">Dashboard Financeiro — HORTIMANIK</h1>
+        <div class="text-right small muted">
+          <div>LocalStorage • Responsivo</div>
+          <div id="now" class="text-sm"></div>
+        </div>
+      </div>
+      <p class="muted small mt-1">Registre vendas, compras e despesas. O sistema compara vendas com a <strong>meta diária</strong> e mostra se a meta foi batida, quanto falta e compara também o lucro estimado.</p>
+    </header>
+
+    <!-- Cards principais -->
+    <section class="grid grid-cols-3 gap-4 mb-6 grid-responsive" style="grid-template-columns: repeat(3, 1fr);">
+      <div class="card p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-sm muted">Total Vendas (registradas)</div>
+            <div id="totalVendas" class="text-2xl font-bold">R$ 0,00</div>
+          </div>
+          <div class="text-right small muted">
+            <div>Entradas</div>
+            <div id="countVendas">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-sm muted">Total Despesas</div>
+            <div id="totalDespesas" class="text-2xl font-bold">R$ 0,00</div>
+          </div>
+          <div class="text-right small muted">
+            <div>Itens</div>
+            <div id="countDespesas">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-sm muted">Lucro Estimado</div>
+            <div id="lucroEstimado" class="text-2xl font-bold">R$ 0,00</div>
+          </div>
+          <div class="text-right">
+            <div class="text-sm muted">Meta de Lucro</div>
+            <div>
+              <input id="metaLucro" type="number" step="0.01" placeholder="R$ 0,00" class="w-28 p-1 border rounded small" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Meta diária e status -->
+    <section class="card p-4 mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <label class="muted small">Meta diária de Vendas (R$):</label>
+          <input id="metaDiaria" type="number" step="0.01" placeholder="Ex.: 321.00" class="p-2 border rounded w-36" />
+          <button id="salvarMetasBtn" class="ml-2 px-3 py-2 bg-blue-600 text-white rounded small">Salvar metas</button>
+        </div>
+        <div id="statusMeta" class="text-right">
+          <div class="small muted">Status da meta de hoje</div>
+          <div id="txtStatusMeta" class="text-lg font-semibold">Meta: R$ 0,00</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Formulários para registro -->
+    <section class="grid grid-cols-3 gap-4 mb-6 grid-responsive" style="grid-template-columns: repeat(3, 1fr);">
+      <!-- Registro Venda -->
+      <div class="card p-4">
+        <h3 class="font-semibold mb-2">Registrar Venda</h3>
+        <form id="formVenda" class="space-y-2">
+          <input id="vendaDescricao" type="text" placeholder="Descrição" class="w-full p-2 border rounded" required />
+          <input id="vendaValor" type="number" step="0.01" placeholder="Valor (R$)" class="w-full p-2 border rounded" required />
+          <input id="vendaQuantidade" type="number" step="1" placeholder="Quantidade (opcional)" class="w-full p-2 border rounded" />
+          <input id="vendaFornecedor" type="text" placeholder="Fornecedor (opcional)" class="w-full p-2 border rounded" />
+          <div class="flex gap-2">
+            <button type="submit" class="flex-1 px-3 py-2 bg-green-600 text-white rounded">Adicionar Venda</button>
+            <button id="limparVendasUI" type="button" class="px-3 py-2 border rounded">Limpar Campos</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Registro Compra -->
+      <div class="card p-4">
+        <h3 class="font-semibold mb-2">Registrar Compra (Custo)</h3>
+        <form id="formCompra" class="space-y-2">
+          <input id="compraDescricao" type="text" placeholder="Descrição" class="w-full p-2 border rounded" required />
+          <input id="compraValor" type="number" step="0.01" placeholder="Valor (R$)" class="w-full p-2 border rounded" required />
+          <input id="compraFornecedor" type="text" placeholder="Fornecedor (opcional)" class="w-full p-2 border rounded" />
+          <div class="flex gap-2">
+            <button type="submit" class="flex-1 px-3 py-2 bg-indigo-600 text-white rounded">Adicionar Compra</button>
+            <button id="limparComprasUI" type="button" class="px-3 py-2 border rounded">Limpar Campos</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Registro Despesa -->
+      <div class="card p-4">
+        <h3 class="font-semibold mb-2">Registrar Despesa</h3>
+        <form id="formDespesa" class="space-y-2">
+          <input id="despesaDescricao" type="text" placeholder="Descrição" class="w-full p-2 border rounded" required />
+          <input id="despesaValor" type="number" step="0.01" placeholder="Valor (R$)" class="w-full p-2 border rounded" required />
+          <input id="despesaCategoria" type="text" placeholder="Categoria (opcional)" class="w-full p-2 border rounded" />
+          <div class="flex gap-2">
+            <button type="submit" class="flex-1 px-3 py-2 bg-yellow-600 text-white rounded">Adicionar Despesa</button>
+            <button id="limparDespesasUI" type="button" class="px-3 py-2 border rounded">Limpar Campos</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Tabelas e ações -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+      <!-- Vendas list -->
+      <div class="card p-4 col-span-1 lg:col-span-1">
+        <div class="flex items-center justify-between mb-2">
+          <h4 class="font-semibold">Vendas registradas</h4>
+          <div class="small muted">Export/Editar/Apagar</div>
+        </div>
+        <div class="overflow-auto max-h-64">
+          <table class="w-full text-left small">
+            <thead class="muted small">
+              <tr><th class="p-2">Descrição</th><th class="p-2">Valor</th><th class="p-2">Qtd</th><th class="p-2">Ações</th></tr>
+            </thead>
+            <tbody id="tbodyVendas"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Compras list -->
+      <div class="card p-4">
+        <div class="flex items-center justify-between mb-2">
+          <h4 class="font-semibold">Compras (custos)</h4>
+        </div>
+        <div class="overflow-auto max-h-64">
+          <table class="w-full text-left small">
+            <thead class="muted small"><tr><th class="p-2">Descrição</th><th class="p-2">Valor</th><th class="p-2">Fornecedor</th><th class="p-2">Ações</th></tr></thead>
+            <tbody id="tbodyCompras"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Despesas list -->
+      <div class="card p-4">
+        <div class="flex items-center justify-between mb-2">
+          <h4 class="font-semibold">Despesas</h4>
+        </div>
+        <div class="overflow-auto max-h-64">
+          <table class="w-full text-left small">
+            <thead class="muted small"><tr><th class="p-2">Descrição</th><th class="p-2">Valor</th><th class="p-2">Categoria</th><th class="p-2">Ações</th></tr></thead>
+            <tbody id="tbodyDespesas"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ações gerais -->
+    <section class="flex gap-3 mb-12">
+      <button id="exportCSV" class="px-4 py-2 bg-sky-600 text-white rounded">Exportar CSV (tudo)</button>
+      <button id="limparTudo" class="px-4 py-2 border rounded">Limpar todos dados (localStorage)</button>
+      <button id="carregarDemo" class="px-4 py-2 bg-gray-100 border rounded">Carregar demo</button>
+      <div class="ml-auto muted small">Dados salvos no seu navegador.</div>
+    </section>
+
+    <footer class="muted small text-center pb-6">Feito para HORTIMANIK • Salve seus dados localmente no navegador</footer>
+
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    /* -----------------------
+       Helpers
+       ----------------------- */
+    const $ = (id) => document.getElementById(id);
+    const money = (v) => {
+      // number to BRL format
+      const n = Number(v) || 0;
+      return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    };
+
+    // LocalStorage keys
+    const KEY = {
+      VENDAS: 'hm_vendas_v1',
+      COMPRAS: 'hm_compras_v1',
+      DESPESAS: 'hm_despesas_v1',
+      METAS: 'hm_metas_v1'
+    };
+
+    // State arrays
+    let vendas = [];
+    let compras = [];
+    let despesas = [];
+    let metas = { diaria: 0, lucro: 0 };
+
+    /* -----------------------
+       Inicialização
+       ----------------------- */
+    function nowStr() {
+      return new Date().toLocaleString('pt-BR');
+    }
+    $('now').textContent = nowStr();
+    // Load data
+    function loadStorage() {
+      try {
+        vendas = JSON.parse(localStorage.getItem(KEY.VENDAS)) || [];
+        compras = JSON.parse(localStorage.getItem(KEY.COMPRAS)) || [];
+        despesas = JSON.parse(localStorage.getItem(KEY.DESPESAS)) || [];
+        metas = JSON.parse(localStorage.getItem(KEY.METAS)) || { diaria: 0, lucro: 0 };
+      } catch (e) {
+        vendas = []; compras = []; despesas = []; metas = { diaria: 0, lucro: 0 };
+      }
+      // set inputs
+      $('metaDiaria').value = metas.diaria || '';
+      $('metaLucro').value = metas.lucro || '';
+    }
+
+    function saveStorage() {
+      localStorage.setItem(KEY.VENDAS, JSON.stringify(vendas));
+      localStorage.setItem(KEY.COMPRAS, JSON.stringify(compras));
+      localStorage.setItem(KEY.DESPESAS, JSON.stringify(despesas));
+      localStorage.setItem(KEY.METAS, JSON.stringify(metas));
+    }
+
+    /* -----------------------
+       Render
+       ----------------------- */
+    function renderTables() {
+      // Vendas
+      const tbodyV = $('tbodyVendas');
+      tbodyV.innerHTML = '';
+      vendas.forEach((v, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-2">${escapeHtml(v.descricao || '')}</td>
+          <td class="p-2">${money(v.valor)}</td>
+          <td class="p-2">${v.quantidade ? v.quantidade : '-'}</td>
+          <td class="p-2">
+            <button data-idx="${idx}" data-type="editVenda" class="text-sm px-2 py-1 border rounded mr-1">Editar</button>
+            <button data-idx="${idx}" data-type="delVenda" class="text-sm px-2 py-1 border rounded">Excluir</button>
+          </td>
+        `;
+        tbodyV.appendChild(tr);
+      });
+
+      // Compras
+      const tbodyC = $('tbodyCompras');
+      tbodyC.innerHTML = '';
+      compras.forEach((c, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-2">${escapeHtml(c.descricao || '')}</td>
+          <td class="p-2">${money(c.valor)}</td>
+          <td class="p-2">${escapeHtml(c.fornecedor || '-')}</td>
+          <td class="p-2">
+            <button data-idx="${idx}" data-type="editCompra" class="text-sm px-2 py-1 border rounded mr-1">Editar</button>
+            <button data-idx="${idx}" data-type="delCompra" class="text-sm px-2 py-1 border rounded">Excluir</button>
+          </td>
+        `;
+        tbodyC.appendChild(tr);
+      });
+
+      // Despesas
+      const tbodyD = $('tbodyDespesas');
+      tbodyD.innerHTML = '';
+      despesas.forEach((d, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-2">${escapeHtml(d.descricao || '')}</td>
+          <td class="p-2">${money(d.valor)}</td>
+          <td class="p-2">${escapeHtml(d.categoria || '-')}</td>
+          <td class="p-2">
+            <button data-idx="${idx}" data-type="editDespesa" class="text-sm px-2 py-1 border rounded mr-1">Editar</button>
+            <button data-idx="${idx}" data-type="delDespesa" class="text-sm px-2 py-1 border rounded">Excluir</button>
+          </td>
+        `;
+        tbodyD.appendChild(tr);
+      });
+
+      // contadores
+      $('countVendas').textContent = vendas.length;
+      $('countDespesas').textContent = despesas.length;
+
+      // Totais e status
+      updateTotalsAndStatus();
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    /* -----------------------
+       Cálculos
+       ----------------------- */
+    function sumVendas() {
+      // cada venda pode ter quantidade
+      return vendas.reduce((s, v) => {
+        const valor = Number(v.valor) || 0;
+        const q = Number(v.quantidade) || 1;
+        return s + valor * q;
+      }, 0);
+    }
+
+    function sumCompras() {
+      return compras.reduce((s, c) => s + (Number(c.valor) || 0), 0);
+    }
+
+    function sumDespesas() {
+      return despesas.reduce((s, d) => s + (Number(d.valor) || 0), 0);
+    }
+
+    function updateTotalsAndStatus() {
+      const totalV = round2(sumVendas());
+      const totalC = round2(sumCompras());
+      const totalD = round2(sumDespesas());
+      const lucroEstimado = round2(totalV - totalC - totalD);
+
+      $('totalVendas').textContent = money(totalV);
+      $('totalDespesas').textContent = money(totalD);
+      $('lucroEstimado').textContent = money(lucroEstimado);
+
+      // Meta diária (vendas)
+      const metaDiaria = Number(metas.diaria) || 0;
+      const metaLucro = Number(metas.lucro) || 0;
+      let statusText = `Meta diária: ${money(metaDiaria)}`;
+
+      // Comparação vendas X meta diária
+      if (metaDiaria > 0) {
+        if (totalV >= metaDiaria) {
+          statusText = `✅ Meta de vendas DIÁRIA batida! (${money(totalV)} ≥ ${money(metaDiaria)})`;
+        } else {
+          const falta = round2(metaDiaria - totalV);
+          statusText = `❌ Faltam ${money(falta)} para bater a meta diária (${money(totalV)} / ${money(metaDiaria)})`;
+        }
+      } else {
+        statusText = `Meta diária: ${money(0)} (defina uma meta para ativar comparação)`;
+      }
+
+      // Adiciona comparação do lucro com metaLucro se fornecida
+      if (metaLucro > 0) {
+        if (lucroEstimado >= metaLucro) {
+          statusText += ` • ✅ Meta de lucro batida (${money(lucroEstimado)} ≥ ${money(metaLucro)})`;
+        } else {
+          const faltaL = round2(metaLucro - lucroEstimado);
+          statusText += ` • ❌ Faltam ${money(faltaL)} para a meta de lucro`;
+        }
+      }
+
+      $('txtStatusMeta').innerHTML = statusText;
+    }
+
+    function round2(v) {
+      // arredonda e evita erros de ponto flutuante
+      return Math.round((Number(v) || 0) * 100) / 100;
+    }
+
+    /* -----------------------
+       Eventos forms
+       ----------------------- */
+    // Adicionar venda
+    $('formVenda').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const descricao = $('vendaDescricao').value.trim();
+      const valor = parseFloat($('vendaValor').value) || 0;
+      const quantidade = $('vendaQuantidade').value ? parseInt($('vendaQuantidade').value) : 1;
+      const fornecedor = $('vendaFornecedor').value.trim();
+
+      vendas.push({ descricao, valor: round2(valor), quantidade: quantidade, fornecedor, data: new Date().toISOString() });
+      saveStorage();
+      renderTables();
+      // limpar campos
+      $('vendaDescricao').value = '';
+      $('vendaValor').value = '';
+      $('vendaQuantidade').value = '';
+      $('vendaFornecedor').value = '';
+    });
+
+    // Adicionar compra
+    $('formCompra').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const descricao = $('compraDescricao').value.trim();
+      const valor = parseFloat($('compraValor').value) || 0;
+      const fornecedor = $('compraFornecedor').value.trim();
+
+      compras.push({ descricao, valor: round2(valor), fornecedor, data: new Date().toISOString() });
+      saveStorage();
+      renderTables();
+      $('compraDescricao').value = '';
+      $('compraValor').value = '';
+      $('compraFornecedor').value = '';
+    });
+
+    // Adicionar despesa
+    $('formDespesa').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const descricao = $('despesaDescricao').value.trim();
+      const valor = parseFloat($('despesaValor').value) || 0;
+      const categoria = $('despesaCategoria').value.trim();
+
+      despesas.push({ descricao, valor: round2(valor), categoria, data: new Date().toISOString() });
+      saveStorage();
+      renderTables();
+      $('despesaDescricao').value = '';
+      $('despesaValor').value = '';
+      $('despesaCategoria').value = '';
+    });
+
+    // limpar campos UI
+    $('limparVendasUI').addEventListener('click', () => {
+      $('vendaDescricao').value = '';
+      $('vendaValor').value = '';
+      $('vendaQuantidade').value = '';
+      $('vendaFornecedor').value = '';
+    });
+    $('limparComprasUI').addEventListener('click', () => {
+      $('compraDescricao').value = '';
+      $('compraValor').value = '';
+      $('compraFornecedor').value = '';
+    });
+    $('limparDespesasUI').addEventListener('click', () => {
+      $('despesaDescricao').value = '';
+      $('despesaValor').value = '';
+      $('despesaCategoria').value = '';
+    });
+
+    /* -----------------------
+       Edit / Delete via event delegation
+       ----------------------- */
+    document.addEventListener('click', (ev) => {
+      const t = ev.target;
+      const type = t.getAttribute('data-type');
+      const idx = t.getAttribute('data-idx');
+      if (!type) return;
+
+      if (type === 'delVenda') {
+        if (confirm('Excluir venda?')) {
+          vendas.splice(Number(idx), 1);
+          saveStorage(); renderTables();
+        }
+      }
+      if (type === 'delCompra') {
+        if (confirm('Excluir compra?')) {
+          compras.splice(Number(idx), 1);
+          saveStorage(); renderTables();
+        }
+      }
+      if (type === 'delDespesa') {
+        if (confirm('Excluir despesa?')) {
+          despesas.splice(Number(idx), 1);
+          saveStorage(); renderTables();
+        }
+      }
+
+      if (type === 'editVenda') {
+        const v = vendas[idx];
+        const newDesc = prompt('Descrição', v.descricao);
+        if (newDesc === null) return;
+        const newVal = prompt('Valor (R$)', v.valor);
+        if (newVal === null) return;
+        const newQtd = prompt('Quantidade', v.quantidade || 1);
+        if (newQtd === null) return;
+        vendas[idx] = {
+          ...v,
+          descricao: newDesc.trim(),
+          valor: round2(parseFloat(newVal) || 0),
+          quantidade: parseInt(newQtd) || 1
+        };
+        saveStorage(); renderTables();
+      }
+
+      if (type === 'editCompra') {
+        const c = compras[idx];
+        const newDesc = prompt('Descrição', c.descricao);
+        if (newDesc === null) return;
+        const newVal = prompt('Valor (R$)', c.valor);
+        if (newVal === null) return;
+        const newFor = prompt('Fornecedor', c.fornecedor || '');
+        if (newFor === null) return;
+        compras[idx] = { ...c, descricao: newDesc.trim(), valor: round2(parseFloat(newVal) || 0), fornecedor: newFor.trim() };
+        saveStorage(); renderTables();
+      }
+
+      if (type === 'editDespesa') {
+        const d = despesas[idx];
+        const newDesc = prompt('Descrição', d.descricao);
+        if (newDesc === null) return;
+        const newVal = prompt('Valor (R$)', d.valor);
+        if (newVal === null) return;
+        const newCat = prompt('Categoria', d.categoria || '');
+        if (newCat === null) return;
+        despesas[idx] = { ...d, descricao: newDesc.trim(), valor: round2(parseFloat(newVal) || 0), categoria: newCat.trim() };
+        saveStorage(); renderTables();
+      }
+    });
+
+    /* -----------------------
+       Metas: salvar e aplicar
+       ----------------------- */
+    $('salvarMetasBtn').addEventListener('click', () => {
+      metas.diaria = Number($('metaDiaria').value) || 0;
+      metas.lucro = Number($('metaLucro').value) || 0;
+      saveStorage();
+      renderTables();
+      alert('Metas salvas.');
+    });
+
+    /* -----------------------
+       Export CSV
+       ----------------------- */
+    function toCSV() {
+      const lines = [];
+      // header
+      lines.push(['tipo','descricao','valor','quantidade','fornecedor_categoria','data'].join(','));
+
+      vendas.forEach(v => {
+        lines.push(['venda', csvSafe(v.descricao), v.valor, (v.quantidade||1), csvSafe(v.fornecedor||''), v.data].join(','));
+      });
+      compras.forEach(c => {
+        lines.push(['compra', csvSafe(c.descricao), c.valor, '', csvSafe(c.fornecedor||''), c.data].join(','));
+      });
+      despesas.forEach(d => {
+        lines.push(['despesa', csvSafe(d.descricao), d.valor, '', csvSafe(d.categoria||''), d.data].join(','));
+      });
+
+      return lines.join('\n');
+    }
+    function csvSafe(s) {
+      if (s == null) return '';
+      const str = String(s).replace(/"/g, '""');
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        return `"${str}"`;
+      }
+      return str;
+    }
+
+    $('exportCSV').addEventListener('click', () => {
+      const csv = toCSV();
+      const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `hortimanik_export_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    /* -----------------------
+       Limpar tudo
+       ----------------------- */
+    $('limparTudo').addEventListener('click', () => {
+      if (!confirm('Tem certeza que deseja apagar TODOS os dados salvos neste navegador?')) return;
+      localStorage.removeItem(KEY.VENDAS);
+      localStorage.removeItem(KEY.COMPRAS);
+      localStorage.removeItem(KEY.DESPESAS);
+      localStorage.removeItem(KEY.METAS);
+      vendas = []; compras = []; despesas = []; metas = { diaria: 0, lucro: 0 };
+      $('metaDiaria').value = '';
+      $('metaLucro').value = '';
+      renderTables();
+    });
+
+    /* -----------------------
+       Carregar demo (exemplo)
+       ----------------------- */
+    $('carregarDemo').addEventListener('click', () => {
+      if (!confirm('Carregar dados de exemplo no dashboard? Isso NÃO apagará seus dados existentes; apenas adiciona alguns registros.')) return;
+      vendas.push({ descricao: 'Venda maçãs', valor: 120.50, quantidade: 2, fornecedor: 'Loja A', data: new Date().toISOString() });
+      vendas.push({ descricao: 'Venda alface', valor: 45.00, quantidade: 1, fornecedor: 'Loja B', data: new Date().toISOString() });
+      compras.push({ descricao: 'Compra sementes', valor: 30.00, fornecedor: 'Fornecedor X', data: new Date().toISOString() });
+      despesas.push({ descricao: 'Entrega', valor: 15.00, categoria: 'Logística', data: new Date().toISOString() });
+      metas.diaria = Number($('metaDiaria').value) || metas.diaria || 200;
+      metas.lucro = Number($('metaLucro').value) || metas.lucro || 100;
+      saveStorage();
+      renderTables();
+    });
+
+    /* -----------------------
+       Utilidades
+       ----------------------- */
+    function pad2(n){return n<10?('0'+n):n;}
+    // inicial
+    loadStorage();
+    renderTables();
+
+    // Atualiza o timestamp a cada minuto
+    setInterval(()=> $('now').textContent = nowStr(), 60000);
+
+  </script>
+</body>
+</html>
