@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Contas a Receber - Profissional</title>
+    <style>
+        /* CSS Profissional e Responsivo */
+        :root {
+            --cor-primaria: #0D47A1; /* Azul Escuro */
+            --cor-secundaria: #1565C0; /* Azul Médio */
+            --cor-sucesso: #4CAF50;
+            --cor-perigo: #D32F2F;
+            --cor-alerta: #FFB300; 
+            --cor-neutra: #f4f7f6;
+            --cor-card: #ffffff;
+            --cor-texto: #333;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--cor-neutra);
+            color: var(--cor-texto);
+            margin: 0;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--cor-card);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: var(--cor-primaria);
+            text-align: center;
+            border-bottom: 3px solid var(--cor-primaria);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+        
+        h2 {
+            color: var(--cor-secundaria);
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 8px;
+            margin-top: 30px;
+        }
+        
+        /* Layout Flexível */
+        .grid-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .form-area, .details-area {
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f8f8f8;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-area {
+            flex: 1 1 350px; /* Formulário principal */
+            min-width: 300px;
+        }
+        
+        .details-area {
+            flex: 2 1 600px; /* Área de detalhes (tabelas) */
+        }
+        
+        /* Formulário */
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #444;
+        }
+
+        input:not([type="submit"]), button, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        
+        button {
+            background-color: var(--cor-primaria);
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: var(--cor-secundaria);
+        }
+
+        /* Tabela */
+        .tabela-wrapper {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+        table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        th {
+            background-color: var(--cor-primaria);
+            color: white;
+            text-transform: uppercase;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .status-pendente { color: var(--cor-perigo); font-weight: bold; }
+        .status-pago { color: var(--cor-sucesso); font-weight: bold; }
+        .total-divida { font-size: 1.2em; font-weight: bold; color: var(--cor-primaria); margin-top: 10px; }
+        
+        /* Botões de Ação na Tabela */
+        .action-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-right: 5px;
+        }
+        
+        .btn-pagar { background-color: var(--cor-sucesso); color: white; }
+        .btn-whatsapp { background-color: #25D366; color: white; }
+        .btn-add-nota { background-color: var(--cor-alerta); color: var(--cor-texto); }
+        .btn-delete { background-color: var(--cor-perigo); color: white; }
+
+        /* Modal para Baixa */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 10; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        .modal-content {
+            background-color: var(--cor-card);
+            margin: 15% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%; 
+            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        /* Responsividade para celular */
+        @media (max-width: 800px) {
+            .grid-layout {
+                flex-direction: column;
+            }
+            .container {
+                padding: 15px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Sistema de Contas a Receber (Dívidas de Clientes)</h1>
+
+        <div class="grid-layout">
+            
+            <div class="form-area">
+                <h2>1. Registrar Nova Dívida/Cliente</h2>
+                <form id="form-cliente">
+                    <label for="nome-cliente">Nome do Cliente:</label>
+                    <input type="text" id="nome-cliente" placeholder="Ex: Maria da Silva" required>
+                    
+                    <label for="contato-cliente">Contato (WhatsApp):</label>
+                    <input type="text" id="contato-cliente" placeholder="Ex: 55 DDD NÚMERO (Ex: 5511987654321)" pattern="[0-9]+" title="Apenas números, incluindo 55 e DDD" required>
+                    
+                    <h3>Primeira Nota/Compra</h3>
+                    <label for="data-compra">Data da Compra:</label>
+                    <input type="date" id="data-compra" required>
+                    
+                    <label for="valor-compra">Valor da Dívida:</label>
+                    <input type="number" id="valor-compra" step="0.01" value="0.00" required>
+                    
+                    <button type="submit">Registrar Cliente e Dívida</button>
+                </form>
+
+                <hr>
+
+                <h2>2. Adicionar Nova Nota a Cliente Existente</h2>
+                <form id="form-nova-nota">
+                    <label for="select-cliente">Selecione o Cliente:</label>
+                    <select id="select-cliente" required>
+                        <option value="" disabled selected>Escolha um cliente...</option>
+                    </select>
+                    
+                    <label for="nova-data-compra">Data da Nova Compra:</label>
+                    <input type="date" id="nova-data-compra" required>
+                    
+                    <label for="novo-valor-compra">Valor da Nova Dívida:</label>
+                    <input type="number" id="novo-valor-compra" step="0.01" value="0.00" required>
+                    
+                    <button type="submit" class="btn-add-nota">Adicionar Nota</button>
+                </form>
+            </div>
+
+            <div class="details-area">
+                <h2>3. Histórico e Gerenciamento de Dívidas</h2>
+                <div class="tabela-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Contato</th>
+                                <th>Total Devedor</th>
+                                <th>Notas Pendentes</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-clientes">
+                            </tbody>
+                    </table>
+                </div>
+                
+                <h3 style="margin-top: 30px;">Detalhes das Notas</h3>
+                <div class="tabela-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Data Compra</th>
+                                <th>Valor Original</th>
+                                <th>Valor Devedor</th>
+                                <th>Status</th>
+                                <th>Ação Nota</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-notas">
+                             <tr><td colspan="6" style="text-align: center;">Selecione um cliente para ver os detalhes das notas.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-pagamento" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Registrar Pagamento</h2>
+            <p>Cliente: <strong id="modal-nome-cliente"></strong></p>
+            <p>Dívida Atual da Nota: <strong id="modal-valor-devido"></strong></p>
+
+            <form id="form-pagamento-modal">
+                <input type="hidden" id="modal-cliente-id">
+                <input type="hidden" id="modal-nota-id">
+
+                <label for="modal-valor-pago">Valor Pago (Baixa):</label>
+                <input type="number" id="modal-valor-pago" step="0.01" required>
+
+                <label for="modal-data-pagamento">Data do Pagamento:</label>
+                <input type="date" id="modal-data-pagamento" required>
+
+                <button type="submit">Confirmar Baixa</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        // JAVASCRIPT
+        
+        const STORAGE_KEY = 'dividasClientesData';
+        let clientes = [];
+        
+        const modalPagamento = document.getElementById('modal-pagamento');
+        const closeModalBtn = document.querySelector('.close-btn');
+
+        // --- Funções Utilitárias ---
+
+        /** Formata um número para a moeda brasileira. */
+        function formatarMoeda(valor) {
+            return parseFloat(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+        
+        /** Formata a data para exibição. */
+        function formatarData(dataISO) {
+             const [ano, mes, dia] = dataISO.split('-');
+             return `${dia}/${mes}/${ano}`;
+        }
+        
+        /** Salva os dados no localStorage. */
+        function salvarDados() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(clientes));
+        }
+
+        /** Carrega os dados do localStorage. */
+        function carregarDados() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            if (data) {
+                clientes = JSON.parse(data);
+            }
+            renderizarTabelas();
+            popularSelectClientes();
+        }
+
+        // --- Funções de Renderização e UI ---
+        
+        /** Renderiza a tabela principal de clientes. */
+        function renderizarTabelas() {
+            const tbodyClientes = document.getElementById('tabela-clientes');
+            tbodyClientes.innerHTML = '';
+            
+            clientes.forEach(cliente => {
+                // Calcula o valor total devido pelo cliente (soma das notas com valorDevedor > 0)
+                const totalDevedor = cliente.notas.reduce((sum, nota) => sum + parseFloat(nota.valorDevedor), 0);
+                const notasPendentes = cliente.notas.filter(n => parseFloat(n.valorDevedor) > 0).length;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: bold;">${cliente.nome}</td>
+                    <td>${cliente.contato}</td>
+                    <td class="total-divida" data-total-devedor="${totalDevedor.toFixed(2)}">${formatarMoeda(totalDevedor)}</td>
+                    <td>${notasPendentes}</td>
+                    <td>
+                        <button class="action-btn btn-add-nota" onclick="selecionarClienteParaDetalhes('${cliente.id}')">Ver Notas</button>
+                        <button class="action-btn btn-whatsapp" onclick="compartilharDivida('${cliente.id}')">Zap Zap</button>
+                        <button class="action-btn btn-delete" onclick="excluirCliente('${cliente.id}')">Excluir</button>
+                    </td>
+                `;
+                tbodyClientes.appendChild(tr);
+            });
+            
+            // Re-renderiza a tabela de notas se um cliente estiver selecionado
+            const clienteSelecionadoId = document.getElementById('tabela-notas').dataset.clienteId;
+            if (clienteSelecionadoId) {
+                renderizarNotasDetalhes(clienteSelecionadoId);
+            } else {
+                 document.getElementById('tabela-notas').innerHTML = `
+                    <tr><td colspan="6" style="text-align: center; color: #777;">Selecione um cliente acima para ver os detalhes das notas.</td></tr>
+                `;
+            }
+
+            popularSelectClientes();
+        }
+        
+        /** Popula o dropdown de clientes para adicionar nova nota. */
+        function popularSelectClientes() {
+            const select = document.getElementById('select-cliente');
+            select.innerHTML = '<option value="" disabled selected>Escolha um cliente...</option>';
+            
+            clientes.forEach(cliente => {
+                const option = document.createElement('option');
+                option.value = cliente.id;
+                option.textContent = cliente.nome;
+                select.appendChild(option);
+            });
+        }
+        
+        /** Renderiza a tabela de notas detalhadas de um cliente. */
+        function renderizarNotasDetalhes(clienteId) {
+            const cliente = clientes.find(c => c.id === clienteId);
+            const tbodyNotas = document.getElementById('tabela-notas');
+            tbodyNotas.innerHTML = '';
+            tbodyNotas.dataset.clienteId = clienteId; // Guarda o ID selecionado
+
+            if (!cliente) {
+                tbodyNotas.innerHTML = `<tr><td colspan="6" style="text-align: center; color: ${'var(--cor-perigo)'};">Cliente não encontrado.</td></tr>`;
+                return;
+            }
+
+            cliente.notas.sort((a, b) => new Date(a.data) - new Date(b.data)); // Ordena por data
+
+            cliente.notas.forEach(nota => {
+                const isPago = parseFloat(nota.valorDevedor) <= 0;
+                const statusClass = isPago ? 'status-pago' : 'status-pendente';
+                const statusText = isPago ? 'PAGO' : 'PENDENTE';
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${cliente.nome}</td>
+                    <td>${formatarData(nota.data)}</td>
+                    <td>${formatarMoeda(nota.valorOriginal)}</td>
+                    <td>${formatarMoeda(nota.valorDevedor)}</td>
+                    <td class="${statusClass}">${statusText}</td>
+                    <td>
+                        <button class="action-btn btn-pagar" ${isPago ? 'disabled' : ''} 
+                            onclick="abrirModalPagamento('${clienteId}', '${nota.id}', '${cliente.nome}', ${nota.valorDevedor})">
+                            Pagar
+                        </button>
+                    </td>
+                `;
+                tbodyNotas.appendChild(tr);
+            });
+        }
+        
+        /** Seleciona um cliente para ver detalhes e rola para a tabela. */
+        function selecionarClienteParaDetalhes(clienteId) {
+            renderizarNotasDetalhes(clienteId);
+            // Rola a página para a tabela de detalhes
+            document.querySelector('.details-area h3').scrollIntoView({ behavior: 'smooth' });
+        }
+
+
+        // --- Funções de Manipulação de Dados ---
+
+        /** 1. Adiciona novo cliente e sua primeira dívida. */
+        document.getElementById('form-cliente').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const nome = document.getElementById('nome-cliente').value.trim();
+            const contato = document.getElementById('contato-cliente').value.trim();
+            const dataCompra = document.getElementById('data-compra').value;
+            const valorCompra = parseFloat(document.getElementById('valor-compra').value);
+            
+            if (!nome || valorCompra <= 0) {
+                alert('Preencha nome e valor corretamente.');
+                return;
+            }
+            
+            if (clientes.some(c => c.nome.toLowerCase() === nome.toLowerCase())) {
+                 alert('Cliente com este nome já existe. Use o formulário de "Adicionar Nova Nota" abaixo.');
+                 return;
+            }
+
+            const clienteId = Date.now().toString();
+            const notaId = Date.now().toString() + 'n';
+            
+            const novaNota = {
+                id: notaId,
+                data: dataCompra,
+                valorOriginal: valorCompra,
+                valorDevedor: valorCompra,
+                pagamentos: []
+            };
+
+            const novoCliente = {
+                id: clienteId,
+                nome: nome,
+                contato: contato,
+                notas: [novaNota]
+            };
+
+            clientes.push(novoCliente);
+            salvarDados();
+            renderizarTabelas();
+            this.reset();
+            alert(`✅ Cliente "${nome}" e primeira dívida de ${formatarMoeda(valorCompra)} registrados com sucesso!`);
+        });
+
+        /** 2. Adiciona nova dívida a cliente existente. */
+        document.getElementById('form-nova-nota').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const clienteId = document.getElementById('select-cliente').value;
+            const dataCompra = document.getElementById('nova-data-compra').value;
+            const valorCompra = parseFloat(document.getElementById('novo-valor-compra').value);
+            
+            if (!clienteId || valorCompra <= 0) {
+                alert('Selecione um cliente e preencha o valor corretamente.');
+                return;
+            }
+
+            const cliente = clientes.find(c => c.id === clienteId);
+            if (cliente) {
+                const notaId = Date.now().toString() + 'n';
+                const novaNota = {
+                    id: notaId,
+                    data: dataCompra,
+                    valorOriginal: valorCompra,
+                    valorDevedor: valorCompra,
+                    pagamentos: []
+                };
+
+                cliente.notas.push(novaNota);
+                salvarDados();
+                renderizarTabelas();
+                selecionarClienteParaDetalhes(clienteId);
+                this.reset();
+                alert(`✅ Nova dívida de ${formatarMoeda(valorCompra)} adicionada para "${cliente.nome}"!`);
+            }
+        });
+        
+        /** 3. Exclui um cliente e todas as suas notas. */
+        function excluirCliente(clienteId) {
+            const cliente = clientes.find(c => c.id === clienteId);
+            if (cliente && confirm(`Tem certeza que deseja EXCLUIR o cliente "${cliente.nome}" e todas as suas dívidas?`)) {
+                clientes = clientes.filter(c => c.id !== clienteId);
+                salvarDados();
+                renderizarTabelas();
+                document.getElementById('tabela-notas').innerHTML = `<tr><td colspan="6" style="text-align: center;">Cliente excluído.</td></tr>`;
+                alert(`Cliente "${cliente.nome}" excluído com sucesso.`);
+            }
+        }
+        
+        // --- Funções de Baixa (Modal) ---
+        
+        /** Abre o modal de pagamento. */
+        function abrirModalPagamento(clienteId, notaId, nomeCliente, valorDevido) {
+            const valorMax = parseFloat(valorDevido).toFixed(2);
+
+            document.getElementById('modal-nome-cliente').textContent = nomeCliente;
+            document.getElementById('modal-valor-devido').textContent = formatarMoeda(valorDevido);
+            document.getElementById('modal-cliente-id').value = clienteId;
+            document.getElementById('modal-nota-id').value = notaId;
+            document.getElementById('modal-valor-pago').value = valorMax; // Sugere o valor total
+            document.getElementById('modal-valor-pago').max = valorMax;
+            document.getElementById('modal-data-pagamento').valueAsDate = new Date(); // Data atual
+            
+            modalPagamento.style.display = 'block';
+        }
+        
+        /** Fecha o modal. */
+        closeModalBtn.onclick = function() {
+            modalPagamento.style.display = 'none';
+        }
+        window.onclick = function(event) {
+            if (event.target == modalPagamento) {
+                modalPagamento.style.display = 'none';
+            }
+        }
+        
+        /** Registra o pagamento (baixa). */
+        document.getElementById('form-pagamento-modal').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const clienteId = document.getElementById('modal-cliente-id').value;
+            const notaId = document.getElementById('modal-nota-id').value;
+            const valorPago = parseFloat(document.getElementById('modal-valor-pago').value);
+            const dataPagamento = document.getElementById('modal-data-pagamento').value;
+
+            const cliente = clientes.find(c => c.id === clienteId);
+            const nota = cliente ? cliente.notas.find(n => n.id === notaId) : null;
+
+            if (nota && valorPago > 0) {
+                const valorDevidoAtual = parseFloat(nota.valorDevedor);
+                
+                if (valorPago > valorDevidoAtual) {
+                    alert(`O valor pago (${formatarMoeda(valorPago)}) não pode ser maior que a dívida restante (${formatarMoeda(valorDevidoAtual)}).`);
+                    return;
+                }
+
+                // 1. Atualiza o valor devedor
+                nota.valorDevedor = (valorDevidoAtual - valorPago).toFixed(2);
+
+                // 2. Registra o pagamento para histórico
+                nota.pagamentos.push({
+                    data: dataPagamento,
+                    valor: valorPago
+                });
+
+                salvarDados();
+                renderizarTabelas();
+                selecionarClienteParaDetalhes(clienteId);
+                modalPagamento.style.display = 'none';
+                
+                const status = parseFloat(nota.valorDevedor) <= 0 ? 'quitada' : 'parcial';
+                alert(`✅ Pagamento de ${formatarMoeda(valorPago)} registrado. Nota ${status}!`);
+            } else {
+                alert('Erro ao registrar pagamento.');
+            }
+        });
+
+
+        // --- Função de Compartilhamento (WhatsApp) ---
+        
+        /** Gera e compartilha a mensagem de dívida via WhatsApp. */
+        function compartilharDivida(clienteId) {
+            const cliente = clientes.find(c => c.id === clienteId);
+            if (!cliente) return;
+            
+            const totalDevido = cliente.notas.reduce((sum, nota) => sum + parseFloat(nota.valorDevedor), 0);
+            
+            let mensagem = `*RESUMO DA DÍVIDA - ${cliente.nome.toUpperCase()}*\n\n`;
+            mensagem += `💰 *Total a Pagar:* ${formatarMoeda(totalDevido)}\n\n`;
+            
+            mensagem += `--- DETALHES DAS NOTAS ---\n`;
+            
+            cliente.notas.forEach(nota => {
+                const status = parseFloat(nota.valorDevedor) <= 0 ? '✅ PAGO' : '❌ PENDENTE';
+                
+                mensagem += `\n*Nota da Compra:* ${formatarData(nota.data)}\n`;
+                mensagem += `  - Valor Original: ${formatarMoeda(nota.valorOriginal)}\n`;
+                mensagem += `  - Valor Devedor: ${formatarMoeda(nota.valorDevedor)}\n`;
+                mensagem += `  - Status: ${status}\n`;
+                
+                if (nota.pagamentos && nota.pagamentos.length > 0) {
+                    let totalPago = 0;
+                    mensagem += `  - Histórico de Pagamentos:\n`;
+                    nota.pagamentos.forEach(p => {
+                        mensagem += `    • ${formatarData(p.data)} - ${formatarMoeda(p.valor)}\n`;
+                        totalPago += parseFloat(p.valor);
+                    });
+                    mensagem += `  - *Total Pago nesta Nota:* ${formatarMoeda(totalPago)}\n`;
+                }
+            });
+
+            mensagem += `\n--------------------------------------\n`;
+            mensagem += `*Agradecemos a preferência!*`;
+
+            const contatoURL = cliente.contato.replace(/\D/g, ''); // Remove caracteres não numéricos
+            const url = `https://api.whatsapp.com/send?phone=${contatoURL}&text=${encodeURIComponent(mensagem)}`;
+            
+            window.open(url, '_blank');
+        }
+
+
+        // --- Início da Aplicação ---
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarDados();
+            // Define data atual como padrão no formulário
+            document.getElementById('data-compra').valueAsDate = new Date();
+            document.getElementById('nova-data-compra').valueAsDate = new Date();
+        });
+
+    </script>
+
+</body>
+</html>
