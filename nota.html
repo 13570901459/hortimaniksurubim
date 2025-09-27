@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Dívidas de Clientes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Controle de Contas a Receber</h1>
+    </header>
+
+    <main>
+        <section class="form-section">
+            <h2>Registrar Nova Compra/Dívida</h2>
+            <form id="registro-form">
+                <div>
+                    <label for="nomeCliente">Nome do Cliente:</label>
+                    <input type="text" id="nomeCliente" required>
+                </div>
+                <div>
+                    <label for="dataCompra">Data da Compra:</label>
+                    <input type="date" id="dataCompra" required>
+                </div>
+                <div>
+                    <label for="valorCompra">Valor (R$):</label>
+                    <input type="number" step="0.01" id="valorCompra" required>
+                </div>
+                <button type="submit">Adicionar Dívida</button>
+            </form>
+        </section>
+
+        <hr>
+
+        <section class="form-section">
+            <h2>Registrar Pagamento (Dar Baixa)</h2>
+            <form id="pagamento-form">
+                <div>
+                    <label for="nomeClientePagamento">Nome do Cliente:</label>
+                    <input type="text" id="nomeClientePagamento" required>
+                </div>
+                <div>
+                    <label for="valorPago">Valor Pago (R$):</label>
+                    <input type="number" step="0.01" id="valorPago" required>
+                </div>
+                <button type="submit">Registrar Pagamento</button>
+            </form>
+        </section>
+
+        <hr>
+
+        <section class="dividas-section">
+            <h2>Dívidas Pendentes</h2>
+            <div id="listaDividas">
+                <p>Nenhuma dívida registrada ainda.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
