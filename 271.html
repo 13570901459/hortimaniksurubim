@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão Financeira Profissional</title>
+    <style>
+        /* CSS ATUALIZADO (RESPONSIVO E PALETA AZUL ESCURO) */
+        :root {
+            --cor-primaria: #0D47A1; /* Azul Escuro */
+            --cor-secundaria: #1565C0; /* Azul Médio */
+            --cor-sucesso: #4CAF50;
+            --cor-perigo: #D32F2F;
+            --cor-neutra: #f4f7f6;
+            --cor-card: #ffffff;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--cor-neutra);
+            color: #333;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background-color: var(--cor-card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Sombra mais profunda */
+        }
+
+        h1 {
+            color: var(--cor-primaria);
+            text-align: center;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            border-bottom: 3px solid var(--cor-primaria);
+        }
+        
+        h2 {
+            color: var(--cor-secundaria);
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* Dashboard e Cards */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.2s;
+            background-color: #f0f7ff; /* Fundo claro para contraste */
+            border-left: 5px solid;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-bruto { border-left-color: var(--cor-secundaria); }
+        .card-liquido { border-left-color: var(--cor-sucesso); }
+        .card-compra { border-left-color: #FFB300; /* Amarelo */ }
+        .card-despesa { border-left-color: var(--cor-perigo); }
+
+        .card h3 {
+            margin-top: 0;
+            color: #555;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .card p {
+            font-size: 1.6em;
+            font-weight: bold;
+            margin: 5px 0 0;
+            color: var(--cor-primaria);
+        }
+        
+        /* Formulários */
+        .form-section {
+            display: flex;
+            flex-wrap: wrap; /* Permite quebras para responsividade */
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            flex: 1 1 45%; /* Flexível, ocupa 45% (2 colunas em PC) */
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        @media (max-width: 768px) {
+            .form-group {
+                flex: 1 1 100%; /* Ocupa 100% em celulares (1 coluna) */
+            }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #444;
+        }
+
+        input:not([type="submit"]),
+        select,
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        
+        button {
+            background-color: var(--cor-primaria);
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: var(--cor-secundaria);
+            transform: translateY(-1px);
+        }
+
+        #btn-cancelar-edicao {
+            background-color: #607d8b;
+        }
+        #btn-cancelar-edicao:hover {
+            background-color: #546e7a;
+        }
+
+        /* Tabela */
+        .tabela-wrapper {
+            overflow-x: auto; /* Scroll horizontal em mobile */
+        }
+        table {
+            width: 100%;
+            min-width: 600px; /* Garante que a tabela não fique muito estreita em mobile */
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            font-size: 0.95em;
+        }
+
+        th {
+            background-color: var(--cor-primaria);
+            color: white;
+            text-transform: uppercase;
+            font-weight: normal;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .delete-btn, .edit-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-right: 5px;
+        }
+        
+        .delete-btn { background-color: var(--cor-perigo); color: white; }
+        .edit-btn { background-color: #FFB300; color: #333; }
+        
+        .data-type-compra { color: var(--cor-primaria); font-weight: bold; }
+        .data-type-venda { color: var(--cor-sucesso); font-weight: bold; }
+        .data-type-despesa { color: var(--cor-perigo); font-weight: bold; }
+        
+        /* Estilos de Projeção */
+        .projecao-info {
+            background-color: #e3f2fd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border-left: 5px solid var(--cor-primaria);
+        }
+        .projecao-info p {
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Sistema Profissional de Gestão Financeira</h1>
+
+        <div class="dashboard">
+            <div class="card card-bruto">
+                <h3>Total de Vendas (Bruto)</h3>
+                <p id="dash-vendas">R$ 0,00</p>
+            </div>
+            <div class="card card-liquido">
+                <h3>Faturamento Líquido (Lucro)</h3>
+                <p id="dash-faturamento-liquido">R$ 0,00</p>
+            </div>
+            <div class="card card-compra">
+                <h3>Total de Compras (Custo)</h3>
+                <p id="dash-compras">R$ 0,00</p>
+            </div>
+            <div class="card card-despesa">
+                <h3>Total de Despesas Fixas/Variáveis</h3>
+                <p id="dash-despesas">R$ 0,00</p>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="form-group">
+                <h2>1. Registrar Compra / Custo</h2>
+                <form id="form-compra">
+                    <label for="compra-descricao">Descrição da Compra (Estoque):</label>
+                    <input type="text" id="compra-descricao" placeholder="Ex: Estoque de Camisetas P/I 2026" required>
+                    
+                    <label for="compra-valor">Valor Total da Compra (Custo):</label>
+                    <input type="number" id="compra-valor" step="0.01" value="0.00" required>
+                    
+                    <label for="compra-margem">Margem de Lucro (%) esperada:</label>
+                    <input type="number" id="compra-margem" step="0.1" min="0" max="500" value="50" required>
+
+                    <button type="submit">Registrar Compra</button>
+                    
+                    <div class="projecao-info">
+                        <p>Faturamento Bruto Esperado: <strong id="projecao-bruta">R$ 0,00</strong></p>
+                        <p>Lucro/Faturamento Líquido Estimado: <strong id="projecao-lucro">R$ 0,00</strong></p>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="form-group">
+                <h2>2. Registrar Movimento Diário</h2>
+                <form id="form-movimento">
+                    <input type="hidden" id="movimento-id">
+                    
+                    <label for="movimento-tipo">Tipo de Transação:</label>
+                    <select id="movimento-tipo" required>
+                        <option value="venda">Venda do Dia (Entrada)</option>
+                        <option value="despesa">Despesa Diária (Saída)</option>
+                    </select>
+                    
+                    <div id="venda-options">
+                        <label for="venda-forma">Forma de Pagamento (Venda):</label>
+                        <select id="venda-forma">
+                            <option value="dinheiro">Dinheiro</option>
+                            <option value="pix">PIX</option>
+                            <option value="cartao">Cartão</option>
+                        </select>
+                    </div>
+
+                    <label for="movimento-descricao">Descrição:</label>
+                    <input type="text" id="movimento-descricao" placeholder="Ex: Venda loja 27/09 ou Aluguel" required>
+                    
+                    <label for="movimento-valor">Valor:</label>
+                    <input type="number" id="movimento-valor" step="0.01" required>
+                    
+                    <label for="movimento-data">Data:</label>
+                    <input type="date" id="movimento-data" required>
+
+                    <button type="submit" id="btn-salvar-movimento">Adicionar Movimento</button>
+                    <button type="button" id="btn-cancelar-edicao" style="display: none;">Cancelar Edição</button>
+                </form>
+            </div>
+        </div>
+
+        ---
+        
+        <h2>3. Histórico de Movimentos (Editar e Excluir)</h2>
+        <div class="tabela-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                        <th>Detalhes</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="movimentos-tabela">
+                    </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        // JAVASCRIPT
+        
+        // --- Variáveis Globais e Inicialização ---
+        const STORAGE_KEY = 'financeiroDataPro';
+        let movimentos = [];
+        let isEditing = false;
+        let editingId = null;
+
+        const forms = {
+            compra: document.getElementById('form-compra'),
+            movimento: document.getElementById('form-movimento')
+        };
+
+        const inputs = {
+            compraValor: document.getElementById('compra-valor'),
+            compraMargem: document.getElementById('compra-margem'),
+            projecaoBruta: document.getElementById('projecao-bruta'),
+            projecaoLucro: document.getElementById('projecao-lucro'),
+            movimentoTipo: document.getElementById('movimento-tipo'),
+            vendaOptions: document.getElementById('venda-options'),
+            movimentoData: document.getElementById('movimento-data'),
+            movimentoId: document.getElementById('movimento-id'),
+            btnSalvarMovimento: document.getElementById('btn-salvar-movimento'),
+            btnCancelarEdicao: document.getElementById('btn-cancelar-edicao')
+        };
+        
+        // Coloca a data atual no input de data do formulário de movimento
+        inputs.movimentoData.valueAsDate = new Date();
+
+        // --- Funções de LocalStorage (Salvamento Local) ---
+
+        /** Carrega os dados do localStorage. */
+        function carregarMovimentos() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            if (data) {
+                movimentos = JSON.parse(data);
+            }
+            atualizarDashboard();
+            renderizarTabela();
+        }
+
+        /** Salva os dados no localStorage. */
+        function salvarMovimentos() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(movimentos));
+        }
+
+        // --- Funções de Cálculo e Projeção ---
+
+        /** Calcula e atualiza a projeção de faturamento na compra. */
+        function calcularProjecao() {
+            const custo = parseFloat(inputs.compraValor.value) || 0;
+            const margem = parseFloat(inputs.compraMargem.value) || 0;
+            
+            if (custo >= 0 && margem >= 0) {
+                const faturamentoBruto = custo * (1 + margem / 100);
+                const lucroEstimado = faturamentoBruto - custo;
+                
+                inputs.projecaoBruta.textContent = formatarMoeda(faturamentoBruto);
+                inputs.projecaoLucro.textContent = formatarMoeda(lucroEstimado);
+            } else {
+                inputs.projecaoBruta.textContent = formatarMoeda(0);
+                inputs.projecaoLucro.textContent = formatarMoeda(0);
+            }
+        }
+
+        /** Atualiza o Dashboard com os totais de Bruto e Líquido. */
+        function atualizarDashboard() {
+            let totalCompras = 0;
+            let totalVendas = 0;
+            let totalDespesas = 0;
+
+            movimentos.forEach(m => {
+                const valor = parseFloat(m.valor);
+                if (m.tipo === 'compra') {
+                    totalCompras += valor;
+                } else if (m.tipo === 'venda') {
+                    totalVendas += valor;
+                } else if (m.tipo === 'despesa') {
+                    totalDespesas += valor;
+                }
+            });
+            
+            // Faturamento Bruto (Total de Vendas)
+            const faturamentoBruto = totalVendas;
+            // Faturamento Líquido (Lucro) = Vendas - Custos - Despesas
+            const faturamentoLiquido = totalVendas - totalCompras - totalDespesas;
+
+            document.getElementById('dash-vendas').textContent = formatarMoeda(faturamentoBruto);
+            document.getElementById('dash-compras').textContent = formatarMoeda(totalCompras);
+            document.getElementById('dash-despesas').textContent = formatarMoeda(totalDespesas);
+            document.getElementById('dash-faturamento-liquido').textContent = formatarMoeda(faturamentoLiquido);
+            
+            // Colore o faturamento líquido
+            const faturamentoLiquidoElement = document.getElementById('dash-faturamento-liquido');
+            faturamentoLiquidoElement.style.color = faturamentoLiquido >= 0 ? 'var(--cor-sucesso)' : 'var(--cor-perigo)';
+        }
+
+        // --- Funções de Renderização e Manipulação da Tabela ---
+
+        /** Renderiza a tabela de movimentos. */
+        function renderizarTabela() {
+            const tbody = document.getElementById('movimentos-tabela');
+            tbody.innerHTML = ''; // Limpa a tabela
+            
+            // Ordena os movimentos por data (mais recente primeiro)
+            const movimentosOrdenados = [...movimentos].sort((a, b) => new Date(b.data) - new Date(a.data));
+
+            movimentosOrdenados.forEach(m => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${formatarData(m.data)}</td>
+                    <td class="data-type-${m.tipo}">${m.tipo.toUpperCase()}</td>
+                    <td>${m.descricao}</td>
+                    <td>${formatarMoeda(m.valor)}</td>
+                    <td>${m.margem ? `Margem: ${m.margem}%` : (m.forma ? `Forma: ${m.forma.toUpperCase()}` : 'N/A')}</td>
+                    <td>
+                        <button class="edit-btn" onclick="editarMovimento(${m.id})">Editar</button>
+                        <button class="delete-btn" onclick="excluirMovimento(${m.id})">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        /** Edita um movimento. */
+        function editarMovimento(id) {
+            const movimento = movimentos.find(m => m.id === id);
+            if (!movimento) return;
+
+            // Transição para o modo de edição
+            isEditing = true;
+            editingId = id;
+            inputs.btnSalvarMovimento.textContent = 'Atualizar Movimento';
+            inputs.btnCancelarEdicao.style.display = 'inline-block';
+            
+            // Preenche o formulário
+            document.getElementById('movimento-tipo').value = movimento.tipo;
+            document.getElementById('movimento-descricao').value = movimento.descricao;
+            document.getElementById('movimento-valor').value = movimento.valor;
+            document.getElementById('movimento-data').value = movimento.data;
+            document.getElementById('venda-forma').value = movimento.forma || 'dinheiro';
+
+            handleTipoMovimentoChange(); 
+        }
+
+        /** Exclui um movimento. */
+        function excluirMovimento(id) {
+            if (confirm('Tem certeza que deseja excluir este movimento?')) {
+                movimentos = movimentos.filter(m => m.id !== id);
+                salvarMovimentos();
+                atualizarDashboard();
+                renderizarTabela();
+            }
+        }
+        
+        /** Cancela o modo de edição e limpa o formulário. */
+        function cancelarEdicao() {
+            isEditing = false;
+            editingId = null;
+            inputs.btnSalvarMovimento.textContent = 'Adicionar Movimento';
+            inputs.btnCancelarEdicao.style.display = 'none';
+            forms.movimento.reset();
+            inputs.movimentoData.valueAsDate = new Date(); 
+            handleTipoMovimentoChange(); 
+        }
+
+        // --- Funções Utilitárias e de Eventos ---
+
+        /** Formata um número para a moeda brasileira. */
+        function formatarMoeda(valor) {
+            return parseFloat(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+        
+        /** Formata a data para exibição na tabela. */
+        function formatarData(dataISO) {
+             const [ano, mes, dia] = dataISO.split('-');
+             return `${dia}/${mes}/${ano}`;
+        }
+        
+        /** Esconde/mostra as opções de forma de pagamento. */
+        function handleTipoMovimentoChange() {
+            const tipo = inputs.movimentoTipo.value;
+            inputs.vendaOptions.style.display = tipo === 'venda' ? 'block' : 'none';
+        }
+
+
+        // --- Event Handlers ---
+
+        forms.compra.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const valor = parseFloat(document.getElementById('compra-valor').value);
+            const descricao = document.getElementById('compra-descricao').value;
+            const margem = parseFloat(document.getElementById('compra-margem').value);
+
+            if (valor > 0) {
+                const novoMovimento = {
+                    id: Date.now(), 
+                    data: new Date().toISOString().split('T')[0],
+                    tipo: 'compra',
+                    descricao: descricao,
+                    valor: valor,
+                    margem: margem 
+                };
+
+                movimentos.push(novoMovimento);
+                salvarMovimentos();
+                atualizarDashboard();
+                renderizarTabela();
+                forms.compra.reset();
+                inputs.compraMargem.value = 50; // Mantém a margem default
+                calcularProjecao();
+            } else {
+                alert('O valor da compra deve ser maior que zero.');
+            }
+        });
+
+        forms.movimento.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const tipo = document.getElementById('movimento-tipo').value;
+            const descricao = document.getElementById('movimento-descricao').value;
+            const valor = parseFloat(document.getElementById('movimento-valor').value);
+            const data = document.getElementById('movimento-data').value;
+            const forma = tipo === 'venda' ? document.getElementById('venda-forma').value : null;
+
+            if (valor > 0 && data) {
+                const movimentoData = {
+                    data: data,
+                    tipo: tipo,
+                    descricao: descricao,
+                    valor: valor,
+                    forma: forma
+                };
+                
+                if (isEditing) {
+                    const index = movimentos.findIndex(m => m.id === editingId);
+                    if (index !== -1) {
+                        movimentos[index] = { ...movimentos[index], ...movimentoData };
+                    }
+                    cancelarEdicao();
+                } else {
+                    movimentos.push({ id: Date.now(), ...movimentoData });
+                }
+
+                salvarMovimentos();
+                atualizarDashboard();
+                renderizarTabela();
+                forms.movimento.reset();
+                inputs.movimentoData.valueAsDate = new Date(); 
+                handleTipoMovimentoChange(); 
+            } else {
+                alert('Preencha o valor e a data corretamente.');
+            }
+        });
+        
+        // Eventos para atualização de projeção e UI
+        inputs.compraValor.addEventListener('input', calcularProjecao);
+        inputs.compraMargem.addEventListener('input', calcularProjecao);
+        inputs.movimentoTipo.addEventListener('change', handleTipoMovimentoChange);
+        inputs.btnCancelarEdicao.addEventListener('click', cancelarEdicao);
+
+
+        // --- Início da Aplicação ---
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarMovimentos();
+            calcularProjecao();
+            handleTipoMovimentoChange(); 
+        });
+
+    </script>
+
+</body>
+</html>
