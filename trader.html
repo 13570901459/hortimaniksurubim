@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day Trader H.U.D. | Journal PRO (v3)</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Variáveis de Cores */
+        :root {
+            --cor-principal: #000000;      
+            --cor-fundo-card: #0d1117;     
+            --cor-detalhe-neon: #00FFFF;   
+            --cor-texto: #e6e6e6;          
+            --cor-positivo: #00FF00;      
+            --cor-negativo: #FF0000;      
+            --font-principal: 'Orbitron', sans-serif;
+            --font-secundaria: 'Share Tech Mono', monospace;
+        }
+
+        /* Reset Básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-secundaria);
+            background-color: var(--cor-principal);
+            color: var(--cor-texto);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--cor-fundo-card);
+            padding: 15px 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--cor-detalhe-neon);
+            box-shadow: 0 0 15px var(--cor-detalhe-neon); 
+            font-family: var(--font-principal);
+        }
+
+        header h1 {
+            color: var(--cor-detalhe-neon);
+            font-size: 1.8em;
+            margin-bottom: 5px;
+            text-shadow: 0 0 5px var(--cor-detalhe-neon);
+        }
+
+        .container {
+            max-width: 1400px; /* Pouco mais largo para caber a simulação */
+            margin: 30px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-wrap: wrap; 
+            gap: 25px;
+        }
+
+        /* Estilo dos Cards/Seções (Módulos do Programa) */
+        .card {
+            background-color: var(--cor-fundo-card);
+            padding: 25px;
+            border-radius: 4px; 
+            border: 1px solid rgba(0, 255, 255, 0.4);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.1); 
+            flex: 1 1 calc(33.33% - 17px); /* 3 colunas padrão */
+            min-width: 300px; 
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4); 
+        }
+
+        #dashboard {
+            flex: 1 1 100%; /* Dashboard ocupa a largura total embaixo */
+        }
+        
+        .card h2 {
+            color: var(--cor-detalhe-neon);
+            border-bottom: 1px solid var(--cor-detalhe-neon);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-family: var(--font-principal);
+            font-size: 1.4em;
+        }
+
+        /* Formulário e Inputs */
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: bold;
+            color: var(--cor-detalhe-neon);
+        }
+
+        input[type="number"],
+        input[type="date"],
+        textarea,
+        .card button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            margin-bottom: 18px;
+            border: 1px solid var(--cor-detalhe-neon); 
+            border-radius: 2px;
+            background-color: #000;
+            color: var(--cor-texto);
+            font-family: var(--font-secundaria);
+        }
+
+        .card button {
+            background-color: var(--cor-detalhe-neon);
+            color: var(--cor-principal);
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card button:hover {
+            background-color: #00CCCC;
+            box-shadow: 0 0 10px var(--cor-detalhe-neon);
+        }
+
+        /* Dashboard e Resumos (Indicadores) */
+        #resumos {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .resumo-box {
+            flex: 1;
+            text-align: center;
+            padding: 18px;
+            border-radius: 4px;
+            min-width: 180px;
+            background-color: #1a202c; 
+            border-left: 3px solid var(--cor-detalhe-neon);
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+        }
+
+        .resumo-box h3 {
+            margin-bottom: 5px;
+            color: var(--cor-texto);
+            font-family: var(--font-secundaria);
+            font-size: 1em;
+            text-transform: uppercase;
+        }
+
+        .resumo-box p {
+            font-size: 1.8em;
+            font-weight: bold;
+            font-family: var(--font-principal);
+            text-shadow: 0 0 5px currentColor; 
+        }
+
+        .positivo p {
+            color: var(--cor-positivo); 
+        }
+
+        .negativo p {
+            color: var(--cor-negativo); 
+        }
+
+        .neutro p {
+            color: var(--cor-detalhe-neon); 
+        }
+
+
+        /* Tabela de Histórico (Log de Dados) */
+        #historico-tabela {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        #historico-tabela th, 
+        #historico-tabela td {
+            padding: 14px 10px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+            font-family: var(--font-secundaria);
+        }
+
+        #historico-tabela th {
+            background-color: var(--cor-detalhe-neon);
+            color: var(--cor-principal);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #historico-tabela tr.win td {
+            color: var(--cor-positivo);
+        }
+
+        #historico-tabela tr.loss td {
+            color: var(--cor-negativo);
+        }
+        
+        #historico-tabela tbody tr:nth-child(even) {
+            background-color: #111; 
+        }
+
+        /* Botões de Ação na Tabela */
+        .action-btn {
+            padding: 5px 10px;
+            margin-left: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8em;
+            font-weight: bold;
+            transition: opacity 0.3s;
+        }
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+        .edit-btn {
+            background-color: orange;
+            color: var(--cor-principal);
+        }
+        .delete-btn {
+            background-color: var(--cor-negativo);
+            color: var(--cor-texto);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(0, 255, 255, 0.3);
+            color: #555;
+            font-size: 0.8em;
+        }
+
+        /* Media Query para Responsividade em Celulares */
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .card {
+                flex: 1 1 100%; 
+                min-width: unset;
+            }
+
+            #resumos {
+                flex-direction: column;
+            }
+            
+            #historico-tabela th, 
+            #historico-tabela td {
+                padding: 10px 5px; 
+                font-size: 0.75em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>[H.U.D.] DAY TRADER LOG</h1>
+        <p>Sistema de Gestão Financeira Ativa</p>
+    </header>
+
+    <main class="container">
+        
+        <section id="capital-metas" class="card">
+            <h2>Módulo de Configuração (Gestão de Risco)</h2>
+            <form id="capital-form">
+                <label for="capital-inicio">CAPITAL INICIO (R$):</label>
+                <input type="number" id="capital-inicio" value="500.00" step="0.01" required>
+
+                <label for="meta-diaria-percentual">META DIARIA (LUCRO) (%):</label>
+                <input type="number" id="meta-diaria-percentual" value="10" step="0.1" required>
+                
+                <label for="stop-diario-reais">STOP DIARIO (PREJUÍZO) Máx. (R$):</label>
+                <input type="number" id="stop-diario-reais" value="25.00" step="0.01" required>
+
+                <label for="stop-win-reais">STOP WIN Mín. (R$):</label> 
+                <input type="number" id="stop-win-reais" value="50.00" step="0.01" required>
+
+                <button type="submit">Atualizar Parâmetros</button>
+            </form>
+            <div id="capital-info">
+                <p>Capital Atual: <span id="capital-atual">R$ 500,00</span></p>
+                <p>Meta Diária (Alvo): <span id="meta-diaria">R$ 50,00</span> (10%)</p>
+            </div>
+        </section>
+
+        <section id="registro-diario" class="card">
+            <h2>Módulo de Entrada de Dados (Log Diário)</h2>
+            <form id="trade-form">
+                <input type="hidden" id="registro-index" value="-1"> <label for="data-operacao">Data da Sessão:</label>
+                <input type="date" id="data-operacao" required>
+
+                <label for="valor-inicial-dia">Capital no Início do Dia (R$):</label>
+                <input type="number" id="valor-inicial-dia" step="0.01" required>
+
+                <label for="valor-final-dia">Capital no Final do Dia (R$):</label>
+                <input type="number" id="valor-final-dia" step="0.01" required>
+
+                <label for="notas">Notas da Estratégia/Psicologia:</label>
+                <textarea id="notas" rows="2"></textarea>
+
+                <button type="submit" id="registrar-btn">REGISTRAR OPERAÇÃO</button>
+            </form>
+        </section>
+        
+        <section id="simulacao-juros" class="card">
+            <h2>Módulo de Simulação (Juros Composto)</h2>
+            <form id="simulacao-form">
+                <label for="sim-capital">Capital Inicial para Simulação (R$):</label>
+                <input type="number" id="sim-capital" value="500.00" step="0.01" required>
+
+                <label for="sim-meta">Meta Diária (%) para Simulação:</label>
+                <input type="number" id="sim-meta" value="10" step="0.1" required>
+
+                <label for="sim-dias">Dias Úteis de Trade (Ex: 20 dias/mês):</label>
+                <input type="number" id="sim-dias" value="20" required>
+
+                <button type="submit">RODAR SIMULAÇÃO</button>
+            </form>
+            
+            <div id="simulacao-resultado">
+                <h3>Projeção (1 Mês de Trade)</h3>
+                <p>Capital Final Estimado: <span id="sim-capital-final" style="color: var(--cor-detalhe-neon); font-family: var(--font-principal);">R$ 0,00</span></p>
+                <p>Rentabilidade: <span id="sim-rentabilidade" style="color: var(--cor-detalhe-neon); font-family: var(--font-principal);">0%</span></p>
+            </div>
+        </section>
+        
+        <section id="dashboard" class="card">
+            <h2>Módulo Analítico (Dashboard de Performance)</h2>
+            <div id="resumos">
+                <div class="resumo-box positivo">
+                    <h3>RESULTADO HOJE (P&L)</h3>
+                    <p id="pnl-dia">R$ 0,00</p>
+                </div>
+                <div class="resumo-box neutro">
+                    <h3>CAPITAL ACUMULADO</h3>
+                    <p id="capital-acumulado">R$ 500,00</p>
+                </div>
+                <div class="resumo-box neutro">
+                    <h3>RENTABILIDADE MENSAL</h3>
+                    <p id="pnl-mensal">R$ 0,00</p>
+                </div>
+            </div>
+
+            <h3>LOG DE REGISTROS (DETALHE)</h3>
+            <table id="historico-tabela">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Valor Inicial</th>
+                        <th>Valor Final</th>
+                        <th>Resultado (P&L)</th>
+                        <th>META (L) / STOP (P)</th>
+                        <th>Ações</th> </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <p>Sistema de Log de Trading | Versão 3.0 (Com Edição, Exclusão e Simulação) | Dados Persistentes com LocalStorage</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Elementos do DOM
+            const capitalForm = document.getElementById('capital-form');
+            const tradeForm = document.getElementById('trade-form');
+            const simulacaoForm = document.getElementById('simulacao-form'); // Novo
+            const capitalAtualSpan = document.getElementById('capital-atual');
+            const metaDiariaSpan = document.getElementById('meta-diaria');
+            const pnlDiaSpan = document.getElementById('pnl-dia');
+            const capitalAcumuladoSpan = document.getElementById('capital-acumulado');
+            const pnlMensalSpan = document.getElementById('pnl-mensal');
+            const historicoTbody = document.querySelector('#historico-tabela tbody');
+            const registrarBtn = document.getElementById('registrar-btn'); // Novo
+            const registroIndexInput = document.getElementById('registro-index'); // Novo
+            
+            // Variáveis de Configuração
+            let config = JSON.parse(localStorage.getItem('traderConfig')) || {
+                capitalInicio: 500.00,
+                metaDiariaPercentual: 10, 
+                stopDiarioReais: 25.00,   
+                stopWinReais: 50.00     
+            };
+
+            // Lista de todas as operações salvas
+            let operacoes = JSON.parse(localStorage.getItem('traderOperacoes')) || [];
+            
+            // Variável para rastrear o índice de edição
+            let registroEmEdicao = -1; 
+
+
+            // --- FUNÇÕES DE LÓGICA CORE ---
+
+            function carregarConfiguracoes() {
+                // Popula os campos com os valores salvos
+                document.getElementById('capital-inicio').value = config.capitalInicio;
+                document.getElementById('meta-diaria-percentual').value = config.metaDiariaPercentual;
+                document.getElementById('stop-diario-reais').value = config.stopDiarioReais;
+                document.getElementById('stop-win-reais').value = config.stopWinReais;
+                
+                // Popula os campos da simulação com os valores padrão de gestão
+                document.getElementById('sim-capital').value = config.capitalInicio;
+                document.getElementById('sim-meta').value = config.metaDiariaPercentual;
+                
+                atualizarDashboard();
+            }
+            
+            function atualizarDashboard() {
+                // 1. Encontra o capital mais recente
+                const ultimoCapital = operacoes.length > 0 
+                    ? operacoes[operacoes.length - 1].valorFinalDia 
+                    : config.capitalInicio;
+
+                // 2. Calcula Meta Diária
+                const metaDiaria = ultimoCapital * (config.metaDiariaPercentual / 100);
+
+                // 3. Atualiza Resumos
+                capitalAtualSpan.textContent = `R$ ${ultimoCapital.toFixed(2).replace('.', ',')}`;
+                metaDiariaSpan.textContent = `R$ ${metaDiaria.toFixed(2).replace('.', ',')} (${config.metaDiariaPercentual}%)`;
+                capitalAcumuladoSpan.textContent = `R$ ${ultimoCapital.toFixed(2).replace('.', ',')}`;
+
+                // 4. Calcula P&L do Dia e Mensal
+                const dataAtual = new Date();
+                let pnlTotalDoDia = 0; 
+                let pnlMensal = 0;
+
+                if (operacoes.length > 0) {
+                    const ultimaData = operacoes[operacoes.length - 1].data;
+                    pnlTotalDoDia = operacoes
+                        .filter(op => op.data === ultimaData)
+                        .reduce((acc, op) => acc + op.pnl, 0);
+
+                    pnlMensal = operacoes
+                        .filter(op => {
+                            const opDate = new Date(op.data + 'T00:00:00'); 
+                            return opDate.getMonth() === dataAtual.getMonth() && opDate.getFullYear() === dataAtual.getFullYear();
+                        })
+                        .reduce((acc, op) => acc + op.pnl, 0);
+                }
+
+                pnlDiaSpan.textContent = `R$ ${pnlTotalDoDia.toFixed(2).replace('.', ',')}`;
+                pnlDiaSpan.parentElement.className = 'resumo-box ' + (pnlTotalDoDia >= 0 ? 'positivo' : 'negativo');
+
+                pnlMensalSpan.textContent = `R$ ${pnlMensal.toFixed(2).replace('.', ',')}`;
+                pnlMensalSpan.parentElement.className = 'resumo-box ' + (pnlMensal >= 0 ? 'positivo' : 'negativo');
+
+                // 5. Exibir registros
+                exibirHistorico();
+                // 6. Reseta o formulário após atualização do dashboard
+                resetarFormulario();
+            }
+            
+            function exibirHistorico() {
+                historicoTbody.innerHTML = ''; 
+                // Invertendo para mostrar o mais recente primeiro, mas usando o índice original para ações
+                operacoes.slice().reverse().forEach((op, reversedIndex) => {
+                    // Mapeia o reversedIndex de volta para o index original
+                    const index = operacoes.length - 1 - reversedIndex; 
+                    
+                    const row = historicoTbody.insertRow();
+                    row.className = op.pnl >= 0 ? 'win' : 'loss';
+
+                    row.insertCell().textContent = op.data;
+                    row.insertCell().textContent = `R$ ${op.valorInicialDia.toFixed(2).replace('.', ',')}`;
+                    row.insertCell().textContent = `R$ ${op.valorFinalDia.toFixed(2).replace('.', ',')}`;
+                    row.insertCell().textContent = `R$ ${op.pnl.toFixed(2).replace('.', ',')}`;
+                    
+                    // Lógica de Status (META / STOP)
+                    let status = 'Resultado Parcial';
+                    if (op.pnl <= -config.stopDiarioReais) {
+                        status = `🛑 STOP DIARIO (PREJUÍZO)`;
+                    } else if (op.pnl >= config.stopWinReais) {
+                        status = `✅ META DIARIA (LUCRO)`;
+                    } else {
+                        status = op.pnl >= 0 ? 'Lucro Parcial' : 'Prejuízo Parcial';
+                    }
+                    row.insertCell().textContent = status;
+                    
+                    // Coluna de Ações
+                    const acoesCell = row.insertCell();
+                    const editBtn = document.createElement('button');
+                    editBtn.textContent = 'Editar';
+                    editBtn.className = 'action-btn edit-btn';
+                    editBtn.onclick = () => prepararEdicao(index);
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Excluir';
+                    deleteBtn.className = 'action-btn delete-btn';
+                    deleteBtn.onclick = () => excluirRegistro(index);
+                    
+                    acoesCell.appendChild(editBtn);
+                    acoesCell.appendChild(deleteBtn);
+                });
+            }
+
+
+            // --- FUNÇÕES DE EDIÇÃO/EXCLUSÃO ---
+
+            window.excluirRegistro = function(index) {
+                if (confirm(`Deseja realmente excluir o registro da data ${operacoes[index].data}?`)) {
+                    operacoes.splice(index, 1);
+                    localStorage.setItem('traderOperacoes', JSON.stringify(operacoes));
+                    atualizarDashboard();
+                    alert('Registro excluído com sucesso.');
+                }
+            }
+
+            window.prepararEdicao = function(index) {
+                const op = operacoes[index];
+                
+                // 1. Preenche o formulário com os dados do registro
+                document.getElementById('data-operacao').value = op.data;
+                document.getElementById('valor-inicial-dia').value = op.valorInicialDia.toFixed(2);
+                document.getElementById('valor-final-dia').value = op.valorFinalDia.toFixed(2);
+                document.getElementById('notas').value = op.notas;
+                
+                // 2. Define o modo de edição
+                registroEmEdicao = index;
+                registroIndexInput.value = index;
+                
+                // 3. Altera o botão
+                registrarBtn.textContent = 'ATUALIZAR REGISTRO';
+                registrarBtn.style.backgroundColor = 'orange';
+                
+                // 4. Rola a tela para o formulário
+                document.getElementById('registro-diario').scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            function resetarFormulario() {
+                // Verifica se terminou a edição ou se está em modo de registro normal
+                if (registroEmEdicao === -1) {
+                    // Limpar o formulário e sugerir o novo capital
+                    document.getElementById('valor-final-dia').value = '';
+                    document.getElementById('notas').value = '';
+                    
+                    // Coloca o último capital final como o novo capital inicial sugerido
+                    const ultimoCapital = operacoes.length > 0 
+                        ? operacoes[operacoes.length - 1].valorFinalDia 
+                        : config.capitalInicio;
+                    document.getElementById('valor-inicial-dia').value = ultimoCapital.toFixed(2);
+                    
+                    registrarBtn.textContent = 'REGISTRAR OPERAÇÃO';
+                    registrarBtn.style.backgroundColor = ''; // Volta ao ciano padrão
+                }
+            }
+
+
+            // --- FUNÇÃO DE SIMULAÇÃO ---
+            
+            function rodarSimulacao(e) {
+                e.preventDefault();
+                
+                const capitalInicial = parseFloat(document.getElementById('sim-capital').value);
+                const metaPercentual = parseFloat(document.getElementById('sim-meta').value) / 100;
+                const dias = parseInt(document.getElementById('sim-dias').value);
+
+                if (isNaN(capitalInicial) || isNaN(metaPercentual) || isNaN(dias) || dias <= 0) {
+                    alert('ERRO: Insira valores válidos para a simulação.');
+                    return;
+                }
+
+                let capital = capitalInicial;
+                
+                // Simulação de Juros Composto Diário (Meta fixa percentual)
+                for (let i = 0; i < dias; i++) {
+                    capital = capital * (1 + metaPercentual);
+                }
+
+                const rentabilidade = ((capital / capitalInicial) - 1) * 100;
+
+                document.getElementById('sim-capital-final').textContent = `R$ ${capital.toFixed(2).replace('.', ',')}`;
+                document.getElementById('sim-rentabilidade').textContent = `${rentabilidade.toFixed(2).replace('.', ',')}%`;
+            }
+
+            // --- EVENT LISTENERS ---
+
+            // 5. Salvar Configurações
+            capitalForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                config.capitalInicio = parseFloat(document.getElementById('capital-inicio').value);
+                config.metaDiariaPercentual = parseFloat(document.getElementById('meta-diaria-percentual').value);
+                config.stopDiarioReais = parseFloat(document.getElementById('stop-diario-reais').value);
+                config.stopWinReais = parseFloat(document.getElementById('stop-win-reais').value);
+
+                localStorage.setItem('traderConfig', JSON.stringify(config));
+                alert('Parâmetros atualizados com sucesso!');
+                atualizarDashboard();
+            });
+
+            // 6. Registrar / Atualizar Nova Operação
+            tradeForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const data = document.getElementById('data-operacao').value;
+                const valorInicial = parseFloat(document.getElementById('valor-inicial-dia').value);
+                const valorFinal = parseFloat(document.getElementById('valor-final-dia').value);
+                const notas = document.getElementById('notas').value;
+                const index = parseInt(registroIndexInput.value);
+
+                if (isNaN(valorInicial) || isNaN(valorFinal)) {
+                    alert('ERRO: Por favor, insira valores numéricos válidos.');
+                    return;
+                }
+
+                const pnl = valorFinal - valorInicial;
+                
+                const operacao = {
+                    data: data,
+                    valorInicialDia: valorInicial,
+                    valorFinalDia: valorFinal,
+                    pnl: pnl,
+                    notas: notas
+                };
+
+                if (index !== -1) {
+                    // MODO EDIÇÃO
+                    operacoes[index] = operacao;
+                    alert(`Registro da data ${data} atualizado com sucesso!`);
+                    registroEmEdicao = -1; // Sai do modo de edição
+                    registroIndexInput.value = -1;
+                } else {
+                    // MODO NOVO REGISTRO
+                    operacoes.push(operacao);
+                    alert(`Log Registrado! Resultado (P&L): R$ ${pnl.toFixed(2)}`);
+                }
+                
+                // Garante que a ordem cronológica é mantida para o cálculo de capital
+                operacoes.sort((a, b) => new Date(a.data) - new Date(b.data));
+
+                localStorage.setItem('traderOperacoes', JSON.stringify(operacoes));
+                
+                atualizarDashboard();
+            });
+
+            // 7. Event Listener para Simulação
+            simulacaoForm.addEventListener('submit', rodarSimulacao);
+
+            // 8. Carregar dados ao iniciar
+            carregarConfiguracoes();
+            rodarSimulacao({preventDefault: () => {}}); // Roda simulação inicial
+        });
+    </script>
+</body>
+</html>
