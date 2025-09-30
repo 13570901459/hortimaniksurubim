@@ -81,6 +81,8 @@
         .card-lucro-bruto-est { border-left-color: var(--cor-sucesso); }
         .card-liquido { border-left-color: #00BCD4; } 
         .card-despesa { border-left-color: var(--cor-perigo); }
+        /* NOVO CARD */
+        .card-saldo-caixa { border-left-color: #4CAF50; background-color: #e8f5e9; } /* Verde claro */
 
 
         .card h3 {
@@ -225,6 +227,10 @@
         <h1>Sistema Profissional de Gestão Financeira</h1>
 
         <div class="dashboard">
+            <div class="card card-saldo-caixa">
+                <h3>Saldo Total de Vendas (Acumulado)</h3>
+                <p id="dash-saldo-caixa">R$ 0,00</p>
+            </div>
             <div class="card card-vendas-dia">
                 <h3>Total de Vendas no Dia</h3>
                 <p id="dash-vendas-dia">R$ 0,00</p>
@@ -483,7 +489,7 @@
             let totalDespesas = 0;
             let vendasEstimadasTotal = 0;
             const hoje = new Date().toISOString().split('T')[0];
-            let vendasHoje = 0; // Novo indicador
+            let vendasHoje = 0; 
             
             // 1. Calcular Totais e Projeções
             movimentos.forEach(m => {
@@ -493,8 +499,8 @@
                     totalCompras += valor;
                     vendasEstimadasTotal += valor * (1 + (m.margem / 100));
                 } else if (m.tipo === 'venda') {
-                    totalVendas += valor;
-                    if (m.data === hoje) { // Soma as vendas do dia
+                    totalVendas += valor; // SOMA PARA O NOVO SALDO TOTAL DE VENDAS
+                    if (m.data === hoje) { 
                          vendasHoje += valor;
                     }
                 } else if (m.tipo === 'despesa') {
@@ -516,6 +522,7 @@
 
 
             // 3. Atualiza os Cards
+            document.getElementById('dash-saldo-caixa').textContent = formatarMoeda(totalVendas); // NOVO CAMPO
             document.getElementById('dash-vendas-dia').textContent = formatarMoeda(vendasHoje);
             document.getElementById('dash-meta-diaria').textContent = formatarMoeda(metaDiaria);
             document.getElementById('dash-proj-diaria').textContent = formatarMoeda(projecaoVendaDiaria);
@@ -703,7 +710,7 @@
                 atualizarDashboard();
                 renderizarTabela();
                 
-                // Se for uma venda E não for uma edição (o valor da venda já foi considerado no dashboard), checa a meta
+                // Checagem de Meta
                 if (tipo === 'venda' && !isEditing) {
                    checarMetaDiaria(valor);
                 } else if (tipo === 'venda' && isEditing) {
