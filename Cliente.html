@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Contas a Receber - Profissional</title>
     <style>
-        /* CSS Profissional e Responsivo */
+        /* CSS Profissional e Responsivo REFORÇADO */
         :root {
             --cor-primaria: #0D47A1; /* Azul Escuro */
             --cor-secundaria: #1565C0; /* Azul Médio */
@@ -49,10 +49,33 @@
             margin-top: 30px;
         }
         
-        /* Layout Flexível */
+        /* Dashboard de Saldo */
+        .dashboard {
+            background-color: #E3F2FD; /* Cor de fundo suave para destaque */
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid var(--cor-secundaria);
+        }
+        
+        .dashboard h3 {
+            margin: 0 0 5px 0;
+            color: var(--cor-primaria);
+            font-size: 1.1em;
+            text-transform: uppercase;
+        }
+        
+        .dashboard p {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: var(--cor-sucesso);
+            margin: 0;
+        }
+
+        /* Layout Flexível para PC (DEFAULT) */
         .grid-layout {
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: wrap; 
             gap: 20px;
         }
         
@@ -64,12 +87,12 @@
         }
         
         .form-area {
-            flex: 1 1 350px; /* Formulário principal */
+            flex: 1 1 350px; 
             min-width: 300px;
         }
         
         .details-area {
-            flex: 2 1 600px; /* Área de detalhes (tabelas) */
+            flex: 2 1 600px; 
         }
         
         /* Formulário */
@@ -104,12 +127,12 @@
 
         /* Tabela */
         .tabela-wrapper {
-            overflow-x: auto;
+            overflow-x: auto; 
             margin-top: 15px;
         }
         table {
             width: 100%;
-            min-width: 600px;
+            min-width: 700px; 
             border-collapse: collapse;
         }
 
@@ -142,6 +165,7 @@
             cursor: pointer;
             font-size: 0.85em;
             margin-right: 5px;
+            white-space: nowrap; 
         }
         
         .btn-pagar { background-color: var(--cor-sucesso); color: white; }
@@ -149,52 +173,77 @@
         .btn-add-nota { background-color: var(--cor-alerta); color: var(--cor-texto); }
         .btn-delete { background-color: var(--cor-perigo); color: white; }
 
-        /* Modal para Baixa */
+        /* Modal */
         .modal {
             display: none; 
             position: fixed; 
-            z-index: 10; 
+            z-index: 100; 
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
             overflow: auto; 
-            background-color: rgba(0,0,0,0.4); 
+            background-color: rgba(0,0,0,0.6); 
         }
 
         .modal-content {
             background-color: var(--cor-card);
-            margin: 15% auto; 
+            margin: 10% auto; 
             padding: 20px;
             border: 1px solid #888;
-            width: 90%; 
-            max-width: 400px;
+            width: 95%; 
+            max-width: 450px;
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             position: relative;
         }
 
-        .close-btn {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close-btn:hover,
-        .close-btn:focus {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        
-        /* Responsividade para celular */
+        /* MEDIA QUERY PARA CELULARES (Layout Vertical) */
         @media (max-width: 800px) {
-            .grid-layout {
-                flex-direction: column;
+            
+            body {
+                padding: 5px;
             }
+            
             .container {
                 padding: 15px;
+            }
+            
+            /* FORÇA O EMPILHAMENTO (Responsividade) */
+            .grid-layout {
+                flex-direction: column; 
+            }
+            
+            .form-area, .details-area {
+                flex: 1 1 100%; 
+                min-width: auto;
+            }
+            
+            /* Reduz padding de itens da tabela em mobile */
+            th, td {
+                padding: 8px 5px;
+                font-size: 0.8em;
+            }
+            
+            .action-btn {
+                padding: 5px 8px;
+                font-size: 0.75em;
+                margin-right: 3px;
+            }
+            
+            /* Ajuste de Margem do Modal para telas muito pequenas */
+            .modal-content {
+                 margin: 5% auto;
+            }
+            
+            .dashboard p {
+                font-size: 1.8em; /* Reduz o tamanho da fonte no mobile */
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .container {
+                padding: 10px;
             }
         }
 
@@ -204,6 +253,11 @@
 
     <div class="container">
         <h1>Sistema de Contas a Receber (Dívidas de Clientes)</h1>
+
+        <div class="dashboard">
+            <h3>Saldo Atual de Caixa (Vendas Recebidas)</h3>
+            <p id="saldo-caixa">R$ 0,00</p>
+        </div>
 
         <div class="grid-layout">
             
@@ -319,23 +373,19 @@
 
         // --- Funções Utilitárias ---
 
-        /** Formata um número para a moeda brasileira. */
         function formatarMoeda(valor) {
             return parseFloat(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
         
-        /** Formata a data para exibição. */
         function formatarData(dataISO) {
              const [ano, mes, dia] = dataISO.split('-');
              return `${dia}/${mes}/${ano}`;
         }
         
-        /** Salva os dados no localStorage. */
         function salvarDados() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(clientes));
         }
 
-        /** Carrega os dados do localStorage. */
         function carregarDados() {
             const data = localStorage.getItem(STORAGE_KEY);
             if (data) {
@@ -343,17 +393,34 @@
             }
             renderizarTabelas();
             popularSelectClientes();
+            atualizarSaldoCaixa(); // Adicionado para carregar o saldo ao iniciar
+        }
+
+        // --- NOVO CÁLCULO DE SALDO ---
+
+        function atualizarSaldoCaixa() {
+            let totalPagamentos = 0;
+
+            clientes.forEach(cliente => {
+                cliente.notas.forEach(nota => {
+                    // Percorre todos os pagamentos (baixas) de cada nota
+                    nota.pagamentos.forEach(pagamento => {
+                        totalPagamentos += parseFloat(pagamento.valor);
+                    });
+                });
+            });
+
+            // Atualiza o card do dashboard
+            document.getElementById('saldo-caixa').textContent = formatarMoeda(totalPagamentos);
         }
 
         // --- Funções de Renderização e UI ---
         
-        /** Renderiza a tabela principal de clientes. */
         function renderizarTabelas() {
             const tbodyClientes = document.getElementById('tabela-clientes');
             tbodyClientes.innerHTML = '';
             
             clientes.forEach(cliente => {
-                // Calcula o valor total devido pelo cliente (soma das notas com valorDevedor > 0)
                 const totalDevedor = cliente.notas.reduce((sum, nota) => sum + parseFloat(nota.valorDevedor), 0);
                 const notasPendentes = cliente.notas.filter(n => parseFloat(n.valorDevedor) > 0).length;
                 
@@ -372,20 +439,18 @@
                 tbodyClientes.appendChild(tr);
             });
             
-            // Re-renderiza a tabela de notas se um cliente estiver selecionado
             const clienteSelecionadoId = document.getElementById('tabela-notas').dataset.clienteId;
             if (clienteSelecionadoId) {
                 renderizarNotasDetalhes(clienteSelecionadoId);
             } else {
                  document.getElementById('tabela-notas').innerHTML = `
-                    <tr><td colspan="6" style="text-align: center; color: #777;">Selecione um cliente acima para ver os detalhes das notas.</td></tr>
+                    <tr><td colspan="6" style="text-align: center; color: #777;">Selecione um cliente para ver os detalhes das notas.</td></tr>
                 `;
             }
 
             popularSelectClientes();
         }
         
-        /** Popula o dropdown de clientes para adicionar nova nota. */
         function popularSelectClientes() {
             const select = document.getElementById('select-cliente');
             select.innerHTML = '<option value="" disabled selected>Escolha um cliente...</option>';
@@ -398,19 +463,18 @@
             });
         }
         
-        /** Renderiza a tabela de notas detalhadas de um cliente. */
         function renderizarNotasDetalhes(clienteId) {
             const cliente = clientes.find(c => c.id === clienteId);
             const tbodyNotas = document.getElementById('tabela-notas');
             tbodyNotas.innerHTML = '';
-            tbodyNotas.dataset.clienteId = clienteId; // Guarda o ID selecionado
+            tbodyNotas.dataset.clienteId = clienteId; 
 
             if (!cliente) {
                 tbodyNotas.innerHTML = `<tr><td colspan="6" style="text-align: center; color: ${'var(--cor-perigo)'};">Cliente não encontrado.</td></tr>`;
                 return;
             }
 
-            cliente.notas.sort((a, b) => new Date(a.data) - new Date(b.data)); // Ordena por data
+            cliente.notas.sort((a, b) => new Date(a.data) - new Date(b.data)); 
 
             cliente.notas.forEach(nota => {
                 const isPago = parseFloat(nota.valorDevedor) <= 0;
@@ -435,17 +499,14 @@
             });
         }
         
-        /** Seleciona um cliente para ver detalhes e rola para a tabela. */
         function selecionarClienteParaDetalhes(clienteId) {
             renderizarNotasDetalhes(clienteId);
-            // Rola a página para a tabela de detalhes
             document.querySelector('.details-area h3').scrollIntoView({ behavior: 'smooth' });
         }
 
 
         // --- Funções de Manipulação de Dados ---
 
-        /** 1. Adiciona novo cliente e sua primeira dívida. */
         document.getElementById('form-cliente').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -485,11 +546,11 @@
             clientes.push(novoCliente);
             salvarDados();
             renderizarTabelas();
+            // Nâo precisa atualizar o caixa aqui, pois é registro de dívida, não pagamento
             this.reset();
             alert(`✅ Cliente "${nome}" e primeira dívida de ${formatarMoeda(valorCompra)} registrados com sucesso!`);
         });
 
-        /** 2. Adiciona nova dívida a cliente existente. */
         document.getElementById('form-nova-nota').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -522,7 +583,6 @@
             }
         });
         
-        /** 3. Exclui um cliente e todas as suas notas. */
         function excluirCliente(clienteId) {
             const cliente = clientes.find(c => c.id === clienteId);
             if (cliente && confirm(`Tem certeza que deseja EXCLUIR o cliente "${cliente.nome}" e todas as suas dívidas?`)) {
@@ -531,12 +591,12 @@
                 renderizarTabelas();
                 document.getElementById('tabela-notas').innerHTML = `<tr><td colspan="6" style="text-align: center;">Cliente excluído.</td></tr>`;
                 alert(`Cliente "${cliente.nome}" excluído com sucesso.`);
+                atualizarSaldoCaixa(); // Atualiza o caixa após exclusão (se havia pagamentos)
             }
         }
         
         // --- Funções de Baixa (Modal) ---
         
-        /** Abre o modal de pagamento. */
         function abrirModalPagamento(clienteId, notaId, nomeCliente, valorDevido) {
             const valorMax = parseFloat(valorDevido).toFixed(2);
 
@@ -544,14 +604,13 @@
             document.getElementById('modal-valor-devido').textContent = formatarMoeda(valorDevido);
             document.getElementById('modal-cliente-id').value = clienteId;
             document.getElementById('modal-nota-id').value = notaId;
-            document.getElementById('modal-valor-pago').value = valorMax; // Sugere o valor total
+            document.getElementById('modal-valor-pago').value = valorMax; 
             document.getElementById('modal-valor-pago').max = valorMax;
-            document.getElementById('modal-data-pagamento').valueAsDate = new Date(); // Data atual
+            document.getElementById('modal-data-pagamento').valueAsDate = new Date(); 
             
             modalPagamento.style.display = 'block';
         }
         
-        /** Fecha o modal. */
         closeModalBtn.onclick = function() {
             modalPagamento.style.display = 'none';
         }
@@ -561,7 +620,6 @@
             }
         }
         
-        /** Registra o pagamento (baixa). */
         document.getElementById('form-pagamento-modal').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -581,10 +639,8 @@
                     return;
                 }
 
-                // 1. Atualiza o valor devedor
                 nota.valorDevedor = (valorDevidoAtual - valorPago).toFixed(2);
 
-                // 2. Registra o pagamento para histórico
                 nota.pagamentos.push({
                     data: dataPagamento,
                     valor: valorPago
@@ -593,6 +649,7 @@
                 salvarDados();
                 renderizarTabelas();
                 selecionarClienteParaDetalhes(clienteId);
+                atualizarSaldoCaixa(); // CHAVE: Atualiza o saldo do caixa após o registro do pagamento
                 modalPagamento.style.display = 'none';
                 
                 const status = parseFloat(nota.valorDevedor) <= 0 ? 'quitada' : 'parcial';
@@ -605,7 +662,6 @@
 
         // --- Função de Compartilhamento (WhatsApp) ---
         
-        /** Gera e compartilha a mensagem de dívida via WhatsApp. */
         function compartilharDivida(clienteId) {
             const cliente = clientes.find(c => c.id === clienteId);
             if (!cliente) return;
@@ -639,7 +695,7 @@
             mensagem += `\n--------------------------------------\n`;
             mensagem += `*Agradecemos a preferência!*`;
 
-            const contatoURL = cliente.contato.replace(/\D/g, ''); // Remove caracteres não numéricos
+            const contatoURL = cliente.contato.replace(/\D/g, ''); 
             const url = `https://api.whatsapp.com/send?phone=${contatoURL}&text=${encodeURIComponent(mensagem)}`;
             
             window.open(url, '_blank');
@@ -649,7 +705,6 @@
         // --- Início da Aplicação ---
         document.addEventListener('DOMContentLoaded', () => {
             carregarDados();
-            // Define data atual como padrão no formulário
             document.getElementById('data-compra').valueAsDate = new Date();
             document.getElementById('nova-data-compra').valueAsDate = new Date();
         });
