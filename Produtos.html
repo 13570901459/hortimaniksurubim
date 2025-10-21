@@ -1771,21 +1771,28 @@
   </div>
    
 
-  <!-- Produto:Batata-doce  3KG POR R$ 9,99 -->
-<div class="bg-white p-4 rounded shadow relative categoria-verduras oferta">
-    <img src="imagens/batata-doce.jpg" alt="Pimentão" class="w-full h-40 object-contain rounded">
-    <h2 class="text-lg font-bold mt-2"Batata-doce  3KG POR R$ 9,99</h2>
-    <p class="text-sm text-gray-500">Batata novinha e enxuta, direto da roça pra sua mesa.</p>
+ <!-- Produto:Batata-doce  3KG POR R$ 9,99 -->
+<div class="bg-white p-4 rounded shadow relative ategoria-raizes oferta">
+  <img src="imagens/batata-doce.jpg" alt="acelga" class="w-full h-40 object-contain rounded">
+  <h2 class="text-lg font-bold mt-2">Batata-doce  3KG POR R$ 9,99</h2>
+  <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
+    <!-- Preço anterior riscado -->
+<!--<p class="text-red-500 line-through text-sm">R$ 2,99</p>-->
+    <!-- Preço anterior riscado -->
     <p class="text-green-700 font-bold">R$ 9,99</p>
-    <form onsubmit="addToCart(event, 'Batata-doce  3KG POR R$ 9.99)" class="mt-2 space-y-2">
-        <select class="w-full border rounded p-1" name="peso">
-    <option value="1">1 un</option>
-        </select>
-        <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
-        <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
-        <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    <form onsubmit="addToCart(event, 'Batata-doce  3KG POR R$ 9,99', 9.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
     </form>
-</div>
+  </div>
+
+
+
+ 
   
   
   <!-- Produto:Cará KG -->
@@ -2129,6 +2136,7 @@ function finalizarPedido() {
   </footer>
 </body>
 </html>
+
 
 
 
