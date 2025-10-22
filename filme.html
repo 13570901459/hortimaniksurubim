@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Total ao Entretenimento | R$19,99/mês</title>
+    <!-- Carrega Tailwind CSS para estilização fácil e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuração de cores e fonte -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'lilac-claro': '#E0BBE4', // Lilás Claro
+                        'lilac-escuro': '#957DAD', // Lilás Escuro (um tom mais profundo e elegante)
+                        'accent-yellow': '#FEEB7A', // Amarelo vibrante para destaque
+                        'dark-purple': '#4D2B60', // Roxo escuro para texto principal
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Estilos personalizados para o degradê do fundo */
+        .hero-bg {
+            background: linear-gradient(135deg, #4D2B60 0%, #957DAD 100%);
+        }
+        /* Estilo para a animação do botão (Efeito "pop" ao clicar) */
+        .cta-button {
+            transition: all 0.15s ease-in-out;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        .cta-button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+
+    <!-- Seção Principal (Hero) -->
+    <header class="hero-bg text-white p-6 md:p-12 shadow-xl rounded-b-3xl">
+        <div class="container mx-auto text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">
+                Seu Entretenimento Ilimitado Chegou!
+            </h1>
+            <p class="text-xl md:text-2xl font-light mb-6 text-lilac-claro">
+                Filmes, Séries, Desenhos e TV - Tudo em um só lugar.
+            </p>
+            
+            <div class="inline-block bg-accent-yellow text-dark-purple font-black text-3xl md:text-4xl p-3 px-6 rounded-full shadow-lg transform rotate-3">
+                APENAS R$ 19,99/MÊS
+            </div>
+            
+        </div>
+    </header>
+
+    <!-- Seção de Acesso e Teste Grátis -->
+    <section id="trial" class="py-12 px-6 bg-lilac-claro text-dark-purple">
+        <div class="container mx-auto max-w-4xl text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                Comece Agora com o Acesso Teste Grátis!
+            </h2>
+            <p class="text-lg md:text-xl mb-8">
+                Queremos que você experimente a qualidade antes de se comprometer.
+                Solicite seu **acesso teste grátis** hoje e veja a enorme biblioteca que preparamos!
+            </p>
+            
+            <!-- Botão de Chamada para Ação Principal (CTA) -->
+            <a id="whatsapp-link-top"
+               href="https://wa.me/SEUNUMERO?text=Ol%C3%A1%2C%20tenho%20interesse%20no%20acesso%20teste%20gr%C3%A1tis%20de%20streaming."
+               target="_blank"
+               class="cta-button inline-block bg-accent-yellow text-dark-purple font-bold text-xl md:text-2xl py-3 px-8 rounded-xl shadow-xl hover:bg-yellow-300 transition duration-300 transform scale-105">
+                Quero Meu Teste Grátis Agora!
+            </a>
+            <p class="mt-4 text-sm font-semibold">
+                (Será direcionado para o WhatsApp)
+            </p>
+        </div>
+    </section>
+
+    <!-- Seção de Benefícios (O que você recebe) -->
+    <section id="benefits" class="py-16 px-6 bg-white">
+        <div class="container mx-auto max-w-5xl">
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-dark-purple mb-10">
+                O Que Está Incluso na Sua Assinatura de R$19,99?
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Cartão 1: Conteúdo Premium -->
+                <div class="bg-lilac-claro p-6 rounded-2xl shadow-lg border-b-4 border-lilac-escuro">
+                    <div class="flex items-center mb-3">
+                        <svg class="w-8 h-8 text-dark-purple mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L19.5 7.25M9.75 17L2.25 14.5M19.5 7.25L17 2.25M9.75 17L14.75 19.5M19.5 7.25L14.75 4.75M2.25 14.5L7.25 17"></path></svg>
+                        <h3 class="text-2xl font-semibold text-dark-purple">Filmes e Séries das Gigantes</h3>
+                    </div>
+                    <p class="text-dark-purple text-lg">
+                        Tenha acesso a um catálogo vasto de filmes e séries. Reunimos o melhor conteúdo de plataformas como:
+                        <span class="font-bold block mt-2">
+                            Netflix, Amazon Prime Video, Max, Disney+, Globoplay e muitas outras
+                        </span>
+                        em um único lugar, sem precisar de múltiplas assinaturas!
+                    </p>
+                </div>
+
+                <!-- Cartão 2: Canais de TV -->
+                <div class="bg-lilac-claro p-6 rounded-2xl shadow-lg border-b-4 border-lilac-escuro">
+                    <div class="flex items-center mb-3">
+                        <svg class="w-8 h-8 text-dark-purple mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.5 4.5 4.5-4.5M3 10h18M3 14h18M11 5v14"></path></svg>
+                        <h3 class="text-2xl font-semibold text-dark-purple">Canais de TV Aberta e Fechada</h3>
+                    </div>
+                    <p class="text-dark-purple text-lg">
+                        Nunca mais perca seu programa favorito! Assista aos principais canais de TV:
+                        <span class="font-bold block mt-2">
+                            Canais abertos (Globo, SBT, Record) e os canais fechados de esporte, notícias, filmes e infantis.
+                        </span>
+                        Tudo isso com a qualidade que você merece.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Preço Final e Benefício Extra -->
+            <div class="mt-12 p-6 bg-dark-purple text-white rounded-2xl text-center shadow-xl">
+                <p class="text-3xl font-light">Seu acesso completo inclui tudo isso por:</p>
+                <p class="text-5xl md:text-7xl font-black mt-2 text-accent-yellow">R$ 19,99 <span class="text-2xl font-light">/ mês</span></p>
+                <p class="mt-4 text-lilac-claro font-medium">Economia e Entretenimento em um só pacote!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Final de Chamada para Ação -->
+    <section id="cta-final" class="py-12 px-6 bg-lilac-escuro text-white text-center rounded-t-3xl mt-8">
+        <div class="container mx-auto max-w-4xl">
+            <h2 class="text-3xl md:text-5xl font-extrabold mb-4">
+                Não Perca Mais Tempo!
+            </h2>
+            <p class="text-lg md:text-2xl mb-8 font-light">
+                Garanta o seu login hoje e transforme sua maneira de assistir TV e streaming.
+            </p>
+            
+            <!-- Botão de Chamada para Ação Final -->
+            <a id="whatsapp-link-bottom"
+               href="https://wa.me/SEUNUMERO?text=Tenho%20interesse%20no%20acesso%20de%20streaming%20de%20R%2419%2C99%20por%20m%C3%AAs."
+               target="_blank"
+               class="cta-button inline-block bg-accent-yellow text-dark-purple font-black text-2xl md:text-3xl py-4 px-12 rounded-full shadow-2xl hover:bg-yellow-300 transition duration-300">
+                TENHO INTERESSE!
+            </a>
+        </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer class="bg-dark-purple p-4 text-center text-lilac-claro text-sm">
+        <p>&copy; 2025 Seu Acesso Premium. Todos os direitos reservados.</p>
+        <p class="mt-1">Conteúdo digital via login. Suporte e Atendimento via WhatsApp.</p>
+    </footer>
+
+    <!-- Script JavaScript para funcionalidade (se necessário, mas neste caso é só redirecionamento) -->
+    <script>
+        // O script aqui é minimalista, pois toda a funcionalidade é baseada no link direto do WhatsApp.
+
+        // NOTA IMPORTANTE:
+        // TROQUE O 'SEUNUMERO' nos links (hrefs) acima pelo seu número de telefone,
+        // incluindo o código do país (55) e o DDD, sem traços ou espaços. Ex: 5581987654321.
+    </script>
+</body>
+</html>
