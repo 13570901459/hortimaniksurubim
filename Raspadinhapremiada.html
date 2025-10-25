@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hortimanik - Raspadinha Premiada!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /*
+        Paleta de Cores Hortimanik:
+        Verde: #4CAF50 (para frescor)
+        Vermelho: #F44336 (para destaque e marca)
+        Branco: #FFFFFF (fundo e texto)
+        */
+
+        :root {
+            --color-primary-green: #4CAF50;
+            --color-primary-red: #F44336;
+            --color-white: #FFFFFF;
+            --color-dark: #333333;
+            --color-scratch-cover: #A9A9A9; /* Cinza para a raspadinha */
+        }
+
+        /* Reset Básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--color-white);
+            color: var(--color-dark);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Cabeçalho */
+        header {
+            background-color: var(--color-primary-green);
+            color: var(--color-white);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        /* Conteúdo Principal */
+        .container {
+            max-width: 900px;
+            width: 90%;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: var(--color-white);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            flex-grow: 1; 
+        }
+
+        h2 {
+            color: var(--color-primary-red);
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .instrucao {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        /* Seção de Senha */
+        #password-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #password-input {
+            padding: 12px;
+            border: 2px solid var(--color-primary-green);
+            border-radius: 5px;
+            width: 100%;
+            max-width: 300px;
+            font-size: 1em;
+            text-align: center;
+        }
+
+        #submit-password {
+            background-color: var(--color-primary-red);
+            color: var(--color-white);
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        #submit-password:hover {
+            background-color: #D32F2F; /* Vermelho mais escuro no hover */
+        }
+
+        /* Mensagens */
+        .message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        /* Classes para mensagens de status */
+        .message.error {
+            color: var(--color-primary-red);
+        }
+
+        .message.success {
+            color: var(--color-primary-green);
+        }
+
+        /* Raspadinha */
+        .hidden {
+            display: none !important;
+        }
+
+        #scratch-card-section {
+            text-align: center;
+        }
+
+        .scratch-area {
+            position: relative;
+            width: 300px; 
+            height: 150px; 
+            margin: 30px auto 15px;
+            border: 3px solid var(--color-primary-green);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #scratch-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2; 
+            cursor: grab;
+        }
+
+        .prize-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* Fundo listrado verde e cinza */
+            background: repeating-linear-gradient(
+                45deg,
+                var(--color-primary-green),
+                var(--color-primary-green) 10px,
+                #f0f0f0 10px,
+                #f0f0f0 20px
+            );
+            z-index: 1; 
+            padding: 10px;
+            text-align: center;
+        }
+
+        .prize-content h3 {
+            font-size: 1.8em;
+            color: var(--color-primary-red);
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .prize-content p {
+            font-size: 1.2em;
+            color: var(--color-dark);
+        }
+
+        .instrucao-raspar {
+            font-style: italic;
+            color: var(--color-dark);
+        }
+
+        /* Rodapé */
+        footer {
+            background-color: var(--color-dark);
+            color: var(--color-white);
+            text-align: center;
+            padding: 15px;
+            font-size: 0.9em;
+        }
+
+        /* Responsividade para telas menores (Celular) */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .container {
+                margin: 20px auto;
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            .instrucao {
+                font-size: 1em;
+            }
+
+            #password-input {
+                max-width: 100%;
+            }
+
+            #submit-password {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+
+            .scratch-area {
+                width: 100%; 
+                height: 180px; 
+            }
+
+            .prize-content h3 {
+                font-size: 1.5em;
+            }
+
+            .prize-content p {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Hortimanik</h1>
+        <p>Sua feira fresquinha de cada dia!</p>
+    </header>
+
+    <main class="container">
+        <h2>🎉 Sua Chance de Ganhar! 🎉</h2>
+        <p class="instrucao">Digite sua senha única para liberar a raspadinha e descubra se você ganhou um Vale Compras de R$ 20!</p>
+
+        <div id="password-section">
+            <input type="text" id="password-input" placeholder="Digite sua senha aqui" maxlength="10">
+            <button id="submit-password">Liberar Raspadinha</button>
+            <p id="password-message" class="message"></p>
+        </div>
+
+        <div id="scratch-card-section" class="hidden">
+            <div id="scratch-area" class="scratch-area">
+                <canvas id="scratch-canvas"></canvas>
+                <div id="prize-content" class="prize-content">
+                    </div>
+            </div>
+            <p id="result-message" class="message"></p>
+            <p class="instrucao-raspar">Use o mouse ou o dedo para raspar a área cinza!</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Hortimanik. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // === Elementos do DOM ===
+            const passwordInput = document.getElementById('password-input');
+            const submitPasswordButton = document.getElementById('submit-password');
+            const passwordMessage = document.getElementById('password-message');
+            const passwordSection = document.getElementById('password-section');
+            const scratchCardSection = document.getElementById('scratch-card-section');
+            const prizeContent = document.getElementById('prize-content');
+            const resultMessage = document.getElementById('result-message');
+
+            // === Configurações de Senhas e Prêmios ===
+            // **ATENÇÃO: Mude estas senhas para as que você irá entregar aos clientes.**
+            const validPasswords = ['HORTI001', 'MANIK20', 'FEIRA333', 'FRUTA50', 'PREMIO20', 'VERDEE'];
+            
+            // Simulação de rastreamento de senhas usadas (usando o navegador)
+            const usedPasswordsKey = 'hortimanik_used_passwords';
+            let usedPasswords = JSON.parse(localStorage.getItem(usedPasswordsKey)) || {};
+
+            let currentPassword = null;
+            let isWinner = false; // Define se esta senha específica é premiada
+
+            // === Lógica de Senha ===
+
+            submitPasswordButton.addEventListener('click', () => {
+                const input = passwordInput.value.toUpperCase().trim();
+
+                passwordMessage.textContent = '';
+                passwordMessage.classList.remove('error', 'success');
+
+                if (!input) {
+                    passwordMessage.textContent = 'Por favor, digite sua senha.';
+                    passwordMessage.classList.add('error');
+                    return;
+                }
+
+                // 1. Verificar se a senha é válida
+                if (!validPasswords.includes(input)) {
+                    passwordMessage.textContent = 'Senha inválida. Verifique o código.';
+                    passwordMessage.classList.add('error');
+                    return;
+                }
+
+                // 2. Verificar se a senha já foi usada
+                if (usedPasswords[input]) {
+                    passwordMessage.textContent = `A senha ${input} já foi utilizada.`;
+                    passwordMessage.classList.add('error');
+                    return;
+                }
+
+                // 3. Senha válida e não usada: Procede
+                currentPassword = input;
+                passwordMessage.textContent = 'Senha liberada! Clique e raspe para descobrir seu prêmio!';
+                passwordMessage.classList.add('success');
+
+                // Determina se o cliente vai ganhar ALEATORIAMENTE
+                // **AJUSTE A CHANCE DE GANHO:** // 1 em 4 chances de ganhar (25%). Ajuste o '4' para mudar a probabilidade.
+                // Se for '2', a chance é 50%. Se for '10', a chance é 10%.
+                const winChance = 1; 
+                isWinner = (Math.floor(Math.random() * winChance) === 0);
+
+                // Configura o conteúdo do prêmio
+                if (isWinner) {
+                    prizeContent.innerHTML = '<h3>PARABÉNS!</h3><p>Você ganhou R$ 20,00 de Vale Compras!</p>';
+                } else {
+                    prizeContent.innerHTML = '<h3>QUE PENA!</h3><p>Não foi dessa vez. Tente novamente na próxima compra!</p>';
+                }
+
+                // Oculta a seção de senha e mostra a raspadinha
+                passwordSection.classList.add('hidden');
+                scratchCardSection.classList.remove('hidden');
+
+                // Inicializa a Raspadinha
+                initScratchCard();
+            });
+
+            // === Lógica da Raspadinha (Canvas) ===
+            const canvas = document.getElementById('scratch-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            let isDrawing = false;
+            let revealPercentage = 0;
+            const revealThreshold = 50; // Porcentagem de raspagem para exibir o resultado final
+
+            function initScratchCard() {
+                // Redimensiona o canvas para o tamanho da área
+                const scratchArea = document.getElementById('scratch-area');
+                canvas.width = scratchArea.offsetWidth;
+                canvas.height = scratchArea.offsetHeight;
+
+                // Desenha a "tinta" da raspadinha (Cinza)
+                ctx.fillStyle = '#A9A9A9'; 
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Configurações para apagar
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = 40; // Tamanho do 'pincel'
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                // Reseta o display do canvas caso tenha sido escondido
+                canvas.style.display = 'block'; 
+                resultMessage.textContent = '';
+            }
+
+            function getPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                if (e.touches) { // Para telas touch
+                    return {
+                        x: e.touches[0].clientX - rect.left,
+                        y: e.touches[0].clientY - rect.top
+                    };
+                } else { // Para mouse
+                    return {
+                        x: e.clientX - rect.left,
+                        y: e.clientY - rect.top
+                    };
+                }
+            }
+
+            function startScratch(e) {
+                if (!currentPassword || canvas.style.display === 'none') return; 
+                isDrawing = true;
+                const pos = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+                if (e.type.startsWith('touch')) e.preventDefault();
+            }
+
+            function scratch(e) {
+                if (!isDrawing) return;
+                const pos = getPos(e);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                checkRevealAmount(); // Checa enquanto raspa
+            }
+
+            function stopScratch() {
+                if (!isDrawing) return;
+                isDrawing = false;
+                ctx.closePath();
+            }
+
+            function checkRevealAmount() {
+                // Pega os dados de pixel do canvas
+                const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                let totalPixels = canvas.width * canvas.height;
+                let transparentPixels = 0;
+
+                // Conta quantos pixels estão transparentes (apagados)
+                for (let i = 3; i < data.length; i += 4) {
+                    if (data[i] === 0) { 
+                        transparentPixels++;
+                    }
+                }
+
+                revealPercentage = (transparentPixels / totalPixels) * 100;
+
+                // Se mais que 50% for raspado, revela o resultado final
+                if (revealPercentage > revealThreshold && currentPassword) {
+                    // Remove o canvas para revelar totalmente o prêmio
+                    canvas.style.display = 'none';
+
+                    // MARCAÇÃO DA SENHA USADA E SALVAMENTO
+                    usedPasswords[currentPassword] = true;
+                    localStorage.setItem(usedPasswordsKey, JSON.stringify(usedPasswords));
+                    currentPassword = null; 
+
+                    // Exibe a mensagem final
+                    if (isWinner) {
+                        resultMessage.textContent = 'PARABÉNS! Seu Vale Compras de R$ 20,00 foi garantido. Apresente esta tela e garanta o vale compras no próximo pedido!';
+                        resultMessage.classList.add('success');
+                    } else {
+                        resultMessage.textContent = 'Não desanime! Volte para mais frutas e verduras fresquinhas e tente a sorte na próxima.';
+                        resultMessage.classList.add('error');
+                    }
+                }
+            }
+            
+            // === Listeners para Mouse e Touch (Responsividade) ===
+
+            // Mouse Events
+            canvas.addEventListener('mousedown', startScratch);
+            canvas.addEventListener('mousemove', scratch);
+            window.addEventListener('mouseup', stopScratch);
+
+            // Touch Events
+            canvas.addEventListener('touchstart', startScratch, { passive: false });
+            canvas.addEventListener('touchmove', scratch, { passive: false });
+            window.addEventListener('touchend', stopScratch);
+
+            // Inicializa e redimensiona
+            window.addEventListener('resize', initScratchCard);
+            initScratchCard();
+        });
+    </script>
+</body>
+</html>
