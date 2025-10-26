@@ -724,8 +724,8 @@
     <!-- Preço anterior riscado -->
     <p class="text-red-500 line-through text-sm">R$ 5,99</p> 
     <!-- Preço anterior riscado -->
-    <p class="text-green-700 font-bold">R$ 4,99</p>
-    <form onsubmit="addToCart(event, 'Goiaba KG', 4.99)" class="mt-2 space-y-2">
+    <p class="text-green-700 font-bold">R$ 2,99</p>
+    <form onsubmit="addToCart(event, 'Goiaba KG', 2.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
         <option value="1">1kg</option>
         <option value="0.5">500g</option>
@@ -803,12 +803,29 @@
       <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
       <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
     </form>
+  </div>-->
+<!-- Produto: Laranja Pera UN -->
+  <div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
+    <img src="imagens/laranja_pera.jpg" alt="Laranja Pera" class="w-full h-40 object-contain rounded">
+    <h2 class="text-lg font-bold mt-2">15  Laranja Pokam por R$ 9,99</h2>
+    <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade.</p>
+    <!-- Preço anterior riscado -->
+<!--<p class="text-red-500 line-through text-sm">R$ 6,99 </p>-->
+    <!-- Preço anterior riscado -->
+    <p class="text-green-700 font-bold">R$ 9,99</p>
+    <form onsubmit="addToCart(event, '15  Laranja Pokam por R$ 9,99', 9.99)" class="mt-2 space-y-2">
+      <select class="w-full border rounded p-1" name="peso">
+        <option value="1">1 un</option>
+      </select>
+      <input type="number" name="quantidade" min="1" value="1" class="w-full border rounded p-1" required>
+      <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
+      <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
+    </form>
   </div>
-
 <!-- Produto: Laranja Pokam un -->
   <div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
     <img src="imagens/pokam.JPG" alt="melancia" class="w-full h-40 object-contain rounded">
-    <h2 class="text-lg font-bold mt-2">8  Laranja Pokam por R$ 9,99</h2>
+    <h2 class="text-lg font-bold mt-2">10  Laranja Pokam por R$ 9,99</h2>
     <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
     <p class="text-green-700 font-bold">R$ 9,99</p>
     <form onsubmit="addToCart(event, '8 Laranja Pokam por R$ 9,99', 9.99)" class="mt-2 space-y-2">
@@ -2136,6 +2153,7 @@ function finalizarPedido() {
   </footer>
 </body>
 </html>
+
 
 
 
