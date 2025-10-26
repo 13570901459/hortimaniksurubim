@@ -258,7 +258,7 @@
 
     <main class="container">
         <h2>🎉 Sua Chance de Ganhar! 🎉</h2>
-        <p class="instrucao">Digite sua senha única para liberar a raspadinha e descubra se você ganhou um Vale Compras de R$ 20!</p>
+        <p class="instrucao">Digite sua senha única para liberar a raspadinha e descubra se você ganhou um Vale Compras de R$ 30!</p>
 
         <div id="password-section">
             <input type="text" id="password-input" placeholder="Digite sua senha aqui" maxlength="10">
@@ -344,7 +344,7 @@
 
                 // Configura o conteúdo do prêmio
                 if (isWinner) {
-                    prizeContent.innerHTML = '<h3>PARABÉNS!</h3><p>Você ganhou R$ 20,00 de Vale Compras!</p>';
+                    prizeContent.innerHTML = '<h3>PARABÉNS!</h3><p>Você ganhou R$ 30,00 de Vale Compras!</p>';
                 } else {
                     prizeContent.innerHTML = '<h3>QUE PENA!</h3><p>Não foi dessa vez. Tente novamente na próxima compra!</p>';
                 }
@@ -451,7 +451,7 @@
 
                     // Exibe a mensagem final
                     if (isWinner) {
-                        resultMessage.textContent = 'PARABÉNS! Seu Vale Compras de R$ 20,00 foi garantido. Apresente esta tela e garanta o vale compras no próximo pedido!';
+                        resultMessage.textContent = 'PARABÉNS! Seu Vale Compras de R$ 30,00 foi garantido. Apresente esta tela e garanta o vale compras no próximo pedido!';
                         resultMessage.classList.add('success');
                     } else {
                         resultMessage.textContent = 'Não desanime! Volte para mais frutas e verduras fresquinhas e tente a sorte na próxima.';
