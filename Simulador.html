@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9K999.COM - Início Simulada</title>
+    <style>
+        /* CSS RESET BÁSICO */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a; /* Fundo escuro */
+            color: #ffffff;
+            padding-bottom: 60px; /* Espaço para a navegação inferior fixa */
+        }
+
+        /* CABEÇALHO SUPERIOR */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #000000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffcc00; /* Cor de destaque */
+        }
+
+        .auth-buttons button {
+            background-color: #ffcc00;
+            color: #000000;
+            border: none;
+            padding: 8px 12px;
+            margin-left: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .auth-buttons button:nth-child(2) { /* Registro */
+            background-color: #ff0000;
+            color: #ffffff;
+        }
+
+        /* BANNER/CTA PRINCIPAL */
+        .main-banner {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #333333, #1a1a1a);
+            margin-bottom: 20px;
+        }
+
+        .main-banner h1 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #ffcc00;
+        }
+
+        .install-btn {
+            background-color: #00cc66; /* Cor verde para instalar/baixar */
+            color: #ffffff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s;
+        }
+
+        .install-btn:hover {
+            background-color: #00a854;
+        }
+
+        /* CONTEÚDO PRINCIPAL (JOGOS) */
+        .content {
+            padding: 0 15px;
+        }
+
+        .game-list-header {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #cccccc;
+            border-left: 5px solid #ffcc00;
+            padding-left: 10px;
+        }
+
+        .game-placeholder {
+            background-color: #333333;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            color: #999999;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        /* NAVEGAÇÃO INFERIOR FIXA (Mobile) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            background-color: #000000;
+            padding: 8px 0;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            text-align: center;
+            text-decoration: none;
+            color: #999999;
+            font-size: 0.75em;
+            transition: color 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .nav-item i { /* Ícones simulados */
+            font-size: 1.2em;
+            margin-bottom: 3px;
+        }
+
+        .nav-item.active, .nav-item:hover {
+            color: #ffcc00;
+        }
+
+        /* RODAPÉ */
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 0.7em;
+            color: #666666;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">9K999.COM</div>
+        <div class="auth-buttons">
+            <button onclick="handleAuth('Entrar')">Entrar</button>
+            <button onclick="handleAuth('Registro')">Registro</button>
+        </div>
+    </div>
+
+    <main>
+        <div class="main-banner">
+            <h1>Baixe Nosso APP, Ganhe Super Prêmios!</h1>
+            <button class="install-btn" onclick="handleInstall()">Instalar</button>
+        </div>
+
+        <div class="content">
+            <h2 class="game-list-header">Popular (0 games)</h2>
+            <div class="game-placeholder">
+                Espaço para a lista de jogos populares.
+            </div>
+            </div>
+    </main>
+
+    <footer class="footer">
+        ©2025 9K999.COM Todos os direitos reservados.
+        <br>Aplicativo Baixar iOS | Aplicativo Baixar Android
+    </footer>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" onclick="handleNav('Inicio')">
+            <i class="icon">🏠</i>
+            <span>Inicio</span>
+        </a>
+        <a href="#" class="nav-item" onclick="handleNav('Promocao')">
+            <i class="icon">🎁</i>
+            <span>Promoção</span>
+        </a>
+        <a href="#" class="nav-item" onclick="handleNav('Convidar')">
+            <i class="icon">👥</i>
+            <span>Convidar</span>
+        </a>
+        <a href="#" class="nav-item" onclick="handleNav('Deposito')">
+            <i class="icon">💰</i>
+            <span>Depósito</span>
+        </a>
+        <a href="#" class="nav-item" onclick="handleNav('Perfil')">
+            <i class="icon">👤</i>
+            <span>Perfil</span>
+        </a>
+    </nav>
+
+    <script>
+        // Função de exemplo para o botão de Instalar
+        function handleInstall() {
+            alert("Iniciando download do APP! (Simulação)");
+            // Em um site real, esta função iniciaria o download ou redirecionaria para a loja de apps.
+        }
+
+        // Função de exemplo para os botões de Autenticação
+        function handleAuth(action) {
+            alert(`Ação de ${action} acionada! (Simulação)`);
+            // Em um site real, esta função abriria um modal de login ou redirecionaria para a página de registro.
+        }
+
+        // Função de exemplo para os itens do menu inferior
+        function handleNav(page) {
+            // Remove a classe 'active' de todos os itens
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Adiciona a classe 'active' ao item clicado (Simulação de navegação)
+            // No mundo real, isso carregaria uma nova página ou alteraria o conteúdo da página atual (SPA).
+            event.currentTarget.classList.add('active');
+            console.log(`Navegando para: ${page}`);
+        }
+    </script>
+</body>
+</html>
