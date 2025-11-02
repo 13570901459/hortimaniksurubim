@@ -803,7 +803,7 @@
       <input type="text" name="comentario" placeholder="Comentários (opcional)" class="w-full border rounded p-1">
       <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded w-full">Adicionar</button>
     </form>
-  </div>-->
+  </div>
 <!-- Produto: Laranja Pera UN -->
   <div class="bg-white p-4 rounded shadow relative categoria-frutas oferta">
     <img src="imagens/laranja_pera.jpg" alt="Laranja Pera" class="w-full h-40 object-contain rounded">
@@ -1232,10 +1232,10 @@
   <!-- Produto: Morango UN -->
   <div class="bg-white p-4 rounded shadow relative categoria-frutas ">
     <img src="imagens/morango.jpg" alt="morango" class="w-full h-40 object-contain rounded">
-    <h2 class="text-lg font-bold mt-2">Morango UN</h2>
+    <h2 class="text-lg font-bold mt-2">Morango Bandeja</h2>
     <p class="text-sm text-gray-500">Produto fresco e selecionado.</p>
     <p class="text-green-700 font-bold">R$ 12,99</p>
-    <form onsubmit="addToCart(event, 'Morango UN', 12.99)" class="mt-2 space-y-2">
+    <form onsubmit="addToCart(event, 'Morango Bandeja', 12.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
         <option value="1">1 un</option>
       </select>
@@ -1495,8 +1495,8 @@
   <img src="imagens/chuchu.jpg" alt="chuchu" class="w-full h-40 object-contain rounded">
   <h2 class="text-lg font-bold mt-2">Chuchu UN</h2>
   <p class="text-sm text-gray-500">Produto selecionado de primeira qualidade..</p>
-  <p class="text-green-700 font-bold">R$ 2,99</p>
-  <form onsubmit="addToCart(event, 'Chuchu UN', 2.99)" class="mt-2 space-y-2">
+  <p class="text-green-700 font-bold">R$ 1,99</p>
+  <form onsubmit="addToCart(event, 'Chuchu UN', 1.99)" class="mt-2 space-y-2">
     <select class="w-full border rounded p-1" name="peso">
       <option value="1">1 un</option>
     </select>
@@ -1724,15 +1724,15 @@
 </div> 
 
 <!-- Produto:FEIJÃO VERDE kg -->
-<div class="bg-white p-4 rounded shadow relative categoria-verduras">
+<div class="bg-white p-4 rounded shadow relative categoria-verduras oferta">
     <img src="feijaoverde.PNG" alt="Cebola Branca" class="w-full h-40 object-contain rounded">
     <h2 class="text-lg font-bold mt-2">Feijão Verde KG</h2>
     <p class="text-sm text-gray-500">Produto verdinho e novinho.</p>
     <!-- Preço anterior riscado -->
-<!--<p class="text-red-500 line-through text-sm">R$ 14,99</p> -->
+<p class="text-red-500 line-through text-sm">R$ 19,99</p>
     <!-- Preço anterior riscado -->
-    <p class="text-green-700 font-bold">R$ 19,99</p>
-    <form onsubmit="addToCart(event, 'Feijão Verde KG', 19.99)" class="mt-2 space-y-2">
+    <p class="text-green-700 font-bold">R$ 9,99</p>
+    <form onsubmit="addToCart(event, 'Feijão Verde KG', 9.99)" class="mt-2 space-y-2">
         <select class="w-full border rounded p-1" name="peso">
             <option value="1">1kg</option>
             <option value="0.5">500g</option>
@@ -1756,7 +1756,7 @@
      <!--<p class="text-red-500 line-through text-sm">R$ 4,99</p> -->
     <!-- Preço anterior riscado -->
     <p class="text-green-700 font-bold">R$ 4,99</p>
-    <form onsubmit="addToCart(event, 'Macaxeira KG', 4,99)" class="mt-2 space-y-2">
+    <form onsubmit="addToCart(event, 'Macaxeira KG', 4.99)" class="mt-2 space-y-2">
       <select class="w-full border rounded p-1" name="peso">
         <option value="1">1kg</option>
         <option value="0.5">500g</option>
@@ -2153,6 +2153,7 @@ function finalizarPedido() {
   </footer>
 </body>
 </html>
+
 
 
 
