@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Provas - Responsivo</title>
+    
+    <style>
+        /* ==================================== */
+        /* === ESTILO CSS (INÍCIO) - RESPONSIVO === */
+        /* ==================================== */
+
+        :root {
+            --cor-principal: #0056b3;
+            --cor-secundaria: #003a75;
+            --cor-fundo: #f4f7f6;
+            --cor-acerto: #28a745;
+            --cor-erro: #dc3545;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--cor-fundo);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* --- Estrutura Geral --- */
+        header, footer {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        header h1 {
+            color: var(--cor-principal);
+            font-size: 1.8em; /* Ajuste para celular */
+        }
+        
+        header p {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        /* --- Container do Quiz e Questões --- */
+        #quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .questao {
+            background-color: #fff;
+            padding: 20px; /* Reduzido para celular */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border-left: 5px solid var(--cor-principal);
+        }
+
+        .questao h2 {
+            color: var(--cor-secundaria);
+            margin-bottom: 15px;
+            font-size: 1.3em; 
+        }
+
+        .enunciado-texto, .pergunta-texto {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* --- Estilo das Alternativas --- */
+        .alternativa {
+            display: flex;
+            align-items: flex-start; /* Alinha no topo para quebra de texto */
+            margin-bottom: 10px;
+            padding: 12px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            border: 1px solid #ddd;
+            user-select: none;
+        }
+
+        .alternativa:hover {
+            background-color: #eee;
+        }
+
+        .alternativa.eliminada {
+            opacity: 0.5;
+            text-decoration: line-through;
+            pointer-events: all; 
+        }
+
+        .alternativa.selecionada {
+            background-color: #cce5ff;
+            border-color: var(--cor-principal);
+            box-shadow: 0 0 5px rgba(0, 86, 179, 0.5);
+            font-weight: bold;
+        }
+
+        .alternativa input[type="radio"] {
+            display: none; 
+        }
+        
+        .alternativa label {
+            flex-grow: 1;
+            cursor: pointer;
+            padding-left: 5px; /* Espaço para a letra da alternativa */
+        }
+        
+        .alternativa strong {
+             /* Garante que a letra da alternativa (A, B, C...) fique em negrito */
+            min-width: 20px; 
+            display: inline-block;
+        }
+
+        /* --- Botão --- */
+        .btn-finalizar {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em; /* Ajuste para celular */
+            background-color: var(--cor-acerto);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 30px;
+        }
+
+        .btn-finalizar:hover {
+            background-color: #1e7e34;
+        }
+
+        /* --- Resultado e Gabarito (Estilos Mantidos) --- */
+        #resultado {
+            background-color: #fff;
+            padding: 30px 20px; /* Ajuste de padding */
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .metricas p {
+            font-size: 1em; /* Ajuste para celular */
+        }
+        
+        .gabarito-item {
+            text-align: left;
+            margin-top: 15px;
+            padding: 15px;
+            font-size: 0.95em;
+        }
+        
+        /* --- MEDIA QUERIES (A partir daqui, regras específicas para telas maiores) --- */
+
+        @media (min-width: 600px) {
+            body {
+                padding: 30px;
+            }
+            
+            header h1 {
+                font-size: 2.2em;
+            }
+
+            .questao {
+                padding: 30px;
+            }
+            
+            .questao h2 {
+                font-size: 1.4em;
+            }
+
+            .btn-finalizar {
+                font-size: 1.2em;
+            }
+            
+            .metricas p {
+                font-size: 1.1em;
+            }
+            
+            .gabarito-item {
+                margin-top: 20px;
+                font-size: 1em;
+            }
+        }
+        /* ==================================== */
+        /* === ESTILO CSS (FIM) === */
+        /* ==================================== */
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Simulador de Provas 🎯</h1>
+        <p>Use o **SHIFT + Clique** para **ELIMINAR** alternativas. Use o **Clique Simples** para **MARCAR** a resposta.</p>
+    </header>
+
+    <main id="quiz-container">
+        <p class="loading">Carregando questões...</p>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Simulador de Concursos</p>
+    </footer>
+
+    <script>
+        /* ==================================== */
+        /* === LÓGICA JAVASCRIPT (INÍCIO) === */
+        /* ==================================== */
+
+        // 1. Variável JSON de Questões
+        const DADOS_QUESTOES = [
+            {
+                "id": 1,
+                "enunciado": "## Enunciado da Questão 1 (Tecnologia da Informação)\n\n**Texto de Apoio:** A computação em nuvem (cloud computing) transformou a maneira como as empresas armazenam e acessam dados, oferecendo modelos de serviço como IaaS, PaaS e SaaS.",
+                "pergunta": "Qual dos modelos de serviço de computação em nuvem fornece aos usuários acesso a recursos de infraestrutura de TI, como máquinas virtuais, armazenamento e redes, sem a necessidade de gerenciar o hardware subjacente?",
+                "alternativas": {
+                    "A": "Software as a Service (SaaS)",
+                    "B": "Platform as a Service (PaaS)",
+                    "C": "Infrastructure as a Service (IaaS)",
+                    "D": "Function as a Service (FaaS)"
+                },
+                "resposta_correta": "C",
+                "explicacao": "IaaS (Infrastructure as a Service) oferece infraestrutura de computação virtualizada, como VMs e redes, sendo o usuário responsável pelo S.O. e aplicações."
+            },
+            {
+                "id": 2,
+                "enunciado": "## Enunciado da Questão 2 (Direito Constitucional)\n\n**Texto de Apoio:** A Constituição Federal de 1988 estabelece os direitos e garantias fundamentais. Entre eles, o princípio da legalidade é um pilar essencial do Estado Democrático de Direito.",
+                "pergunta": "Conforme o Art. 5º da CF/88, qual princípio fundamental estabelece que 'ninguém será obrigado a fazer ou deixar de fazer alguma coisa senão em virtude de lei'?",
+                "alternativas": {
+                    "A": "Princípio da Isonomia",
+                    "B": "Princípio da Anterioridade",
+                    "C": "Princípio da Irretroatividade",
+                    "D": "Princípio da Legalidade"
+                },
+                "resposta_correta": "D",
+                "explicacao": "O Princípio da Legalidade é a base para a limitação do poder estatal e a proteção da liberdade individual, conforme o Art. 5º, II, da CF/88."
+            },
+            {
+                "id": 3,
+                "enunciado": "## Enunciado da Questão 3 (Língua Portuguesa)\n\n**Texto de Apoio:** A coesão e a coerência são elementos essenciais para a construção de um texto bem elaborado e compreensível.",
+                "pergunta": "No período 'Ele estudou muito, **portanto**, obteve sucesso no concurso.', o vocábulo destacado estabelece uma relação de:",
+                "alternativas": {
+                    "A": "Adição",
+                    "B": "Oposição",
+                    "C": "Alternância",
+                    "D": "Conclusão"
+                },
+                "resposta_correta": "D",
+                "explicacao": "O vocábulo 'portanto' é uma conjunção conclusiva, introduzindo uma ideia que resulta do que foi dito anteriormente."
+            },
+            {
+                "id": 4,
+                "enunciado": "## Enunciado da Questão 4 (Administração Pública)\n\n**Texto de Apoio:** O ciclo de gestão de projetos na Administração Pública frequentemente envolve as fases de planejamento, execução, monitoramento e encerramento.",
+                "pergunta": "Qual das características abaixo NÃO é um princípio expresso no Art. 37 da Constituição Federal de 1988?",
+                "alternativas": {
+                    "A": "Legalidade",
+                    "B": "Impessoalidade",
+                    "C": "Eficiência",
+                    "D": "Economicidade"
+                },
+                "resposta_correta": "D",
+                "explicacao": "O Art. 37 da CF/88 lista os princípios: Legalidade, Impessoalidade, Moralidade, Publicidade e Eficiência (LIMPE). Economicidade é um princípio importante, mas não está listado expressamente no caput do Art. 37."
+            },
+            {
+                "id": 5,
+                "enunciado": "## Enunciado da Questão 5 (Raciocínio Lógico)\n\nConsidere a proposição P: 'Se chove, então João usa guarda-chuva'.",
+                "pergunta": "Qual é a negação lógica da proposição P?",
+                "alternativas": {
+                    "A": "Se não chove, então João não usa guarda-chuva.",
+                    "B": "Chove e João não usa guarda-chuva.",
+                    "C": "João usa guarda-chuva ou não chove.",
+                    "D": "Não chove ou João usa guarda-chuva."
+                },
+                "resposta_correta": "B",
+                "explicacao": "A negação de uma condicional (P -> Q) é a conjunção da primeira parte com a negação da segunda (P ^ ~Q). Ou seja, 'Chove' E 'João não usa guarda-chuva'."
+            }
+            // Adicione mais questões aqui
+        ];
+
+        const quizContainer = document.getElementById('quiz-container');
+        let questoes = DADOS_QUESTOES;
+        let respostasUsuario = {}; 
+        let eliminadasUsuario = {}; 
+
+        // 2. Renderizar (Mostrar) o Quiz
+        function renderizarQuiz() {
+            quizContainer.innerHTML = ''; 
+
+            questoes.forEach((questao, index) => {
+                respostasUsuario[questao.id] = null;
+                eliminadasUsuario[questao.id] = [];
+
+                const questaoHTML = document.createElement('div');
+                questaoHTML.classList.add('questao');
+                questaoHTML.setAttribute('data-id', questao.id);
+
+                questaoHTML.innerHTML = `
+                    <h2>Questão ${index + 1}</h2>
+                    <div class="enunciado-texto">${questao.enunciado.replace(/\n/g, '<br>')}</div>
+                    <p class="pergunta-texto"><strong>${questao.pergunta}</strong></p>
+                    <div class="alternativas-container">
+                        ${Object.entries(questao.alternativas).map(([key, value]) => `
+                            <div class="alternativa" data-key="${key}" data-qid="${questao.id}">
+                                <input type="radio" id="q${questao.id}-${key}" name="q${questao.id}" value="${key}">
+                                <label for="q${questao.id}-${key}"><strong>${key})</strong> ${value}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                quizContainer.appendChild(questaoHTML);
+            });
+
+            const botaoFinalizar = document.createElement('button');
+            botaoFinalizar.classList.add('btn-finalizar');
+            botaoFinalizar.textContent = `Finalizar Simulado (${questoes.length} Questões)`;
+            botaoFinalizar.addEventListener('click', finalizarQuiz);
+            quizContainer.appendChild(botaoFinalizar);
+
+            document.querySelectorAll('.alternativa').forEach(alt => {
+                alt.addEventListener('click', manipularAlternativa);
+            });
+        }
+
+        // 3. Manipular cliques nas alternativas (com lógica de eliminação SHIFT)
+        function manipularAlternativa(event) {
+            const alternativa = event.currentTarget;
+            const qid = parseInt(alternativa.getAttribute('data-qid'));
+            const key = alternativa.getAttribute('data-key');
+            const container = alternativa.closest('.alternativas-container');
+            
+            const isShiftPressed = event.shiftKey; 
+
+            // --- Lógica de ELIMINAÇÃO (SHIFT + Clique) ---
+            if (isShiftPressed) {
+                event.preventDefault(); 
+                
+                if (alternativa.classList.contains('selecionada')) {
+                    alert('Você não pode eliminar uma alternativa que já marcou como sua resposta final. Desmarque-a primeiro.');
+                    return;
+                }
+
+                if (!alternativa.classList.contains('eliminada')) {
+                    // ELIMINA
+                    alternativa.classList.add('eliminada');
+                    eliminadasUsuario[qid].push(key);
+                } else {
+                    // DESELIMINA
+                    alternativa.classList.remove('eliminada');
+                    eliminadasUsuario[qid] = eliminadasUsuario[qid].filter(k => k !== key);
+                }
+
+            // --- Lógica de MARCAÇÃO (Clique Simples) ---
+            } else {
+                // Se estiver marcada como eliminada, remove a eliminação antes de marcar
+                if (alternativa.classList.contains('eliminada')) {
+                     alternativa.classList.remove('eliminada');
+                     eliminadasUsuario[qid] = eliminadasUsuario[qid].filter(k => k !== key);
+                }
+
+                // Se a alternativa JÁ estiver selecionada, desmarca
+                if (alternativa.classList.contains('selecionada')) {
+                    alternativa.classList.remove('selecionada');
+                    respostasUsuario[qid] = null; 
+                } else {
+                    // Remove a seleção de qualquer outra alternativa na mesma questão
+                    container.querySelectorAll('.selecionada').forEach(sel => {
+                        sel.classList.remove('selecionada');
+                    });
+                    
+                    // Marca a nova alternativa como selecionada
+                    alternativa.classList.add('selecionada');
+                    respostasUsuario[qid] = key; 
+                }
+            }
+        }
+
+        // 4. Finalizar o Quiz e Mostrar o Resultado
+        function finalizarQuiz() {
+            let acertos = 0;
+            const totalQuestoes = questoes.length;
+
+            questoes.forEach(q => {
+                const respostaCorreta = q.resposta_correta;
+                const respostaDoUsuario = respostasUsuario[q.id];
+
+                if (respostaDoUsuario === respostaCorreta) {
+                    acertos++;
+                }
+            });
+
+            const erros = totalQuestoes - acertos;
+            const porcentagemAcerto = ((acertos / totalQuestoes) * 100).toFixed(2);
+
+            let resultadoHTML = `
+                <div id="resultado">
+                    <h2>🎉 Resultado do Simulado 🎉</h2>
+                    <div class="metricas">
+                        <p>Total de Questões: <strong>${totalQuestoes}</strong></p>
+                        <p class="acertos">Acertos: <strong>${acertos}</strong></p>
+                        <p class="erros">Erros: <strong>${erros}</strong></p>
+                        <p>Porcentagem de Acerto: <strong>${porcentagemAcerto}%</strong> de acertividade</p>
+                    </div>
+                    
+                    <hr style="margin: 20px 0;">
+
+                    <h2>Gabarito e Revisão</h2>
+                    <div id="gabarito-container">
+                        ${questoes.map(q => {
+                            const status = respostasUsuario[q.id] === q.resposta_correta ? 'correto' : 'errado';
+                            const suaRespostaKey = respostasUsuario[q.id];
+                            const suaRespostaTexto = suaRespostaKey ? `${suaRespostaKey}) ${q.alternativas[suaRespostaKey]}` : 'Não respondida';
+
+                            return `
+                                <div class="gabarito-item ${status}">
+                                    <h3>Questão ${q.id}: ${status === 'correto' ? 'CORRETO' : 'ERRADO'}</h3>
+                                    <p>${q.pergunta}</p>
+                                    <p class="sua-resposta">Sua Resposta: ${suaRespostaTexto}</p>
+                                    <p class="resposta-correta">Resposta Correta: ${q.resposta_correta}) ${q.alternativas[q.resposta_correta]}</p>
+                                    <p class="explicacao">**Explicação:** ${q.explicacao}</p>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <button class="btn-finalizar" onclick="location.reload()">Refazer Simulado</button>
+                </div>
+            `;
+
+            quizContainer.innerHTML = resultadoHTML;
+            window.scrollTo(0, 0); 
+        }
+
+        // 5. Inicia o quiz ao carregar a página
+        document.addEventListener('DOMContentLoaded', renderizarQuiz);
+
+        /* ==================================== */
+        /* === LÓGICA JAVASCRIPT (FIM) === */
+        /* ==================================== */
+    </script>
+</body>
+</html>
