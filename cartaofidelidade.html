@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartão Fidelidade Exclusivo - Tudo em HTML</title>
+    
+    <style>
+        /* --- 🎨 2. Estilo CSS (Incorporado) --- */
+        :root {
+            --color-primary: #D90429; /* Vermelho vibrante */
+            --color-secondary: #008000; /* Verde intenso */
+            --color-background: #F4F4F4; /* Fundo levemente cinza/branco */
+            --color-text: #333;
+            --color-white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .card-container {
+            background-color: var(--color-white);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--color-primary);
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 25px;
+        }
+
+        .stamp-area {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stamp-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px dashed var(--color-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--color-primary);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .stamp-circle.stamped {
+            background-color: var(--color-secondary);
+            border: 3px solid var(--color-secondary);
+            color: var(--color-white);
+            font-size: 24px;
+            box-shadow: 0 0 10px rgba(0, 128, 0, 0.5);
+        }
+
+        .stamp-action {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="password"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #A60321;
+        }
+
+        #couponArea {
+            padding: 20px;
+            border: 2px solid var(--color-secondary);
+            border-radius: 10px;
+            background-color: #e6ffe6;
+            margin-top: 20px;
+        }
+
+        .coupon-code {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--color-secondary);
+            background-color: var(--color-white);
+            padding: 10px;
+            border: 1px dashed var(--color-secondary);
+            margin: 10px 0;
+            user-select: all;
+        }
+
+        #couponArea button {
+            background-color: var(--color-secondary);
+            margin-top: 10px;
+        }
+
+        #couponArea button:hover {
+            background-color: #006400;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .message-area {
+            min-height: 20px;
+            font-weight: bold;
+            color: var(--color-primary);
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="card-container">
+        <h1>Fidelidade Premiada!</h1>
+        <p>Complete **6 carimbos** e ganhe **20% de desconto**!</p>
+        
+        <div class="stamp-area" id="stampArea">
+            </div>
+
+        <div class="stamp-action">
+            <input type="password" id="stampPassword" placeholder="Insira a Senha Secreta">
+            <button onclick="applyStamp()">Carimbar Compra</button>
+        </div>
+
+        <div id="couponArea" class="coupon-area hidden">
+            <h2>🎉 Parabéns! Você Ganhou um Cupom!</h2>
+            <p>Seu desconto de **20%**:</p>
+            <div class="coupon-code" id="couponCodeDisplay"></div>
+            <button onclick="resetCard()">Usar e Reiniciar Cartão</button>
+        </div>
+        
+        <div id="messageArea" class="message-area"></div>
+    </div>
+
+    <script>
+        /* --- 📜 3. Lógica JavaScript (Incorporada) --- */
+        
+        // --- Configurações ---
+        const TOTAL_STAMPS = 6;
+        // Senhas secretas: Carimbo 1 até Carimbo 6
+        const STAMP_PASSWORDS = [
+            "carimbo1", 
+            "carimbo2", 
+            "carimbo3", 
+            "carimbo4", 
+            "carimbo5", 
+            "carimbo6"
+        ]; 
+
+        // --- Variáveis do DOM ---
+        const stampArea = document.getElementById('stampArea');
+        const stampPasswordInput = document.getElementById('stampPassword');
+        const couponArea = document.getElementById('couponArea');
+        const couponCodeDisplay = document.getElementById('couponCodeDisplay');
+        const messageArea = document.getElementById('messageArea');
+
+        // --- Funções de LocalStorage ---
+
+        function loadStamps() {
+            const stamps = localStorage.getItem('loyaltyStamps');
+            return parseInt(stamps) || 0;
+        }
+
+        function saveStamps(count) {
+            localStorage.setItem('loyaltyStamps', count);
+        }
+
+        // --- Funções de UI (Interface) ---
+
+        function renderStamps() {
+            const currentStamps = loadStamps();
+            stampArea.innerHTML = ''; 
+
+            for (let i = 0; i < TOTAL_STAMPS; i++) {
+                const circle = document.createElement('div');
+                circle.classList.add('stamp-circle');
+                circle.textContent = i < currentStamps ? '✅' : `${i + 1}º`;
+                
+                if (i < currentStamps) {
+                    circle.classList.add('stamped');
+                }
+                
+                stampArea.appendChild(circle);
+            }
+
+            if (currentStamps >= TOTAL_STAMPS) {
+                showCoupon();
+            } else {
+                couponArea.classList.add('hidden');
+            }
+        }
+
+        function generateCouponCode() {
+            const randomSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
+            return `FIDELIZA-20-${randomSuffix}`;
+        }
+
+        function showCoupon() {
+            let coupon = localStorage.getItem('loyaltyCoupon');
+            if (!coupon) {
+                coupon = generateCouponCode();
+                localStorage.setItem('loyaltyCoupon', coupon);
+            }
+            
+            couponCodeDisplay.textContent = coupon;
+            couponArea.classList.remove('hidden');
+        }
+
+        function displayMessage(text, isError = false) {
+            messageArea.textContent = text;
+            // Define a cor com base se é erro ou sucesso
+            messageArea.style.color = isError ? 'var(--color-primary)' : 'var(--color-secondary)'; 
+            stampPasswordInput.value = ''; 
+            setTimeout(() => {
+                messageArea.textContent = '';
+            }, 3000);
+        }
+
+        // --- Lógica Principal ---
+
+        function applyStamp() {
+            const currentStamps = loadStamps();
+            const enteredPassword = stampPasswordInput.value.trim();
+
+            if (currentStamps >= TOTAL_STAMPS) {
+                displayMessage("O cartão já está completo! Use o cupom.", true);
+                return;
+            }
+
+            // A senha esperada é a da posição do próximo carimbo
+            const expectedPassword = STAMP_PASSWORDS[currentStamps]; 
+
+            if (enteredPassword === expectedPassword) {
+                const newStamps = currentStamps + 1;
+                saveStamps(newStamps);
+                renderStamps();
+                
+                if (newStamps === TOTAL_STAMPS) {
+                    displayMessage("Último carimbo! Cupom gerado!", false);
+                } else {
+                    displayMessage(`Carimbo número ${newStamps} aplicado com sucesso!`, false);
+                }
+            } else {
+                displayMessage("Senha incorreta. Verifique a senha do carimbo que está faltando.", true);
+            }
+        }
+
+        function resetCard() {
+            if (confirm("Você confirma que o cupom foi utilizado? O cartão será zerado.")) {
+                localStorage.removeItem('loyaltyStamps');
+                localStorage.removeItem('loyaltyCoupon');
+                renderStamps();
+                displayMessage("Cartão reiniciado. Pronto para a próxima rodada!", false);
+            }
+        }
+
+        // Inicializa a aplicação ao carregar a página
+        document.addEventListener('DOMContentLoaded', renderStamps);
+    </script>
+</body>
+</html>
