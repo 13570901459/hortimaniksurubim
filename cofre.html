@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Cofre Digital - Desafio 250</title>
+    <style>
+        /* PALETA DE CORES E ESTILO (CSS) */
+        :root {
+            --cor-fundo: #0a0e14;
+            --cor-card: #161b22;
+            --azul-oceano: #0077be;
+            --verde-sucesso: #28a745;
+            --texto: #ffffff;
+            --texto-secundario: #8b949e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--cor-fundo);
+            color: var(--texto);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 { color: var(--azul-oceano); margin-bottom: 5px; }
+        p { color: var(--texto-secundario); }
+
+        /* Painel de Resumo */
+        .painel-status {
+            background-color: var(--cor-card);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid var(--azul-oceano);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .total-valor {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--verde-sucesso);
+            margin: 10px 0;
+        }
+
+        /* Grade de Valores */
+        .grid-poupanca {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 10px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .item-valor {
+            background-color: var(--cor-card);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 15px 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            user-select: none;
+        }
+
+        .item-valor:hover {
+            border-color: var(--azul-oceano);
+            transform: translateY(-3px);
+        }
+
+        /* Estilo quando marcado */
+        .item-valor.marcado {
+            background-color: var(--verde-sucesso);
+            border-color: #fff;
+            color: white;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+        }
+
+        .btn-reset {
+            margin-top: 40px;
+            background: none;
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-reset:hover {
+            background: #ff4444;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Cofre Digital</h1>
+        <p>Desafio: Guardar de R$ 1 até R$ 250</p>
+    </header>
+
+    <div class="painel-status">
+        <div>Total Acumulado:</div>
+        <div class="total-valor" id="totalExibido">R$ 0,00</div>
+        <div id="progressoTexto">Você completou 0 de 250 itens</div>
+    </div>
+
+    <div class="grid-poupanca" id="grid">
+        </div>
+
+    <button class="btn-reset" onclick="limparTudo()">Zerar Progresso</button>
+
+    <script>
+        /* LÓGICA DO SITE (JAVASCRIPT) */
+        const gridElemento = document.getElementById('grid');
+        const totalExibido = document.getElementById('totalExibido');
+        const progressoTexto = document.getElementById('progressoTexto');
+        const TOTAL_ITENS = 250;
+
+        // Carregar dados salvos ou criar novo array
+        let progressoSalvo = JSON.parse(localStorage.getItem('poupanca_desafio')) || [];
+
+        function criarGrade() {
+            for (let i = 1; i <= TOTAL_ITENS; i++) {
+                const div = document.createElement('div');
+                div.classList.add('item-valor');
+                div.innerText = `R$ ${i}`;
+                
+                // Verificar se já estava marcado
+                if (progressoSalvo.includes(i)) {
+                    div.classList.add('marcado');
+                }
+
+                div.onclick = () => alternarValor(i, div);
+                gridElemento.appendChild(div);
+            }
+            atualizarResumo();
+        }
+
+        function alternarValor(valor, elemento) {
+            if (progressoSalvo.includes(valor)) {
+                // Remover marcação
+                progressoSalvo = progressoSalvo.filter(item => item !== valor);
+                elemento.classList.remove('marcado');
+            } else {
+                // Adicionar marcação
+                progressoSalvo.push(valor);
+                elemento.classList.add('marcado');
+            }
+            
+            // Salvar no LocalStorage
+            localStorage.setItem('poupanca_desafio', JSON.stringify(progressoSalvo));
+            atualizarResumo();
+        }
+
+        function atualizarResumo() {
+            const soma = progressoSalvo.reduce((acc, curr) => acc + curr, 0);
+            totalExibido.innerText = `R$ ${soma.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            progressoTexto.innerText = `Você completou ${progressoSalvo.length} de ${TOTAL_ITENS} itens`;
+        }
+
+        function limparTudo() {
+            if (confirm("Tem certeza que deseja zerar todo o seu progresso?")) {
+                localStorage.removeItem('poupanca_desafio');
+                location.reload();
+            }
+        }
+
+        // Inicializar o site
+        criarGrade();
+    </script>
+</body>
+</html>
