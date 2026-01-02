@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Sinais - Estilo Trader</title>
+    <style>
+        body {
+            background-color: #0b1217;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Card do Sinal */
+        .card-sinal {
+            background-color: #1a2329;
+            border-radius: 12px;
+            padding: 30px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #2a353d;
+        }
+
+        .moeda {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #adb5bd;
+            margin-bottom: 10px;
+        }
+
+        .horario {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 10px 0;
+        }
+
+        .alerta {
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* Cores de Compra e Venda */
+        .compra { background-color: #00b15d; color: white; box-shadow: 0 0 20px rgba(0, 177, 93, 0.4); }
+        .venda { background-color: #ff4a4a; color: white; box-shadow: 0 0 20px rgba(255, 74, 74, 0.4); }
+
+        /* Painel de Controle (Onde você muda o sinal) */
+        .controles {
+            margin-top: 40px;
+            background: #1e2931;
+            padding: 20px;
+            border-radius: 10px;
+            display: grid;
+            gap: 10px;
+            width: 350px;
+        }
+
+        input, select, button {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            font-size: 1rem;
+        }
+
+        button {
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-update { background-color: #2468ff; color: white; }
+        .btn-update:hover { background-color: #1a50c7; }
+    </style>
+</head>
+<body>
+
+    <div class="card-sinal">
+        <div id="txt-moeda" class="moeda">EUR/USD</div>
+        <div id="txt-horario" class="horario">00:00</div>
+        <div id="alerta-box" class="alerta compra">COMPRA</div>
+    </div>
+
+    <div class="controles">
+        <label>Par de Moeda:</label>
+        <input type="text" id="input-moeda" placeholder="Ex: BTC/USD">
+        
+        <label>Horário do Sinal:</label>
+        <input type="time" id="input-horario">
+        
+        <label>Direção:</label>
+        <select id="select-direcao">
+            <option value="compra">COMPRA (Verde)</option>
+            <option value="venda">VENDA (Vermelho)</option>
+        </select>
+
+        <button class="btn-update" onclick="atualizarSinal()">ATUALIZAR SINAL</button>
+    </div>
+
+    <script>
+        function atualizarSinal() {
+            // Pegar valores dos inputs
+            const moeda = document.getElementById('input-moeda').value;
+            const horario = document.getElementById('input-horario').value;
+            const direcao = document.getElementById('select-direcao').value;
+
+            // Elementos da tela
+            const txtMoeda = document.getElementById('txt-moeda');
+            const txtHorario = document.getElementById('txt-horario');
+            const alertaBox = document.getElementById('alerta-box');
+
+            // Atualizar textos (se não estiver vazio)
+            if(moeda) txtMoeda.innerText = moeda.toUpperCase();
+            if(horario) txtHorario.innerText = horario;
+
+            // Atualizar cores e direção
+            if(direcao === "compra") {
+                alertaBox.innerText = "COMPRA";
+                alertaBox.className = "alerta compra";
+            } else {
+                alertaBox.innerText = "VENDA";
+                alertaBox.className = "alerta venda";
+            }
+        }
+    </script>
+</body>
+</html>
