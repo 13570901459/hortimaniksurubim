@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Banca - Modelo B</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2ecc71;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        h1, h2 { text-align: center; color: var(--dark); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-box span { display: block; font-size: 0.8em; color: #7f8c8d; }
+        .stat-box strong { font-size: 1.2em; color: var(--dark); }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button {
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            flex: 1;
+            font-size: 1em;
+        }
+
+        .btn-green { background-color: var(--primary); color: white; }
+        .btn-red { background-color: var(--danger); color: white; }
+        .btn-reset { background-color: #95a5a6; color: white; margin-top: 10px; }
+
+        button:hover { opacity: 0.8; transform: translateY(-2px); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .text-green { color: var(--primary); font-weight: bold; }
+        .text-red { color: var(--danger); font-weight: bold; }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>📊 Modelo B - R$ 1.000</h1>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span>Banca Atual</span>
+                <strong id="bancaAtual">R$ 1000,00</strong>
+            </div>
+            <div class="stat-box">
+                <span>Entrada (10%)</span>
+                <strong id="valorEntrada">R$ 100,00</strong>
+            </div>
+            <div class="stat-box">
+                <span>Meta do Dia</span>
+                <strong class="text-green">+ R$ 224,00</strong>
+            </div>
+            <div class="stat-box">
+                <span>Stop do Dia</span>
+                <strong class="text-red">- R$ 100,00</strong>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn-green" onclick="registrarDia('WIN')">✅ GANHEI (WIN)</button>
+            <button class="btn-red" onclick="registrarDia('LOSS')">❌ PERDI (LOSS)</button>
+        </div>
+        <center><button class="btn-reset" onclick="resetarDados()">Resetar Dados</button></center>
+    </div>
+
+    <div class="card">
+        <h2>Histórico Recente</h2>
+        <div style="overflow-x: auto;">
+            <table id="tabelaHistorico">
+                <thead>
+                    <tr>
+                        <th>Dia</th>
+                        <th>Resultado</th>
+                        <th>Lucro/Prejuízo</th>
+                        <th>Banca Final</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let banca = parseFloat(localStorage.getItem('banca')) || 1000;
+    let historico = JSON.parse(localStorage.getItem('historico')) || [];
+
+    function atualizarInterface() {
+        const entrada = banca * 0.10;
+        document.getElementById('bancaAtual').innerText = `R$ ${banca.toFixed(2)}`;
+        document.getElementById('valorEntrada').innerText = `R$ ${entrada.toFixed(2)}`;
+        
+        const tbody = document.querySelector('#tabelaHistorico tbody');
+        tbody.innerHTML = '';
+        
+        historico.slice(-10).reverse().forEach((item, index) => {
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>${item.data}</td>
+                <td class="${item.tipo === 'WIN' ? 'text-green' : 'text-red'}">${item.tipo}</td>
+                <td class="${item.tipo === 'WIN' ? 'text-green' : 'text-red'}">${item.valor > 0 ? '+' : ''}${item.valor.toFixed(2)}</td>
+                <td>R$ ${item.bancaResultante.toFixed(2)}</td>
+            `;
+        });
+
+        localStorage.setItem('banca', banca);
+        localStorage.setItem('historico', JSON.stringify(historico));
+    }
+
+    function registrarDia(tipo) {
+        const entrada = banca * 0.10;
+        let resultadoVal = 0;
+
+        if (tipo === 'WIN') {
+            // Ganha 10 + Soros (18) = Lucro total de 22.4% sobre a banca (se payout 80%)
+            // Mas seguindo sua regra de entrada fixa 10% da banca:
+            resultadoVal = entrada * 2.24; 
+        } else {
+            resultadoVal = -entrada;
+        }
+
+        banca += resultadoVal;
+        
+        const dataAtual = new Date().toLocaleDateString('pt-BR');
+        historico.push({
+            data: dataAtual,
+            tipo: tipo,
+            valor: resultadoVal,
+            bancaResultante: banca
+        });
+
+        atualizarInterface();
+    }
+
+    function resetarDados() {
+        if(confirm("Deseja resetar sua banca para R$ 1.000?")) {
+            banca = 1000;
+            historico = [];
+            atualizarInterface();
+        }
+    }
+
+    atualizarInterface();
+</script>
+
+</body>
+</html>
