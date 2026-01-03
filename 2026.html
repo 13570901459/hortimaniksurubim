@@ -3,288 +3,319 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI TRADING - GESTÃO MODELO B</title>
+    <title>SISTEMA OPERACIONAL - MODELO B</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --accent: #38bdf8;
-            --green: #22c55e;
-            --red: #ef4444;
+            --bg: #020617;
+            --card: rgba(30, 41, 59, 0.7);
+            --accent: #0ea5e9;
+            --green: #10b981;
+            --red: #f43f5e;
+            --gold: #f59e0b;
             --text: #f8fafc;
         }
 
-        * { box-sizing: border-box; transition: all 0.3s ease; }
+        * { box-sizing: border-box; font-family: 'Rajdhani', sans-serif; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap');
 
         body {
-            font-family: 'Inter', system-ui, sans-serif;
             background-color: var(--bg);
+            background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%);
             color: var(--text);
             margin: 0;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            min-height: 100vh;
         }
 
-        .container { width: 100%; max-width: 900px; }
+        .container { max-width: 1100px; margin: auto; animation: fadeIn 1s ease-out; }
 
-        .glass-card {
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .glass {
             background: var(--card);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        .header {
-            text-align: center;
-            border-bottom: 2px solid var(--accent);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .header h1 { margin: 0; font-size: 1.5rem; letter-spacing: 2px; color: var(--accent); }
-
-        .input-group {
+        .header-top {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--accent);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
         }
 
-        input {
-            background: var(--bg);
-            border: 1px solid var(--accent);
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            width: 150px;
-            font-size: 1rem;
+        .header-top h1 { 
+            margin: 0; 
+            text-transform: uppercase; 
+            letter-spacing: 4px; 
+            color: var(--accent);
+            text-shadow: 0 0 15px rgba(14, 165, 233, 0.5);
         }
 
-        .grid-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .stat-box {
-            background: rgba(255,255,255,0.05);
-            padding: 15px;
-            border-radius: 12px;
+        .motivation-zone {
             text-align: center;
-            border-left: 4px solid var(--accent);
-        }
-
-        .stat-box span { font-size: 0.8rem; opacity: 0.7; display: block; }
-        .stat-box strong { font-size: 1.3rem; color: var(--accent); }
-
-        .btn-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        button {
-            flex: 1;
-            padding: 15px;
-            border-radius: 12px;
-            border: none;
+            font-style: italic;
+            color: var(--gold);
             cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.9rem;
+            padding: 10px;
+            border: 1px dashed rgba(245, 158, 11, 0.3);
+            border-radius: 10px;
+            margin-bottom: 20px;
         }
 
-        .btn-win { background: var(--green); color: white; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
-        .btn-loss { background: var(--red); color: white; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
-        .btn-win:hover, .btn-loss:hover { transform: scale(1.02); filter: brightness(1.2); }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            font-size: 0.9rem;
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
         }
 
-        th { text-align: left; opacity: 0.6; padding: 10px; }
-        td { padding: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
-
-        .pulse { animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .projection-grid {
+        .stats-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 10px;
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
-        .proj-item { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; text-align: center; }
-        .proj-item small { display: block; font-size: 0.7rem; }
-        .proj-item b { color: var(--green); }
+        .stat-card {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
 
-        @media (max-width: 600px) {
-            .projection-grid { grid-template-columns: 1fr; }
-            .btn-group { flex-direction: column; }
+        .stat-card span { font-size: 0.8rem; text-transform: uppercase; opacity: 0.6; }
+        .stat-card div { font-size: 1.8rem; font-weight: 700; margin-top: 5px; }
+
+        .btn-action {
+            width: 100%;
+            padding: 20px;
+            border-radius: 15px;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .btn-win { background: linear-gradient(135deg, #059669, #10b981); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
+        .btn-loss { background: linear-gradient(135deg, #dc2626, #f43f5e); box-shadow: 0 10px 20px rgba(244, 63, 94, 0.3); }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); opacity: 0.5; }
+        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        .badge { padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; }
+        .badge-win { background: rgba(16, 185, 129, 0.2); color: var(--green); }
+        .badge-loss { background: rgba(244, 63, 94, 0.2); color: var(--red); }
+
+        .btn-icon { background: none; border: none; color: white; opacity: 0.5; cursor: pointer; padding: 5px; }
+        .btn-icon:hover { opacity: 1; color: var(--accent); }
+
+        .projection-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .proj-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .proj-row b { color: var(--green); }
+
+        @media (max-width: 850px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="glass-card">
-        <div class="header">
-            <h1>🤖 MODELO B - DASHBOARD</h1>
-            <small id="data-atual" class="pulse"></small>
+    <div class="glass">
+        <div class="header-top">
+            <h1><i class="fa-solid fa-microchip"></i> Trader System v3.0</h1>
+            <div id="relogio">00:00:00</div>
         </div>
 
-        <div class="input-group">
-            <label style="align-self: center;">Banca Inicial R$:</label>
-            <input type="number" id="bancaManual" value="1000" onchange="configurarBanca()">
+        <div class="motivation-zone" onclick="mudarFrase()" title="Clique para mudar a frase">
+            <i class="fa-solid fa-quote-left"></i> 
+            <span id="frase-texto">O mercado é uma transferência de dinheiro dos impacientes para os pacientes.</span>
+            <i class="fa-solid fa-quote-right"></i>
         </div>
 
-        <div class="grid-stats">
-            <div class="stat-box">
-                <span>BANCA ATUAL</span>
-                <strong id="displayBanca">R$ 1.000,00</strong>
+        <div class="main-grid">
+            <div class="left-col">
+                <div class="stats-row">
+                    <div class="stat-card" style="border-top: 3px solid var(--accent)">
+                        <span>Banca Operacional</span>
+                        <div id="bancaDisplay" onclick="editarBanca()" style="cursor: pointer">R$ 1.000,00</div>
+                    </div>
+                    <div class="stat-card" style="border-top: 3px solid var(--gold)">
+                        <span>Entrada (10%)</span>
+                        <div id="entradaDisplay">R$ 100,00</div>
+                    </div>
+                    <div class="stat-card" style="border-top: 3px solid var(--green)">
+                        <span>Soros 1</span>
+                        <div id="sorosDisplay" style="color: var(--green)">R$ 180,00</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 20px;">
+                    <button class="btn-action btn-win" onclick="registrar('WIN')">
+                        <i class="fa-solid fa-chart-line"></i> META BATIDA
+                    </button>
+                    <button class="btn-action btn-loss" onclick="registrar('LOSS')">
+                        <i class="fa-solid fa-shield-halved"></i> STOP LOSS
+                    </button>
+                </div>
+
+                <div class="glass" style="margin-top: 25px; background: rgba(0,0,0,0.2)">
+                    <h3><i class="fa-solid fa-list-check"></i> Registro de Operações</h3>
+                    <div style="overflow-x: auto;">
+                        <table id="tabelaHistorico">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Resultado</th>
+                                    <th>Lucro/Loss</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <div class="stat-box">
-                <span>ENTRADA DO DIA (10%)</span>
-                <strong id="displayEntrada">R$ 100,00</strong>
-            </div>
-            <div class="stat-box" style="border-left-color: var(--green);">
-                <span>SOROS 1</span>
-                <strong id="displaySoros" style="color: var(--green);">R$ 180,00</strong>
+
+            <div class="right-col">
+                <div class="projection-box">
+                    <h3><i class="fa-solid fa-bolt"></i> PROJEÇÃO 66%</h3>
+                    <div class="proj-row"><span>Semana:</span> <b id="p-semana">R$ 0,00</b></div>
+                    <div class="proj-row"><span>1 Mês:</span> <b id="p-mes">R$ 0,00</b></div>
+                    <div class="proj-row"><span>3 Meses:</span> <b id="p-3meses">R$ 0,00</b></div>
+                    <p style="font-size: 0.7rem; opacity: 0.5; margin-top: 15px;">*Cálculo baseado em juros compostos mensais sobre 12W/8L.</p>
+                </div>
+
+                <div class="glass" style="margin-top: 20px; text-align: center;">
+                    <button onclick="resetarTudo()" style="background:none; border: 1px solid var(--red); color: var(--red); padding: 10px; border-radius: 8px; cursor: pointer; width: 100%;">
+                        <i class="fa-solid fa-rotate-left"></i> ZERAR SISTEMA
+                    </button>
+                </div>
             </div>
         </div>
-
-        <div class="btn-group">
-            <button class="btn-win" onclick="operar('WIN')">Registrar Win (+22.4%)</button>
-            <button class="btn-loss" onclick="operar('LOSS')">Registrar Loss (-10%)</button>
-        </div>
-    </div>
-
-    <div class="glass-card">
-        <h3 style="margin-top:0">📈 PROJEÇÃO (66% de Assertividade)</h3>
-        <p style="font-size: 0.8rem; opacity: 0.7;">Baseado em 12 Wins e 8 Losses mensais com juros compostos.</p>
-        <div class="projection-grid">
-            <div class="proj-item">
-                <small>1 SEMANA</small>
-                <b id="proj1s">R$ 0,00</b>
-            </div>
-            <div class="proj-item">
-                <small>1 MÊS</small>
-                <b id="proj1m">R$ 0,00</b>
-            </div>
-            <div class="proj-item">
-                <small>3 MESES</small>
-                <b id="proj3m">R$ 0,00</b>
-            </div>
-        </div>
-    </div>
-
-    <div class="glass-card">
-        <h3>📜 HISTÓRICO DE OPERAÇÕES</h3>
-        <table id="tabela">
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Tipo</th>
-                    <th>Valor</th>
-                    <th>Saldo</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
     </div>
 </div>
 
 <script>
-    let banca = parseFloat(localStorage.getItem('banca_v2')) || 1000;
-    let historico = JSON.parse(localStorage.getItem('historico_v2')) || [];
+    let banca = parseFloat(localStorage.getItem('banca_v3')) || 1000;
+    let historico = JSON.parse(localStorage.getItem('historico_v3')) || [];
+    let fraseMotivacional = localStorage.getItem('frase_v3') || "O mercado é uma transferência de dinheiro dos impacientes para os pacientes.";
 
-    function configurarBanca() {
-        const novoValor = parseFloat(document.getElementById('bancaManual').value);
-        if(novoValor > 0) {
-            banca = novoValor;
-            atualizarUI();
+    function atualizarRelogio() {
+        const agora = new Date();
+        document.getElementById('relogio').innerText = agora.toLocaleTimeString('pt-br');
+    }
+    setInterval(atualizarRelogio, 1000);
+
+    function mudarFrase() {
+        const nova = prompt("Digite sua nova frase de motivação:", fraseMotivacional);
+        if(nova) {
+            fraseMotivacional = nova;
+            localStorage.setItem('frase_v3', nova);
+            document.getElementById('frase-texto').innerText = nova;
         }
     }
 
-    function atualizarUI() {
+    function editarBanca() {
+        const valor = prompt("Definir novo valor de Banca:", banca);
+        if(valor && !isNaN(valor)) {
+            banca = parseFloat(valor);
+            render();
+        }
+    }
+
+    function registrar(tipo) {
         const entrada = banca * 0.10;
-        const soros = entrada + (entrada * 0.8);
+        let valorOp = tipo === 'WIN' ? entrada * 2.24 : -entrada;
         
-        document.getElementById('displayBanca').innerText = `R$ ${banca.toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
-        document.getElementById('displayEntrada').innerText = `R$ ${entrada.toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
-        document.getElementById('displaySoros').innerText = `R$ ${soros.toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
-        document.getElementById('data-atual').innerText = new Date().toLocaleDateString('pt-br');
-
-        // Calcular Projeções
-        const lucroMes1 = banca * 1.888; // Multiplicador baseado em 12W e 8L
-        const lucroMes2 = (banca + lucroMes1) * 1.888;
-        const lucroMes3 = (banca + lucroMes1 + lucroMes2) * 1.888; // Simplificação de juros compostos
-
-        // Projeção simples de crescimento
-        const m1 = banca * 2.888;
-        const m2 = m1 * 2.888;
-        const m3 = m2 * 2.888;
-
-        document.getElementById('proj1s').innerText = `R$ ${(banca * 1.47).toLocaleString('pt-br', {maximumFractionDigits: 0})}`;
-        document.getElementById('proj1m').innerText = `R$ ${m1.toLocaleString('pt-br', {maximumFractionDigits: 0})}`;
-        document.getElementById('proj3m').innerText = `R$ ${m3.toLocaleString('pt-br', {maximumFractionDigits: 0})}`;
-
-        // Atualizar Tabela
-        const tbody = document.querySelector('#tabela tbody');
-        tbody.innerHTML = '';
-        historico.slice(-7).reverse().forEach(item => {
-            const row = tbody.insertRow();
-            row.innerHTML = `
-                <td>${item.data}</td>
-                <td style="color: ${item.cor}">${item.tipo}</td>
-                <td style="color: ${item.cor}">${item.valor > 0 ? '+' : ''}${item.valor.toFixed(2)}</td>
-                <td>${item.bancaResultante.toFixed(2)}</td>
-            `;
-        });
-
-        localStorage.setItem('banca_v2', banca);
-        localStorage.setItem('historico_v2', JSON.stringify(historico));
-    }
-
-    function operar(tipo) {
-        const entrada = banca * 0.10;
-        let resultado = 0;
-        let cor = '';
-
-        if(tipo === 'WIN') {
-            resultado = entrada * 2.24;
-            cor = 'var(--green)';
-        } else {
-            resultado = -entrada;
-            cor = 'var(--red)';
-        }
-
-        banca += resultado;
+        banca += valorOp;
         historico.push({
+            id: Date.now(),
             data: new Date().toLocaleDateString('pt-br'),
             tipo: tipo,
-            valor: resultado,
-            cor: cor,
-            bancaResultante: banca
+            valor: valorOp,
+            bancaPos: banca
         });
-
-        atualizarUI();
+        render();
     }
 
-    atualizarUI();
-</script>
+    function deletar(id) {
+        if(confirm("Excluir este registro? A banca não será recalculada retroativamente.")) {
+            historico = historico.filter(h => h.id !== id);
+            render();
+        }
+    }
 
+    function editarRegistro(id) {
+        const novoValor = prompt("Digite o novo lucro/prejuízo para este dia:");
+        if(novoValor && !isNaN(novoValor)) {
+            const index = historico.findIndex(h => h.id === id);
+            historico[index].valor = parseFloat(novoValor);
+            render();
+        }
+    }
+
+    function render() {
+        document.getElementById('bancaDisplay').innerText = `R$ ${banca.toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
+        document.getElementById('entradaDisplay').innerText = `R$ ${(banca * 0.1).toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
+        document.getElementById('sorosDisplay').innerText = `R$ ${(banca * 0.18).toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
+        document.getElementById('frase-texto').innerText = fraseMotivacional;
+
+        // Projeções
+        document.getElementById('p-semana').innerText = `R$ ${(banca * 1.47).toLocaleString('pt-br', {maximumFractionDigits: 0})}`;
+        document.getElementById('p-mes').innerText = `R$ ${(banca * 2.88).toLocaleString('pt-br', {maximumFractionDigits: 0})}`;
+        document.getElementById('p-3meses').innerText = `R$ ${(banca * Math.pow(2.88, 3)).toLocaleString('pt-br', {maximumFractionDigits: 0})}`;
+
+        const tbody = document.querySelector('#tabelaHistorico tbody');
+        tbody.innerHTML = '';
+        historico.slice().reverse().forEach(h => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${h.data}</td>
+                <td><span class="badge ${h.tipo === 'WIN' ? 'badge-win' : 'badge-loss'}">${h.tipo}</span></td>
+                <td style="color: ${h.valor > 0 ? 'var(--green)' : 'var(--red)'}">R$ ${h.valor.toFixed(2)}</td>
+                <td>
+                    <button class="btn-icon" onclick="editarRegistro(${h.id})"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn-icon" onclick="deletar(${h.id})"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        localStorage.setItem('banca_v3', banca);
+        localStorage.setItem('historico_v3', JSON.stringify(historico));
+    }
+
+    function resetarTudo() {
+        if(confirm("AVISO: Isso apagará todo o histórico e resetará a banca para R$ 1.000. Confirma?")) {
+            banca = 1000;
+            historico = [];
+            render();
+        }
+    }
+
+    render();
+</script>
 </body>
 </html>
