@@ -3,319 +3,297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA OPERACIONAL - MODELO B</title>
+    <title>ULTIMATE TRADER DASHBOARD</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg: #020617;
-            --card: rgba(30, 41, 59, 0.7);
-            --accent: #0ea5e9;
+            --bg: #030712;
+            --card: rgba(17, 24, 39, 0.8);
+            --accent: #38bdf8;
             --green: #10b981;
             --red: #f43f5e;
-            --gold: #f59e0b;
-            --text: #f8fafc;
+            --gold: #fbbf24;
+            --text: #f3f4f6;
         }
 
-        * { box-sizing: border-box; font-family: 'Rajdhani', sans-serif; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
 
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap');
+        * { box-sizing: border-box; font-family: 'Rajdhani', sans-serif; transition: all 0.3s ease; }
 
         body {
-            background-color: var(--bg);
-            background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%);
+            background: var(--bg);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0, transparent 50%);
             color: var(--text);
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             min-height: 100vh;
         }
 
-        .container { max-width: 1100px; margin: auto; animation: fadeIn 1s ease-out; }
+        .container { max-width: 1200px; margin: auto; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .glass {
-            background: var(--card);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--accent);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-
-        .header-top h1 { 
-            margin: 0; 
-            text-transform: uppercase; 
-            letter-spacing: 4px; 
-            color: var(--accent);
-            text-shadow: 0 0 15px rgba(14, 165, 233, 0.5);
-        }
-
-        .motivation-zone {
-            text-align: center;
-            font-style: italic;
-            color: var(--gold);
-            cursor: pointer;
-            padding: 10px;
-            border: 1px dashed rgba(245, 158, 11, 0.3);
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-        }
-
-        .stats-row {
+        /* Placar Dinâmico */
+        .scoreboard {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .score-card {
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-number { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 3rem; 
+            display: block;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        .score-label { text-transform: uppercase; font-weight: 700; letter-spacing: 2px; opacity: 0.7; }
+
+        /* Estilo Vidro */
+        .glass {
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);
+        }
+
+        .main-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
+
+        .stat-main {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
             margin-bottom: 25px;
         }
 
-        .stat-card {
-            background: rgba(15, 23, 42, 0.6);
-            padding: 20px;
+        .stat-item {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
             border-radius: 15px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 3px solid var(--accent);
         }
 
-        .stat-card span { font-size: 0.8rem; text-transform: uppercase; opacity: 0.6; }
-        .stat-card div { font-size: 1.8rem; font-weight: 700; margin-top: 5px; }
+        .stat-item span { font-size: 0.8rem; display: block; margin-bottom: 5px; opacity: 0.6; }
+        .stat-item strong { font-size: 1.4rem; color: var(--text); }
 
-        .btn-action {
-            width: 100%;
+        /* Botões */
+        .btn-zone { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+        .btn {
             padding: 20px;
             border-radius: 15px;
             border: none;
+            cursor: pointer;
             font-size: 1.2rem;
             font-weight: bold;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             color: white;
+            text-transform: uppercase;
+        }
+        .btn-win { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 10px 15px rgba(16, 185, 129, 0.2); }
+        .btn-loss { background: linear-gradient(135deg, #f43f5e, #e11d48); box-shadow: 0 10px 15px rgba(244, 63, 94, 0.2); }
+        .btn:active { transform: scale(0.95); }
+
+        /* Tabela */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; padding: 12px; opacity: 0.5; font-size: 0.8rem; text-transform: uppercase; }
+        td { padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); }
+
+        .badge { padding: 4px 8px; border-radius: 5px; font-weight: bold; font-size: 0.7rem; }
+        .badge-win { background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid var(--green); }
+        .badge-loss { background: rgba(244,63,94,0.1); color: var(--red); border: 1px solid var(--red); }
+
+        .motivation {
+            text-align: center;
+            color: var(--gold);
+            font-style: italic;
+            margin-bottom: 25px;
+            padding: 10px;
+            border-left: 4px solid var(--gold);
+            background: rgba(251, 191, 36, 0.05);
+            cursor: pointer;
         }
 
-        .btn-win { background: linear-gradient(135deg, #059669, #10b981); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
-        .btn-loss { background: linear-gradient(135deg, #dc2626, #f43f5e); box-shadow: 0 10px 20px rgba(244, 63, 94, 0.3); }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { text-align: left; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); opacity: 0.5; }
-        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-        .badge { padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; }
-        .badge-win { background: rgba(16, 185, 129, 0.2); color: var(--green); }
-        .badge-loss { background: rgba(244, 63, 94, 0.2); color: var(--red); }
-
-        .btn-icon { background: none; border: none; color: white; opacity: 0.5; cursor: pointer; padding: 5px; }
-        .btn-icon:hover { opacity: 1; color: var(--accent); }
-
-        .projection-box {
-            background: rgba(0,0,0,0.3);
-            border-radius: 15px;
-            padding: 20px;
-        }
-
-        .proj-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .proj-row b { color: var(--green); }
-
-        @media (max-width: 850px) {
+        @media (max-width: 768px) {
             .main-grid { grid-template-columns: 1fr; }
-            .stats-row { grid-template-columns: 1fr; }
+            .scoreboard { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="glass">
-        <div class="header-top">
-            <h1><i class="fa-solid fa-microchip"></i> Trader System v3.0</h1>
-            <div id="relogio">00:00:00</div>
-        </div>
+    <div class="motivation" onclick="setFrase()">
+        <i class="fa-solid fa-quote-left"></i> <span id="txt-frase">Carregando frase de guerra...</span>
+    </div>
 
-        <div class="motivation-zone" onclick="mudarFrase()" title="Clique para mudar a frase">
-            <i class="fa-solid fa-quote-left"></i> 
-            <span id="frase-texto">O mercado é uma transferência de dinheiro dos impacientes para os pacientes.</span>
-            <i class="fa-solid fa-quote-right"></i>
+    <div class="scoreboard">
+        <div class="score-card" style="color: var(--green)">
+            <span class="score-label">Vitórias</span>
+            <span id="count-win" class="score-number">0</span>
         </div>
+        <div class="score-card" style="color: var(--accent)">
+            <span class="score-label">Aproveitamento</span>
+            <span id="count-pct" class="score-number">0%</span>
+        </div>
+        <div class="score-card" style="color: var(--red)">
+            <span class="score-label">Derrotas</span>
+            <span id="count-loss" class="score-number">0</span>
+        </div>
+    </div>
 
-        <div class="main-grid">
-            <div class="left-col">
-                <div class="stats-row">
-                    <div class="stat-card" style="border-top: 3px solid var(--accent)">
-                        <span>Banca Operacional</span>
-                        <div id="bancaDisplay" onclick="editarBanca()" style="cursor: pointer">R$ 1.000,00</div>
+    <div class="main-grid">
+        <div class="left-col">
+            <div class="glass">
+                <div class="stat-main">
+                    <div class="stat-item" onclick="setBanca()" style="cursor:pointer">
+                        <span>Banca Atual</span>
+                        <strong id="b-atual">R$ 0,00</strong>
                     </div>
-                    <div class="stat-card" style="border-top: 3px solid var(--gold)">
+                    <div class="stat-item">
                         <span>Entrada (10%)</span>
-                        <div id="entradaDisplay">R$ 100,00</div>
+                        <strong id="b-ent">R$ 0,00</strong>
                     </div>
-                    <div class="stat-card" style="border-top: 3px solid var(--green)">
+                    <div class="stat-item">
                         <span>Soros 1</span>
-                        <div id="sorosDisplay" style="color: var(--green)">R$ 180,00</div>
+                        <strong id="b-sor" style="color: var(--green)">R$ 0,00</strong>
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 20px;">
-                    <button class="btn-action btn-win" onclick="registrar('WIN')">
-                        <i class="fa-solid fa-chart-line"></i> META BATIDA
+                <div class="btn-zone">
+                    <button class="btn btn-win" onclick="addOp('WIN')">
+                        <i class="fa-solid fa-up-long"></i> WIN
                     </button>
-                    <button class="btn-action btn-loss" onclick="registrar('LOSS')">
-                        <i class="fa-solid fa-shield-halved"></i> STOP LOSS
+                    <button class="btn btn-loss" onclick="addOp('LOSS')">
+                        <i class="fa-solid fa-down-long"></i> LOSS
                     </button>
                 </div>
 
-                <div class="glass" style="margin-top: 25px; background: rgba(0,0,0,0.2)">
-                    <h3><i class="fa-solid fa-list-check"></i> Registro de Operações</h3>
-                    <div style="overflow-x: auto;">
-                        <table id="tabelaHistorico">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Resultado</th>
-                                    <th>Lucro/Loss</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
+                <h3 style="margin: 30px 0 10px 0"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</h3>
+                <div style="max-height: 300px; overflow-y: auto;">
+                    <table id="lista">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
+        </div>
 
-            <div class="right-col">
-                <div class="projection-box">
-                    <h3><i class="fa-solid fa-bolt"></i> PROJEÇÃO 66%</h3>
-                    <div class="proj-row"><span>Semana:</span> <b id="p-semana">R$ 0,00</b></div>
-                    <div class="proj-row"><span>1 Mês:</span> <b id="p-mes">R$ 0,00</b></div>
-                    <div class="proj-row"><span>3 Meses:</span> <b id="p-3meses">R$ 0,00</b></div>
-                    <p style="font-size: 0.7rem; opacity: 0.5; margin-top: 15px;">*Cálculo baseado em juros compostos mensais sobre 12W/8L.</p>
-                </div>
-
-                <div class="glass" style="margin-top: 20px; text-align: center;">
-                    <button onclick="resetarTudo()" style="background:none; border: 1px solid var(--red); color: var(--red); padding: 10px; border-radius: 8px; cursor: pointer; width: 100%;">
-                        <i class="fa-solid fa-rotate-left"></i> ZERAR SISTEMA
-                    </button>
+        <div class="right-col">
+            <div class="glass" style="margin-bottom: 20px;">
+                <h3 style="margin-top:0"><i class="fa-solid fa-chart-pie"></i> Projeção 66%</h3>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display:flex; justify-content:space-between"><span>Semana:</span> <b id="p-sem" style="color:var(--green)">R$ 0</b></div>
+                    <div style="display:flex; justify-content:space-between"><span>1 Mês:</span> <b id="p-mes" style="color:var(--green)">R$ 0</b></div>
+                    <div style="display:flex; justify-content:space-between"><span>3 Meses:</span> <b id="p-3m" style="color:var(--green)">R$ 0</b></div>
                 </div>
             </div>
+            
+            <button onclick="clearAll()" style="width:100%; padding:10px; background:none; border: 1px solid var(--red); color: var(--red); border-radius:10px; cursor:pointer">
+                <i class="fa-solid fa-trash-can"></i> Limpar Tudo
+            </button>
         </div>
     </div>
 </div>
 
 <script>
-    let banca = parseFloat(localStorage.getItem('banca_v3')) || 1000;
-    let historico = JSON.parse(localStorage.getItem('historico_v3')) || [];
-    let fraseMotivacional = localStorage.getItem('frase_v3') || "O mercado é uma transferência de dinheiro dos impacientes para os pacientes.";
+    let banca = parseFloat(localStorage.getItem('banca_fin')) || 1000;
+    let logs = JSON.parse(localStorage.getItem('logs_fin')) || [];
+    let frase = localStorage.getItem('frase_fin') || "Consistência é fazer o simples todo dia.";
 
-    function atualizarRelogio() {
-        const agora = new Date();
-        document.getElementById('relogio').innerText = agora.toLocaleTimeString('pt-br');
-    }
-    setInterval(atualizarRelogio, 1000);
-
-    function mudarFrase() {
-        const nova = prompt("Digite sua nova frase de motivação:", fraseMotivacional);
-        if(nova) {
-            fraseMotivacional = nova;
-            localStorage.setItem('frase_v3', nova);
-            document.getElementById('frase-texto').innerText = nova;
-        }
+    function setBanca() {
+        let n = prompt("Valor da Banca Inicial:", banca);
+        if(n) { banca = parseFloat(n); render(); }
     }
 
-    function editarBanca() {
-        const valor = prompt("Definir novo valor de Banca:", banca);
-        if(valor && !isNaN(valor)) {
-            banca = parseFloat(valor);
-            render();
-        }
+    function setFrase() {
+        let f = prompt("Sua Frase de Guerra:", frase);
+        if(f) { frase = f; render(); }
     }
 
-    function registrar(tipo) {
-        const entrada = banca * 0.10;
-        let valorOp = tipo === 'WIN' ? entrada * 2.24 : -entrada;
-        
-        banca += valorOp;
-        historico.push({
-            id: Date.now(),
-            data: new Date().toLocaleDateString('pt-br'),
-            tipo: tipo,
-            valor: valorOp,
-            bancaPos: banca
-        });
+    function addOp(tipo) {
+        const ent = banca * 0.10;
+        const val = tipo === 'WIN' ? ent * 2.24 : -ent;
+        banca += val;
+        logs.push({ id: Date.now(), dt: new Date().toLocaleDateString('pt-br'), tp: tipo, vl: val });
         render();
     }
 
-    function deletar(id) {
-        if(confirm("Excluir este registro? A banca não será recalculada retroativamente.")) {
-            historico = historico.filter(h => h.id !== id);
-            render();
-        }
+    function delOp(id) {
+        logs = logs.filter(l => l.id !== id);
+        render();
     }
 
-    function editarRegistro(id) {
-        const novoValor = prompt("Digite o novo lucro/prejuízo para este dia:");
-        if(novoValor && !isNaN(novoValor)) {
-            const index = historico.findIndex(h => h.id === id);
-            historico[index].valor = parseFloat(novoValor);
-            render();
+    function clearAll() {
+        if(confirm("Reiniciar todo o sistema?")) {
+            banca = 1000; logs = []; render();
         }
     }
 
     function render() {
-        document.getElementById('bancaDisplay').innerText = `R$ ${banca.toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
-        document.getElementById('entradaDisplay').innerText = `R$ ${(banca * 0.1).toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
-        document.getElementById('sorosDisplay').innerText = `R$ ${(banca * 0.18).toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
-        document.getElementById('frase-texto').innerText = fraseMotivacional;
+        // Stats
+        document.getElementById('b-atual').innerText = `R$ ${banca.toLocaleString('pt-br', {minimumFractionDigits:2})}`;
+        document.getElementById('b-ent').innerText = `R$ ${(banca * 0.1).toLocaleString('pt-br', {minimumFractionDigits:2})}`;
+        document.getElementById('b-sor').innerText = `R$ ${(banca * 0.1 * 1.8).toLocaleString('pt-br', {minimumFractionDigits:2})}`;
+        document.getElementById('txt-frase').innerText = frase;
 
-        // Projeções
-        document.getElementById('p-semana').innerText = `R$ ${(banca * 1.47).toLocaleString('pt-br', {maximumFractionDigits: 0})}`;
-        document.getElementById('p-mes').innerText = `R$ ${(banca * 2.88).toLocaleString('pt-br', {maximumFractionDigits: 0})}`;
-        document.getElementById('p-3meses').innerText = `R$ ${(banca * Math.pow(2.88, 3)).toLocaleString('pt-br', {maximumFractionDigits: 0})}`;
+        // Placar
+        const wins = logs.filter(l => l.tp === 'WIN').length;
+        const loss = logs.filter(l => l.tp === 'LOSS').length;
+        const total = logs.length;
+        const pct = total > 0 ? ((wins / total) * 100).toFixed(1) : 0;
 
-        const tbody = document.querySelector('#tabelaHistorico tbody');
-        tbody.innerHTML = '';
-        historico.slice().reverse().forEach(h => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${h.data}</td>
-                <td><span class="badge ${h.tipo === 'WIN' ? 'badge-win' : 'badge-loss'}">${h.tipo}</span></td>
-                <td style="color: ${h.valor > 0 ? 'var(--green)' : 'var(--red)'}">R$ ${h.valor.toFixed(2)}</td>
-                <td>
-                    <button class="btn-icon" onclick="editarRegistro(${h.id})"><i class="fa-solid fa-pen"></i></button>
-                    <button class="btn-icon" onclick="deletar(${h.id})"><i class="fa-solid fa-trash"></i></button>
-                </td>
+        document.getElementById('count-win').innerText = wins;
+        document.getElementById('count-loss').innerText = loss;
+        document.getElementById('count-pct').innerText = pct + "%";
+
+        // Projeção
+        document.getElementById('p-sem').innerText = `R$ ${(banca * 1.47).toLocaleString('pt-br', {maximumFractionDigits:0})}`;
+        document.getElementById('p-mes').innerText = `R$ ${(banca * 2.88).toLocaleString('pt-br', {maximumFractionDigits:0})}`;
+        document.getElementById('p-3m').innerText = `R$ ${(banca * Math.pow(2.88, 3)).toLocaleString('pt-br', {maximumFractionDigits:0})}`;
+
+        // Tabela
+        const tb = document.querySelector('#lista tbody');
+        tb.innerHTML = '';
+        logs.slice().reverse().forEach(l => {
+            const row = tb.insertRow();
+            row.innerHTML = `
+                <td>${l.dt}</td>
+                <td><span class="badge ${l.tp === 'WIN' ? 'badge-win' : 'badge-loss'}">${l.tp}</span></td>
+                <td style="color: ${l.vl > 0 ? 'var(--green)' : 'var(--red)'}">R$ ${l.vl.toFixed(2)}</td>
+                <td><i class="fa-solid fa-xmark" style="cursor:pointer; opacity:0.5" onclick="delOp(${l.id})"></i></td>
             `;
-            tbody.appendChild(tr);
         });
 
-        localStorage.setItem('banca_v3', banca);
-        localStorage.setItem('historico_v3', JSON.stringify(historico));
-    }
-
-    function resetarTudo() {
-        if(confirm("AVISO: Isso apagará todo o histórico e resetará a banca para R$ 1.000. Confirma?")) {
-            banca = 1000;
-            historico = [];
-            render();
-        }
+        localStorage.setItem('banca_fin', banca);
+        localStorage.setItem('logs_fin', JSON.stringify(logs));
+        localStorage.setItem('frase_fin', frase);
     }
 
     render();
 </script>
+
 </body>
 </html>
