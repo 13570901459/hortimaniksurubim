@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ULTIMATE TRADER DASHBOARD</title>
+    <title>SISTEMA TRADER PRO - ENTRADA MANUAL</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --bg: #030712;
-            --card: rgba(17, 24, 39, 0.8);
-            --accent: #38bdf8;
+            --card: rgba(17, 24, 39, 0.9);
+            --accent: #0ea5e9;
             --green: #10b981;
             --red: #f43f5e;
             --gold: #fbbf24;
@@ -18,278 +18,322 @@
 
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
 
-        * { box-sizing: border-box; font-family: 'Rajdhani', sans-serif; transition: all 0.3s ease; }
+        * { box-sizing: border-box; font-family: 'Rajdhani', sans-serif; transition: all 0.2s ease; }
 
         body {
             background: var(--bg);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0, transparent 50%);
+            background-image: radial-gradient(circle at top right, #1e293b, #030712);
             color: var(--text);
             margin: 0;
             padding: 15px;
             min-height: 100vh;
         }
 
-        .container { max-width: 1200px; margin: auto; }
+        .container { max-width: 1000px; margin: auto; }
 
-        /* Placar Dinâmico */
+        .glass {
+            background: var(--card);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
         .scoreboard {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 25px;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .score-box {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border-radius: 15px;
             text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .score-card {
-            background: var(--card);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 20px;
-            position: relative;
-            overflow: hidden;
-        }
+        .score-val { font-family: 'Orbitron'; font-size: 2rem; display: block; }
 
-        .score-number { 
-            font-family: 'Orbitron', sans-serif; 
-            font-size: 3rem; 
-            display: block;
-            text-shadow: 0 0 10px currentColor;
-        }
-
-        .score-label { text-transform: uppercase; font-weight: 700; letter-spacing: 2px; opacity: 0.7; }
-
-        /* Estilo Vidro */
-        .glass {
-            background: var(--card);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);
-        }
-
-        .main-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
-
-        .stat-main {
+        .main-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 25px;
         }
 
-        .stat-item {
-            background: rgba(0,0,0,0.3);
-            padding: 15px;
-            border-radius: 15px;
-            border-bottom: 3px solid var(--accent);
+        .stat-card {
+            background: rgba(255,255,255,0.03);
+            padding: 20px;
+            border-radius: 18px;
+            border-left: 4px solid var(--accent);
         }
 
-        .stat-item span { font-size: 0.8rem; display: block; margin-bottom: 5px; opacity: 0.6; }
-        .stat-item strong { font-size: 1.4rem; color: var(--text); }
+        .stat-card span { font-size: 0.8rem; opacity: 0.6; text-transform: uppercase; }
+        .stat-card h2 { margin: 5px 0 0 0; font-size: 1.8rem; }
 
-        /* Botões */
-        .btn-zone { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
-        .btn {
+        /* Estilo Entrada Manual */
+        .manual-input-box {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
             padding: 20px;
-            border-radius: 15px;
+            border-radius: 18px;
+            border: 1px solid var(--accent);
+            text-align: center;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 10px 0;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            background: #000;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 12px 12px 12px 35px;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            width: 180px;
+            text-align: center;
+            font-family: 'Orbitron';
+        }
+
+        #pct-display {
+            display: block;
+            margin-top: 5px;
+            font-weight: bold;
+            color: var(--gold);
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 18px;
+            border-radius: 12px;
             border: none;
             cursor: pointer;
-            font-size: 1.2rem;
             font-weight: bold;
+            font-size: 1.1rem;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             color: white;
-            text-transform: uppercase;
         }
-        .btn-win { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 10px 15px rgba(16, 185, 129, 0.2); }
-        .btn-loss { background: linear-gradient(135deg, #f43f5e, #e11d48); box-shadow: 0 10px 15px rgba(244, 63, 94, 0.2); }
-        .btn:active { transform: scale(0.95); }
 
-        /* Tabela */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; padding: 12px; opacity: 0.5; font-size: 0.8rem; text-transform: uppercase; }
-        td { padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .btn-win { background: var(--green); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3); }
+        .btn-loss { background: var(--red); box-shadow: 0 5px 15px rgba(244, 63, 94, 0.3); }
 
-        .badge { padding: 4px 8px; border-radius: 5px; font-weight: bold; font-size: 0.7rem; }
-        .badge-win { background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid var(--green); }
-        .badge-loss { background: rgba(244,63,94,0.1); color: var(--red); border: 1px solid var(--red); }
+        .history-table {
+            width: 100%;
+            margin-top: 25px;
+            border-collapse: collapse;
+        }
 
-        .motivation {
+        .history-table th { text-align: left; padding: 10px; opacity: 0.5; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .history-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.02); }
+
+        .motivation-bar {
             text-align: center;
-            color: var(--gold);
-            font-style: italic;
-            margin-bottom: 25px;
             padding: 10px;
-            border-left: 4px solid var(--gold);
-            background: rgba(251, 191, 36, 0.05);
+            color: var(--gold);
+            background: rgba(251, 191, 36, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
             cursor: pointer;
+            font-style: italic;
         }
 
-        @media (max-width: 768px) {
-            .main-grid { grid-template-columns: 1fr; }
+        @media (max-width: 600px) {
             .scoreboard { grid-template-columns: 1fr; }
+            .btn-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="motivation" onclick="setFrase()">
-        <i class="fa-solid fa-quote-left"></i> <span id="txt-frase">Carregando frase de guerra...</span>
+    <div class="motivation-bar" onclick="novaFrase()">
+        <i class="fa-solid fa-quote-left"></i> <span id="txt-frase">Consistência é o foco no processo, não no dinheiro.</span>
     </div>
 
     <div class="scoreboard">
-        <div class="score-card" style="color: var(--green)">
-            <span class="score-label">Vitórias</span>
-            <span id="count-win" class="score-number">0</span>
+        <div class="score-box" style="color: var(--green)">
+            <span>WINS</span>
+            <b id="placar-w" class="score-val">0</b>
         </div>
-        <div class="score-card" style="color: var(--accent)">
-            <span class="score-label">Aproveitamento</span>
-            <span id="count-pct" class="score-number">0%</span>
+        <div class="score-box" style="color: var(--accent)">
+            <span>ASSERTIVIDADE</span>
+            <b id="placar-pct" class="score-val">0%</b>
         </div>
-        <div class="score-card" style="color: var(--red)">
-            <span class="score-label">Derrotas</span>
-            <span id="count-loss" class="score-number">0</span>
+        <div class="score-box" style="color: var(--red)">
+            <span>LOSSES</span>
+            <b id="placar-l" class="score-val">0</b>
         </div>
     </div>
 
-    <div class="main-grid">
-        <div class="left-col">
-            <div class="glass">
-                <div class="stat-main">
-                    <div class="stat-item" onclick="setBanca()" style="cursor:pointer">
-                        <span>Banca Atual</span>
-                        <strong id="b-atual">R$ 0,00</strong>
-                    </div>
-                    <div class="stat-item">
-                        <span>Entrada (10%)</span>
-                        <strong id="b-ent">R$ 0,00</strong>
-                    </div>
-                    <div class="stat-item">
-                        <span>Soros 1</span>
-                        <strong id="b-sor" style="color: var(--green)">R$ 0,00</strong>
-                    </div>
-                </div>
-
-                <div class="btn-zone">
-                    <button class="btn btn-win" onclick="addOp('WIN')">
-                        <i class="fa-solid fa-up-long"></i> WIN
-                    </button>
-                    <button class="btn btn-loss" onclick="addOp('LOSS')">
-                        <i class="fa-solid fa-down-long"></i> LOSS
-                    </button>
-                </div>
-
-                <h3 style="margin: 30px 0 10px 0"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</h3>
-                <div style="max-height: 300px; overflow-y: auto;">
-                    <table id="lista">
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Tipo</th>
-                                <th>Valor</th>
-                                <th>Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="right-col">
-            <div class="glass" style="margin-bottom: 20px;">
-                <h3 style="margin-top:0"><i class="fa-solid fa-chart-pie"></i> Projeção 66%</h3>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <div style="display:flex; justify-content:space-between"><span>Semana:</span> <b id="p-sem" style="color:var(--green)">R$ 0</b></div>
-                    <div style="display:flex; justify-content:space-between"><span>1 Mês:</span> <b id="p-mes" style="color:var(--green)">R$ 0</b></div>
-                    <div style="display:flex; justify-content:space-between"><span>3 Meses:</span> <b id="p-3m" style="color:var(--green)">R$ 0</b></div>
-                </div>
+    <div class="glass">
+        <div class="main-stats">
+            <div class="stat-card" onclick="setBanca()" style="cursor:pointer">
+                <span>Banca Atual</span>
+                <h2 id="display-banca">R$ 1.000,00</h2>
             </div>
             
-            <button onclick="clearAll()" style="width:100%; padding:10px; background:none; border: 1px solid var(--red); color: var(--red); border-radius:10px; cursor:pointer">
-                <i class="fa-solid fa-trash-can"></i> Limpar Tudo
+            <div class="manual-input-box">
+                <span>VALOR DA ENTRADA</span><br>
+                <div class="input-wrapper">
+                    <span>R$</span>
+                    <input type="number" id="input-entrada" value="100" oninput="calcInfo()">
+                </div>
+                <span id="pct-display">Representa 10% da banca</span>
+            </div>
+
+            <div class="stat-card" style="border-left-color: var(--green)">
+                <span>Mão Soros 1 (80%)</span>
+                <h2 id="display-soros" style="color: var(--green)">R$ 180,00</h2>
+            </div>
+        </div>
+
+        <div class="btn-grid">
+            <button class="btn btn-win" onclick="executar('WIN')">
+                <i class="fa-solid fa-circle-check"></i> WIN (+22.4%)
+            </button>
+            <button class="btn btn-loss" onclick="executar('LOSS')">
+                <i class="fa-solid fa-circle-xmark"></i> LOSS (-100%)
             </button>
         </div>
+
+        <div style="overflow-x: auto;">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-logs"></tbody>
+            </table>
+        </div>
+        
+        <center><button onclick="limpar()" style="margin-top:20px; background:none; border:none; color:var(--red); cursor:pointer; opacity:0.5">Zerar Tudo</button></center>
     </div>
 </div>
 
 <script>
-    let banca = parseFloat(localStorage.getItem('banca_fin')) || 1000;
-    let logs = JSON.parse(localStorage.getItem('logs_fin')) || [];
-    let frase = localStorage.getItem('frase_fin') || "Consistência é fazer o simples todo dia.";
+    let banca = parseFloat(localStorage.getItem('banca_v4')) || 1000;
+    let logs = JSON.parse(localStorage.getItem('logs_v4')) || [];
+    let frase = localStorage.getItem('frase_v4') || "Consistência é o foco no processo, não no dinheiro.";
 
     function setBanca() {
-        let n = prompt("Valor da Banca Inicial:", banca);
+        let n = prompt("Ajustar Banca Atual:", banca);
         if(n) { banca = parseFloat(n); render(); }
     }
 
-    function setFrase() {
-        let f = prompt("Sua Frase de Guerra:", frase);
+    function novaFrase() {
+        let f = prompt("Sua frase motivacional:", frase);
         if(f) { frase = f; render(); }
     }
 
-    function addOp(tipo) {
-        const ent = banca * 0.10;
-        const val = tipo === 'WIN' ? ent * 2.24 : -ent;
-        banca += val;
-        logs.push({ id: Date.now(), dt: new Date().toLocaleDateString('pt-br'), tp: tipo, vl: val });
+    // Função que calcula a % e o soros em tempo real
+    function calcInfo() {
+        const entradaVal = parseFloat(document.getElementById('input-entrada').value) || 0;
+        
+        // Cálculo da porcentagem que a entrada representa da banca
+        const porcentagem = (entradaVal / banca) * 100;
+        document.getElementById('pct-display').innerText = `Representa ${porcentagem.toFixed(1)}% da banca`;
+        
+        // Cálculo do Soros (Entrada + 80%)
+        const soros = entradaVal + (entradaVal * 0.8);
+        document.getElementById('display-soros').innerText = `R$ ${soros.toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
+        
+        return { entradaVal, soros };
+    }
+
+    function executar(tipo) {
+        const { entradaVal } = calcInfo();
+        if(entradaVal <= 0) return alert("Insira um valor de entrada válido");
+
+        let resultado = 0;
+        if(tipo === 'WIN') {
+            // Ciclo: Ganha a 1ª (0.8) e a 2ª (soros * 0.8)
+            // Lucro total do ciclo é 2.24x o valor da primeira entrada
+            resultado = entradaVal * 2.24;
+        } else {
+            resultado = -entradaVal;
+        }
+
+        banca += resultado;
+        logs.push({
+            id: Date.now(),
+            dt: new Date().toLocaleDateString('pt-br'),
+            tp: tipo,
+            vl: resultado
+        });
         render();
     }
 
-    function delOp(id) {
+    function deletar(id) {
         logs = logs.filter(l => l.id !== id);
         render();
     }
 
-    function clearAll() {
-        if(confirm("Reiniciar todo o sistema?")) {
-            banca = 1000; logs = []; render();
+    function limpar() {
+        if(confirm("Deseja apagar todo o histórico?")) {
+            logs = []; render();
         }
     }
 
     function render() {
-        // Stats
-        document.getElementById('b-atual').innerText = `R$ ${banca.toLocaleString('pt-br', {minimumFractionDigits:2})}`;
-        document.getElementById('b-ent').innerText = `R$ ${(banca * 0.1).toLocaleString('pt-br', {minimumFractionDigits:2})}`;
-        document.getElementById('b-sor').innerText = `R$ ${(banca * 0.1 * 1.8).toLocaleString('pt-br', {minimumFractionDigits:2})}`;
+        document.getElementById('display-banca').innerText = `R$ ${banca.toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
         document.getElementById('txt-frase').innerText = frase;
-
+        
         // Placar
-        const wins = logs.filter(l => l.tp === 'WIN').length;
-        const loss = logs.filter(l => l.tp === 'LOSS').length;
+        const w = logs.filter(l => l.tp === 'WIN').length;
+        const l = logs.filter(l => l.tp === 'LOSS').length;
         const total = logs.length;
-        const pct = total > 0 ? ((wins / total) * 100).toFixed(1) : 0;
+        const pct = total > 0 ? ((w / total) * 100).toFixed(1) : 0;
 
-        document.getElementById('count-win').innerText = wins;
-        document.getElementById('count-loss').innerText = loss;
-        document.getElementById('count-pct').innerText = pct + "%";
-
-        // Projeção
-        document.getElementById('p-sem').innerText = `R$ ${(banca * 1.47).toLocaleString('pt-br', {maximumFractionDigits:0})}`;
-        document.getElementById('p-mes').innerText = `R$ ${(banca * 2.88).toLocaleString('pt-br', {maximumFractionDigits:0})}`;
-        document.getElementById('p-3m').innerText = `R$ ${(banca * Math.pow(2.88, 3)).toLocaleString('pt-br', {maximumFractionDigits:0})}`;
+        document.getElementById('placar-w').innerText = w;
+        document.getElementById('placar-l').innerText = l;
+        document.getElementById('placar-pct').innerText = pct + "%";
 
         // Tabela
-        const tb = document.querySelector('#lista tbody');
-        tb.innerHTML = '';
-        logs.slice().reverse().forEach(l => {
-            const row = tb.insertRow();
+        const body = document.getElementById('lista-logs');
+        body.innerHTML = '';
+        logs.slice().reverse().forEach(log => {
+            const row = body.insertRow();
             row.innerHTML = `
-                <td>${l.dt}</td>
-                <td><span class="badge ${l.tp === 'WIN' ? 'badge-win' : 'badge-loss'}">${l.tp}</span></td>
-                <td style="color: ${l.vl > 0 ? 'var(--green)' : 'var(--red)'}">R$ ${l.vl.toFixed(2)}</td>
-                <td><i class="fa-solid fa-xmark" style="cursor:pointer; opacity:0.5" onclick="delOp(${l.id})"></i></td>
+                <td>${log.dt}</td>
+                <td style="color: ${log.tp === 'WIN' ? 'var(--green)' : 'var(--red)'}; font-weight:bold">${log.tp}</td>
+                <td style="color: ${log.vl > 0 ? 'var(--green)' : 'var(--red)'}">R$ ${log.vl.toFixed(2)}</td>
+                <td><i class="fa-solid fa-trash" style="cursor:pointer; opacity:0.3" onclick="deletar(${log.id})"></i></td>
             `;
         });
 
-        localStorage.setItem('banca_fin', banca);
-        localStorage.setItem('logs_fin', JSON.stringify(logs));
-        localStorage.setItem('frase_fin', frase);
+        localStorage.setItem('banca_v4', banca);
+        localStorage.setItem('logs_v4', JSON.stringify(logs));
+        localStorage.setItem('frase_v4', frase);
+        
+        calcInfo(); // Atualiza porcentagem ao renderizar
     }
 
     render();
