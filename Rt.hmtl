@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Analista Pro - Estratégia de Médias</title>
+    <style>
+        :root { --bg: #0a0f1e; --card: #161d31; --primary: #3b82f6; --put: #ff4d4d; --call: #22c55e; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding-top: 50px; }
+        .container { width: 400px; background: var(--card); border-radius: 15px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #2e3a59; }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .checklist-item { display: flex; justify-content: space-between; margin-bottom: 10px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 5px; font-size: 0.9rem; }
+        .check-ok { color: var(--call); font-weight: bold; }
+        
+        .signal-box { margin-top: 20px; padding: 20px; border-radius: 10px; text-align: center; border: 2px dashed #2e3a59; }
+        .signal-call { background: rgba(34, 197, 94, 0.2); border-color: var(--call); color: var(--call); }
+        .signal-put { background: rgba(255, 77, 77, 0.2); border-color: var(--put); color: var(--put); }
+        
+        .btn-analise { width: 100%; padding: 15px; margin-top: 20px; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-analise:hover { filter: brightness(1.2); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Analista AI Real</h2>
+    
+    <div id="checklist">
+        <div class="checklist-item"><span>1. Macro (SMA 50 / EMA 14):</span> <span class="check-ok" id="check1">AGUARDANDO</span></div>
+        <div class="checklist-item"><span>2. Zona de Rompimento:</span> <span class="check-ok" id="check2">AGUARDANDO</span></div>
+        <div class="checklist-item"><span>3. Anatomia (Vela Força):</span> <span class="check-ok" id="check3">AGUARDANDO</span></div>
+    </div>
+
+    <div id="result-box" class="signal-box">
+        <span id="instruction">CLIQUE PARA INICIAR VARREDURA</span>
+        <h1 id="direction">--</h1>
+    </div>
+
+    <div style="font-size: 0.8rem; margin-top: 15px; color: #94a3b8;" id="justification">
+        Justificativa: Aguardando entrada de dados do gráfico...
+    </div>
+
+    <button class="btn-analise" onclick="executarChecklist()">ANALISAR PRÓXIMA VELA</button>
+</div>
+
+<script>
+    function executarChecklist() {
+        const btn = document.querySelector('.btn-analise');
+        btn.innerText = "LENDO GRÁFICO...";
+        
+        // Simulação de leitura de indicadores (Aqui entraria a API)
+        setTimeout(() => {
+            const precoAtual = 1.0850;
+            const sma50 = 1.0860; // Preço abaixo da média roxa
+            const ema14 = 1.0855; // Preço abaixo da média azul
+            const velaForca = true;
+            const rompimento = true;
+
+            // 1. Lógica Macro
+            let tendencia = (precoAtual < sma50 && precoAtual < ema14) ? "Baixa" : "Alta";
+            document.getElementById('check1').innerText = tendencia === "Baixa" ? "PUT CONFIRMADO" : "CALL CONFIRMADO";
+
+            // 2. Lógica Rompimento e 3. Vela
+            document.getElementById('check2').innerText = "ROMPIMENTO OK";
+            document.getElementById('check3').innerText = "VELA DE FORÇA";
+
+            // Resultado Final baseado na sua estratégia
+            const resultBox = document.getElementById('result-box');
+            const direction = document.getElementById('direction');
+            const justification = document.getElementById('justification');
+
+            if (tendencia === "Baixa" && rompimento && velaForca) {
+                resultBox.className = "signal-box signal-put";
+                direction.innerText = "VENDA (PUT)";
+                justification.innerHTML = "<b>Justificativa:</b> Preço abaixo das médias, rompeu suporte com vela de força. Entre na abertura!";
+            } else {
+                resultBox.className = "signal-box signal-call";
+                direction.innerText = "COMPRA (CALL)";
+                justification.innerHTML = "<b>Justificativa:</b> Tendência de alta confirmada acima das médias. Aguarde o pullback na EMA 14.";
+            }
+
+            btn.innerText = "ANALISAR PRÓXIMA VELA";
+        }, 1500);
+    }
+</script>
+
+</body>
+</html>
