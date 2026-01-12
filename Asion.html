@@ -2,124 +2,201 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>S.I.G.M.A - Trading Intelligence</title>
+    <title>QUANTUM TRADING TERMINAL</title>
     <style>
         :root {
-            --neon-green: #00ff41;
-            --sma-purple: #a020f0;
-            --ema-blue: #00d4ff;
-            --bg-dark: #020a02;
-            --put-red: #ff3131;
+            --neon: #00ff41;
+            --bg: #030803;
+            --call: #00ff88;
+            --put: #ff3131;
+            --purple: #bc13fe;
+            --blue: #00d4ff;
         }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--neon-green);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--neon);
+            font-family: 'Courier New', monospace;
             margin: 0;
-            display: grid;
-            grid-template-columns: 250px 1fr 300px;
-            grid-template-rows: 60px 1fr 200px;
+            padding: 10px;
             height: 100vh;
-            gap: 5px;
-            padding: 5px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            grid-template-rows: 50px 1fr 150px;
+            gap: 10px;
             overflow: hidden;
+            text-transform: uppercase;
         }
 
-        /* Layout das Células */
+        /* BOTAO ESCONDIDO NO LOGO */
+        #secret-trigger {
+            cursor: pointer;
+            font-weight: bold;
+            letter-spacing: 2px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            user-select: none;
+        }
+
         .panel {
             border: 1px solid rgba(0, 255, 65, 0.3);
-            background: rgba(0, 15, 0, 0.9);
+            background: rgba(0, 20, 0, 0.4);
+            padding: 15px;
             position: relative;
-            padding: 10px;
         }
 
-        /* Header */
-        header { grid-column: 1 / 4; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--neon-green); padding: 0 20px; }
+        header { grid-column: 1 / 3; display: flex; justify-content: space-between; border-bottom: 2px solid var(--neon); }
+
+        /* Gráfico Central Simulado */
+        .main-display { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px double var(--neon); }
         
-        /* Gráfico Simulado */
-        .chart-area { grid-column: 2; grid-row: 2; display: flex; align-items: center; justify-content: center; position: relative; }
-        .moving-average-sma { border-top: 2px solid var(--sma-purple); width: 100%; position: absolute; top: 60%; filter: drop-shadow(0 0 5px var(--sma-purple)); }
-        .moving-average-ema { border-top: 2px dotted var(--ema-blue); width: 100%; position: absolute; top: 65%; filter: drop-shadow(0 0 5px var(--ema-blue)); }
+        .ticker { font-size: 2em; margin-bottom: 20px; color: white; }
 
-        /* Sinal de Entrada */
-        #signal-alert {
-            grid-column: 3;
-            grid-row: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-weight: bold;
-            font-size: 2.5em;
-            text-transform: uppercase;
-            border: 2px solid var(--neon-green);
-            background: rgba(0, 255, 65, 0.05);
+        /* Sinal Visual */
+        #decision-output {
+            font-size: 5em;
+            font-weight: 900;
+            text-shadow: 0 0 30px currentColor;
+            display: none;
         }
 
-        .waiting { color: #555; animation: pulse 1s infinite; }
-        .put-signal { color: var(--put-red); text-shadow: 0 0 20px var(--put-red); border-color: var(--put-red) !important; }
-        .call-signal { color: var(--neon-green); text-shadow: 0 0 20px var(--neon-green); }
+        .processing-bar {
+            width: 0%;
+            height: 4px;
+            background: var(--neon);
+            box-shadow: 0 0 10px var(--neon);
+            margin-top: 10px;
+        }
 
-        /* Dados de Auditoria */
-        .stats { grid-column: 1; grid-row: 2; font-size: 0.8em; line-height: 1.6; }
-        .log-terminal { grid-column: 1 / 4; grid-row: 3; font-family: monospace; font-size: 11px; overflow-y: hidden; }
+        /* Sidebar com Médias */
+        .sidebar { grid-column: 1; grid-row: 2; font-size: 0.75em; }
+        .indicator-box { margin-bottom: 15px; border-left: 3px solid var(--neon); padding-left: 10px; }
+        .val { color: white; float: right; }
 
-        @keyframes pulse { 50% { opacity: 0.3; } }
-        .glitch { animation: glitch 0.3s infinite; }
+        /* Logs */
+        .footer-logs { grid-column: 1 / 3; grid-row: 3; font-size: 10px; overflow-y: hidden; opacity: 0.7; }
+
+        /* Animações */
+        @keyframes scan { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
+        .analyzing { animation: scan 0.1s infinite; color: white; }
     </style>
 </head>
 <body>
 
     <header class="panel">
-        <div>CORE SYSTEM: ACTIVE</div>
-        <div style="color: white;">M1 ANALYSIS MODE</div>
+        <div id="secret-trigger">S.I.G.M.A_v4.0</div>
+        <div id="pair-name">EUR/USD - OTC [LIVE]</div>
         <div id="clock">00:00:00</div>
     </header>
 
-    <aside class="panel stats">
-        <h4 style="border-bottom: 1px solid">INDICADORES</h4>
-        SMA 50: <span id="sma-val" style="color:var(--sma-purple)">CALCULATING...</span><br>
-        EMA 14: <span id="ema-val" style="color:var(--ema-blue)">SYNCING...</span><br>
-        <br>
-        <h4 style="border-bottom: 1px solid">VOLATILIDADE</h4>
-        ADX: 24.5 (Estável)<br>
-        RSI: 42.1 (Venda)
+    <aside class="panel sidebar">
+        <div class="indicator-box">
+            SMA 50 (TENDÊNCIA): <br> <span id="sma-val" class="val">1.08452</span><br>
+            <small style="color:var(--purple)">STATUS: BELOW PRICE</small>
+        </div>
+        <div class="indicator-box">
+            EMA 14 (FLUXO): <br> <span id="ema-val" class="val">1.08440</span><br>
+            <small style="color:var(--blue)">FORCE: STRONG</small>
+        </div>
+        <div class="indicator-box">
+            PRICE ACTION:<br>
+            SUP: <span class="val">1.08410</span><br>
+            RES: <span class="val">1.08495</span>
+        </div>
+        <div class="indicator-box">
+            VELA ANATOMY:<br>
+            VOL: <span class="val">88% HIGH</span><br>
+            PAVIO: <span class="val">2% (FULL BODY)</span>
+        </div>
     </aside>
 
-    <main class="panel chart-area">
-        <div class="moving-average-sma"></div>
-        <div class="moving-average-ema"></div>
-        <div style="font-size: 10px; opacity: 0.5;">VISUALIZAÇÃO TÉCNICA EM TEMPO REAL</div>
+    <main class="panel main-display">
+        <div id="status-text" style="font-size: 0.8em; margin-bottom: 10px;">SYSTEM READY</div>
+        <div class="ticker">EUR/USD</div>
+        
+        <div id="processing-ui" style="display:none; width: 300px;">
+            <div style="text-align: center; font-size: 10px;">ANALISANDO FLUXO...</div>
+            <div class="processing-bar" id="p-bar"></div>
+        </div>
+
+        <div id="decision-output">---</div>
     </main>
 
-    <div id="signal-alert" class="panel">
-        <div class="waiting">AGUARDANDO<br>PRINT...</div>
-    </div>
-
-    <footer class="panel log-terminal" id="term-logs">
-        [SYS] Inicializando filtros de tendência...<br>
-        [SYS] Monitorando SMA 50 e EMA 14...<br>
-        [SCAN] Rompimentos de suporte/resistência ativos...<br>
+    <footer class="panel footer-logs" id="logs">
+        [INIT] Kernel Trading System Online...<br>
+        [NET] WebSocket connected to OTC Server...<br>
     </footer>
 
     <script>
-        // Relógio Real
+        const trigger = document.getElementById('secret-trigger');
+        const decision = document.getElementById('decision-output');
+        const status = document.getElementById('status-text');
+        const pBar = document.getElementById('p-bar');
+        const pUi = document.getElementById('processing-ui');
+        const logs = document.getElementById('logs');
+
+        // Relógio
         setInterval(() => {
             document.getElementById('clock').innerText = new Date().toLocaleTimeString();
         }, 1000);
 
-        // Simulação de valores mudando
-        setInterval(() => {
-            document.getElementById('sma-val').innerText = (Math.random() * (1.1250 - 1.1240) + 1.1240).toFixed(5);
-            document.getElementById('ema-val').innerText = (Math.random() * (1.1245 - 1.1235) + 1.1235).toFixed(5);
+        // GATILHO DO SINAL
+        trigger.addEventListener('click', () => {
+            startAnalysis();
+        });
+
+        function startAnalysis() {
+            // Reset
+            decision.style.display = 'none';
+            pUi.style.display = 'block';
+            status.innerText = "ANALISANDO MÉDIAS E ROMPIMENTO...";
+            status.classList.add('analyzing');
+            pBar.style.width = '0%';
             
-            let log = document.getElementById('term-logs');
-            let time = new Date().toLocaleTimeString();
-            log.innerHTML += `[${time}] Fluxo detectado: V_${Math.floor(Math.random()*100)} vol/sec<br>`;
-            if(log.innerHTML.length > 800) log.innerHTML = "[SYS] Buffer Cleared...<br>";
-        }, 3000);
+            addLog("[SCAN] Calculando SMA 50 e EMA 14...");
+            addLog("[SCAN] Verificando volume da vela atual...");
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                pBar.style.width = progress + '%';
+
+                if (progress === 40) addLog("[SCAN] Rompimento de Suporte detectado...");
+                if (progress === 70) addLog("[SCAN] Confirmando corpo da vela (Sem exaustão)...");
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    showResult();
+                }
+            }, 50);
+        }
+
+        function showResult() {
+            pUi.style.display = 'none';
+            status.classList.remove('analyzing');
+            status.innerText = "ANÁLISE CONCLUÍDA - ENTRADA M1";
+            
+            // Lógica aleatória profissional (Simulando análise)
+            const isCall = Math.random() > 0.5;
+            
+            decision.innerText = isCall ? "CALL" : "PUT";
+            decision.style.color = isCall ? "var(--call)" : "var(--put)";
+            decision.style.display = 'block';
+
+            addLog(`[SIGNAL] Operação sugerida: ${isCall ? 'CALL' : 'PUT'}`);
+        }
+
+        function addLog(msg) {
+            const time = new Date().toLocaleTimeString();
+            logs.innerHTML = `[${time}] ${msg}<br>` + logs.innerHTML;
+        }
+
+        // Simulação de preço variando
+        setInterval(() => {
+            const val = (1.08400 + Math.random() * 0.001).toFixed(5);
+            document.getElementById('sma-val').innerText = val;
+        }, 2000);
     </script>
 </body>
 </html>
