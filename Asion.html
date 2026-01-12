@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hacker Interface</title>
+    <style>
+        :root {
+            --neon-green: #00ff41;
+            --dark-green: #003b00;
+            --bg-black: #050505;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: var(--neon-green);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+            padding: 10px;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* Estilo das Janelas */
+        .window {
+            border: 1px solid var(--neon-green);
+            background: rgba(0, 20, 0, 0.8);
+            box-shadow: 0 0 10px var(--dark-green);
+            position: relative;
+            padding: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .window::before {
+            content: "SYSTEM_MONITOR_V2.0";
+            position: absolute;
+            top: 0;
+            left: 5px;
+            font-size: 10px;
+            background: var(--neon-green);
+            color: black;
+            padding: 0 5px;
+        }
+
+        /* Terminal de Código */
+        #terminal {
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+
+        /* Gráfico Simulado */
+        .chart-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 100%;
+            border-bottom: 1px solid var(--neon-green);
+        }
+
+        .bar {
+            background: var(--neon-green);
+            width: 10px;
+            animation: fluctuate 2s infinite ease-in-out;
+        }
+
+        /* Tabela de Dados */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th, td {
+            border: 1px solid var(--neon-green);
+            padding: 5px;
+            text-align: left;
+        }
+
+        /* Animações */
+        @keyframes fluctuate {
+            0%, 100% { height: 20%; }
+            50% { height: 80%; }
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background: var(--neon-green);
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 255, 65, 0.1);
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanline"></div>
+
+    <div class="window">
+        <div id="terminal">Initializing system...<br>Accessing kernel...<br></div>
+        <span class="cursor"></span>
+    </div>
+
+    <div class="window">
+        <div class="chart-container" id="chart">
+            </div>
+    </div>
+
+    <div class="window">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>STATUS</th>
+                    <th>LOAD</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <tr><td>0x1A</td><td>ACTIVE</td><td>45%</td></tr>
+                <tr><td>0x2B</td><td>RUNNING</td><td>12%</td></tr>
+                <tr><td>0x3C</td><td>LOCKED</td><td>0%</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="window" style="font-size: 10px;" id="logs">
+        [INFO] Connection established...<br>
+        [WARN] Packet loss detected at 192.168.1.1<br>
+    </div>
+
+    <script>
+        // Efeito de Digitação no Terminal
+        const term = document.getElementById('terminal');
+        const lines = [
+            "> decrypting_rsa_keys...",
+            "> loading_neural_network...",
+            "> bypassing_firewall_v4...",
+            "> status: UNKNOWN_ERROR",
+            "> retrying_exploit..."
+        ];
+        let i = 0;
+
+        function typeTerminal() {
+            term.innerHTML += lines[i % lines.length] + "<br>";
+            i++;
+            if (term.innerHTML.length > 500) term.innerHTML = "";
+            setTimeout(typeTerminal, 1500);
+        }
+
+        // Gerar Barras de Gráfico
+        const chart = document.getElementById('chart');
+        for (let j = 0; j < 30; j++) {
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            bar.style.animationDelay = `${Math.random() * 2}s`;
+            chart.appendChild(bar);
+        }
+
+        // Logs dinâmicos
+        const logs = document.getElementById('logs');
+        setInterval(() => {
+            const time = new Date().toLocaleTimeString();
+            logs.innerHTML += `[${time}] Received data package from node_${Math.floor(Math.random()*100)}<br>`;
+            if (logs.innerHTML.length > 400) logs.innerHTML = "";
+        }, 2000);
+
+        typeTerminal();
+    </script>
+</body>
+</html>
