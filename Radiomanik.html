@@ -3,161 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manik Radio | On Air</title>
+    <title>Manik Radio | Premium Experience</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* CSS - O Visual do Rádio */
         :root {
-            --primary: #6200ea;
-            --secondary: #03dac6;
-            --bg: #121212;
-            --card: #1e1e1e;
-            --text: #ffffff;
+            --accent: #00f2ff;
+            --accent-dark: #0066ff;
+            --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.15);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
 
         body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: white;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            padding: 20px;
         }
 
-        .player-container {
-            background: var(--card);
-            padding: 2rem;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        /* Container Principal */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
             text-align: center;
-            width: 320px;
-            border: 1px solid #333;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
         }
 
-        .logo-area {
-            width: 150px;
-            height: 150px;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
+        /* Efeito de Luz no Fundo */
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,242,255,0.1) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        .radio-header { margin-bottom: 30px; }
+
+        .logo-circle {
+            width: 180px;
+            height: 180px;
+            background: rgba(0,0,0,0.3);
             border-radius: 50%;
-            margin: 0 auto 1.5rem;
+            margin: 0 auto 20px;
+            border: 4px solid var(--accent);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2.5rem;
-            font-weight: bold;
-            box-shadow: 0 0 20px rgba(98, 0, 234, 0.4);
-            animation: pulse 2s infinite;
+            position: relative;
+            transition: 0.5s;
         }
 
-        h1 { margin: 10px 0; font-size: 1.8rem; letter-spacing: 2px; }
-        p { color: #888; margin-bottom: 2rem; }
+        .logo-circle i { font-size: 80px; color: var(--accent); }
 
-        .controls { display: flex; justify-content: center; gap: 20px; align-items: center; }
+        /* Animação de Onda quando toca */
+        .playing .logo-circle {
+            box-shadow: 0 0 30px var(--accent);
+            transform: scale(1.05);
+        }
 
-        .btn {
-            background: none;
+        h1 { font-size: 2.5rem; letter-spacing: 5px; font-weight: 700; margin-bottom: 5px; }
+        .tagline { font-size: 0.9rem; color: #aaa; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* Visualizador de Áudio (Falso, mas elegante) */
+        .visualizer {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 30px;
+            gap: 4px;
+            margin: 20px 0;
+        }
+
+        .bar {
+            width: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+            height: 5px;
+            transition: 0.2s;
+        }
+
+        .playing .bar { animation: bounce 1s ease-in-out infinite; }
+        .bar:nth-child(2) { animation-delay: 0.1s; }
+        .bar:nth-child(3) { animation-delay: 0.2s; }
+        .bar:nth-child(4) { animation-delay: 0.3s; }
+
+        @keyframes bounce {
+            0%, 100% { height: 5px; }
+            50% { height: 30px; }
+        }
+
+        /* Controles */
+        .main-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .btn-play {
+            width: 80px;
+            height: 80px;
+            background: white;
+            color: #121212;
+            border-radius: 50%;
             border: none;
             cursor: pointer;
-            color: white;
-            transition: transform 0.2s;
-        }
-
-        .play-btn {
-            background: var(--primary);
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
+            font-size: 1.8rem;
+            transition: 0.3s;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
 
-        .btn:hover { transform: scale(1.1); }
-        .play-btn:hover { background: #7c4dff; }
+        .btn-play:hover { transform: scale(1.1); background: var(--accent); }
 
-        .volume-container {
-            margin-top: 2rem;
+        .volume-box {
             display: flex;
             align-items: center;
-            gap: 10px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin-top: 20px;
         }
 
         input[type=range] {
-            flex-grow: 1;
-            accent-color: var(--secondary);
+            flex: 1;
+            margin: 0 15px;
+            cursor: pointer;
+            accent-color: var(--accent);
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(98, 0, 234, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(98, 0, 234, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(98, 0, 234, 0); }
+        /* Rodapé Social */
+        .social-links {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
         }
 
-        .status { font-size: 0.8rem; color: var(--secondary); margin-top: 10px; display: none; }
+        .social-links a {
+            color: white;
+            font-size: 1.2rem;
+            opacity: 0.6;
+            transition: 0.3s;
+        }
+
+        .social-links a:hover { opacity: 1; color: var(--accent); }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff4d4d;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .playing .status-badge {
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff88;
+        }
     </style>
 </head>
-<body>
+<body id="body">
 
-    <div class="player-container">
-        <div class="logo-area">M</div>
-        <h1>MANIK</h1>
-        <p id="track-info">Sintonizando...</p>
+    <div class="glass-card" id="player">
+        <div class="radio-header">
+            <div class="logo-circle">
+                <i class="fa-solid fa-tower-broadcast"></i>
+            </div>
+            <h1>MANIK</h1>
+            <div class="tagline">Sua Voz, Sua Energia</div>
+            <div id="status" class="status-badge">OFFLINE</div>
+        </div>
 
-        <div class="controls">
-            <button class="btn play-btn" id="playPauseBtn">
-                <span id="icon">▶</span>
+        <div class="visualizer">
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+
+        <div class="main-controls">
+            <button class="btn-play" id="playBtn">
+                <i class="fa-solid fa-play" id="playIcon"></i>
             </button>
         </div>
 
-        <div class="volume-container">
-            <span>🔈</span>
-            <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.8">
-            <span>🔊</span>
+        <div class="volume-box">
+            <i class="fa-solid fa-volume-low"></i>
+            <input type="range" id="volume" min="0" max="1" step="0.1" value="0.8">
+            <i class="fa-solid fa-volume-high"></i>
         </div>
 
-        <div id="status" class="status">● AO VIVO</div>
+        <div class="social-links">
+            <a href="#"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="#"><i class="fa-brands fa-youtube"></i></a>
+        </div>
     </div>
 
-    <audio id="radioPlayer" src="https://stream.zeno.fm/f97v8m8998zuv"></audio>
+    <audio id="stream" src="https://stream.zeno.fm/f97v8m8998zuv"></audio>
 
     <script>
-        const audio = document.getElementById('radioPlayer');
-        const playPauseBtn = document.getElementById('playPauseBtn');
-        const icon = document.getElementById('icon');
-        const volumeSlider = document.getElementById('volumeSlider');
-        const trackInfo = document.getElementById('track-info');
-        const status = document.getElementById('status');
+        const audio = document.getElementById('stream');
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = document.getElementById('playIcon');
+        const player = document.getElementById('player');
+        const volume = document.getElementById('volume');
+        const statusText = document.getElementById('status');
 
         let isPlaying = false;
 
-        playPauseBtn.addEventListener('click', () => {
-            if (isPlaying) {
-                audio.pause();
-                icon.textContent = '▶';
-                trackInfo.textContent = 'Rádio Pausada';
-                status.style.display = 'none';
-            } else {
+        playBtn.addEventListener('click', () => {
+            if (!isPlaying) {
                 audio.play();
-                icon.textContent = '⏸';
-                trackInfo.textContent = 'Tocando Agora';
-                status.style.display = 'block';
+                playIcon.classList.replace('fa-play', 'fa-pause');
+                player.classList.add('playing');
+                statusText.innerText = 'AO VIVO';
+            } else {
+                audio.pause();
+                playIcon.classList.replace('fa-pause', 'fa-play');
+                player.classList.remove('playing');
+                statusText.innerText = 'PAUSADO';
             }
             isPlaying = !isPlaying;
         });
 
-        volumeSlider.addEventListener('input', (e) => {
+        volume.addEventListener('input', (e) => {
             audio.volume = e.target.value;
         });
 
-        // Caso o stream caia ou mude
-        audio.addEventListener('waiting', () => {
-            trackInfo.textContent = 'Carregando...';
+        // Eventos de Áudio para Feedback Real
+        audio.addEventListener('loadstart', () => {
+            if(isPlaying) statusText.innerText = 'CONECTANDO...';
         });
 
         audio.addEventListener('playing', () => {
-            trackInfo.textContent = 'Transmitindo Manik';
+            statusText.innerText = 'AO VIVO';
         });
     </script>
 </body>
