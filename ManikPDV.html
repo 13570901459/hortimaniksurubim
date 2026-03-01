@@ -2,214 +2,315 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema PDV Gemini</title>
+    <title>PDV Profissional - Caixa Livre</title>
     <style>
         :root {
-            --primary: #2c3e50;
-            --accent: #27ae60;
-            --danger: #e74c3c;
-            --bg: url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1920');
+            --bg-dark: #2c2c2c;
+            --panel-gray: #404040;
+            --text-yellow: #ffff00;
+            --input-bg: #e0e0e0;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            background: var(--bg) no-repeat center center fixed;
-            background-size: cover;
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
             height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .overlay { background: rgba(0,0,0,0.7); height: 100%; display: flex; flex-direction: column; }
+        /* Cabeçalho */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 30px;
+            background: linear-gradient(to bottom, #444, #222);
+        }
 
-        nav { background: var(--primary); padding: 10px; display: flex; gap: 10px; color: white; }
-        button { cursor: pointer; padding: 10px; border: none; border-radius: 4px; font-weight: bold; }
-        .btn-nav { background: #34495e; color: white; }
-        .btn-success { background: var(--accent); color: white; }
+        .logo-area { font-size: 24px; font-weight: bold; letter-spacing: 5px; }
 
-        .container { flex: 1; padding: 20px; display: flex; gap: 20px; overflow: hidden; }
-        
-        /* Layout Caixa */
-        .caixa-main { flex: 2; background: white; border-radius: 8px; display: flex; flex-direction: column; padding: 15px; }
-        .caixa-sidebar { flex: 1; background: #ecf0f1; border-radius: 8px; padding: 15px; }
+        /* Área Principal */
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 250px;
+            gap: 20px;
+            padding: 20px;
+            flex: 1;
+        }
 
-        .item-list { flex: 1; border: 1px solid #ccc; overflow-y: auto; margin-bottom: 10px; }
-        .total-display { font-size: 3rem; text-align: right; color: var(--accent); font-weight: bold; }
+        .left-panel label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .input-box {
+            background: var(--input-bg);
+            color: black;
+            font-size: 2rem;
+            padding: 10px;
+            width: 100%;
+            border: 2px solid #999;
+            margin-bottom: 20px;
+            text-align: right;
+            box-sizing: border-box;
+        }
+        #desc-input { text-align: left; }
 
-        .hidden { display: none !important; }
-        input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        /* Lista de Itens */
+        .center-panel {
+            background: white;
+            color: black;
+            height: 400px;
+            overflow-y: auto;
+            border: 3px solid #666;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #ccc; position: sticky; top: 0; }
+        td, th { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; }
+
+        /* Totalizador Estilo Imagem */
+        .total-container {
+            grid-column: span 2;
+            background: var(--panel-gray);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 5px solid #555;
+        }
+        .total-label { font-size: 2.5rem; }
+        .total-valor { font-size: 4rem; color: var(--text-yellow); font-weight: bold; }
+
+        /* Rodapé de Atalhos */
+        footer {
+            background: #1a1a1a;
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+            font-size: 0.8rem;
+            border-top: 2px solid #ffff00;
+        }
+        .key-hint { color: var(--text-yellow); font-weight: bold; margin-right: 5px; }
+
+        /* Modais */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: #333; padding: 30px; border: 2px solid var(--text-yellow);
+            width: 400px; text-align: center;
+        }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="overlay">
-    <nav>
-        <button class="btn-nav" onclick="showSection('pdv')">Frente de Caixa (F1)</button>
-        <button class="btn-nav" onclick="showSection('retarguarda')">Retaguarda / Estoque</button>
-        <button class="btn-nav" onclick="showSection('clientes')">Clientes</button>
-    </nav>
+<header>
+    <div class="logo-area">CAIXA LIVRE</div>
+    <div id="clock">00:00:00</div>
+</header>
 
-    <div id="pdv" class="container section">
-        <div class="caixa-main">
-            <h2>Ponto de Venda</h2>
-            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <input type="text" id="barcode-input" placeholder="Código de Barras ou Nome" onkeypress="handleBarcode(event)">
-                <input type="number" id="qty-input" value="1" style="width: 80px;" placeholder="Qtd">
-            </div>
-            <div class="item-list" id="cart-list">
-                <table>
-                    <thead><tr><th>Cód</th><th>Produto</th><th>Qtd</th><th>Preço</th><th>Subtotal</th></tr></thead>
-                    <tbody id="cart-items"></tbody>
-                </table>
-            </div>
-            <div class="total-display" id="total-val">R$ 0,00</div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-success" style="flex: 1; height: 50px;" onclick="finishSale()">FINALIZAR VENDA (F2)</button>
-                <button class="btn-nav" onclick="openBalance()">BALANÇA (B)</button>
-            </div>
-        </div>
+<div class="main-container">
+    <div class="left-panel">
+        <label>Produto ou Código de barra</label>
+        <input type="text" id="barcode-input" class="input-box" onkeypress="handleInput(event)" autofocus>
+        
+        <label>Quantidade</label>
+        <input type="number" id="qty-input" class="input-box" value="1.000" step="0.001">
+        
+        <label>Preço Unitário</label>
+        <input type="text" id="unit-price" class="input-box" readonly value="R$ 0,00">
 
-        <div class="caixa-sidebar">
-            <h3>Pagamento</h3>
-            <select id="payment-method" onchange="togglePix()">
-                <option value="dinheiro">Dinheiro</option>
-                <option value="cartao">Cartão</option>
-                <option value="pix">PIX</option>
-            </select>
-            <div id="pix-container" class="hidden" style="text-align: center; margin-top: 20px;">
-                <p>Escaneie o QR Code:</p>
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PagamentoSimulado" alt="QR Code PIX">
-            </div>
+        <label>Preço Total do Item</label>
+        <input type="text" id="item-total" class="input-box" readonly value="R$ 0,00">
+    </div>
+
+    <div class="center-panel">
+        <table id="cart-table">
+            <thead>
+                <tr><th>Item</th><th>Cód</th><th>Descrição</th><th>Qtd</th><th>V.Unit</th><th>V.Total</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="right-panel">
+        <button onclick="toggleRetaguarda()" style="width: 100%; padding: 10px; margin-bottom: 10px;">CONFIG / ESTOQUE</button>
+        <div id="retaguarda-div" class="hidden">
+            <h4 style="color:var(--text-yellow)">Cadastrar/Atualizar</h4>
+            <input type="text" id="reg-code" placeholder="Cód Barras">
+            <input type="text" id="reg-name" placeholder="Nome">
+            <input type="number" id="reg-price" placeholder="Preço">
+            <button onclick="saveProduct()" style="margin-top:5px; width:100%">Salvar</button>
         </div>
     </div>
 
-    <div id="retarguarda" class="container section hidden">
-        <div class="caixa-main" style="overflow-y: auto;">
-            <h2>Cadastro de Produtos (JSON)</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input type="text" id="p-code" placeholder="Código de Barras">
-                <input type="text" id="p-name" placeholder="Nome do Produto">
-                <input type="number" id="p-price" placeholder="Preço">
-                <button class="btn-success" onclick="saveProduct()">Salvar Produto</button>
-            </div>
-            <table id="product-table">
-                <thead><tr><th>Cód</th><th>Nome</th><th>Preço</th></tr></thead>
-                <tbody></tbody>
-            </table>
+    <div class="total-container">
+        <div class="total-label">Total Geral <br> <small id="volumes">VOLUMES: 0</small></div>
+        <div class="total-valor" id="grand-total">R$ 0,00</div>
+    </div>
+</div>
+
+<footer>
+    <div><span class="key-hint">F2</span> CONSULTA PREÇO</div>
+    <div><span class="key-hint">F3</span> FINALIZAR VENDA</div>
+    <div><span class="key-hint">F10</span> BALANÇA</div>
+    <div><span class="key-hint">ESC</span> CANCELAR</div>
+</footer>
+
+<div id="payment-modal" class="modal">
+    <div class="modal-content">
+        <h2>FINALIZAR VENDA</h2>
+        <p>Total: <span id="modal-total" style="color:var(--text-yellow)">R$ 0,00</span></p>
+        <select id="pay-method" onchange="checkPayMethod()" style="width:100%; padding:10px; font-size:1.2rem;">
+            <option value="dinheiro">DINHEIRO</option>
+            <option value="cartao">CARTÃO</option>
+            <option value="pix">PIX</option>
+        </select>
+        
+        <div id="cash-div" style="margin-top:20px;">
+            <input type="number" id="cash-received" placeholder="Valor Recebido" oninput="calcTroco()" style="width:100%; padding:10px;">
+            <h3 id="change-display">TROCO: R$ 0,00</h3>
         </div>
+
+        <div id="pix-div" class="hidden" style="margin-top:20px;">
+            <img id="qr-code" src="" alt="QR PIX" style="width:150px; background:white; padding:10px;">
+            <p>Aguardando confirmação PIX...</p>
+        </div>
+
+        <button onclick="confirmFinalize()" style="background:green; color:white; padding:15px; width:100%; border:none; margin-top:10px;">CONFIRMAR (ENTER)</button>
     </div>
 </div>
 
 <script>
-    // --- DATABASE EM LOCALSTORAGE ---
-    let products = JSON.parse(localStorage.getItem('pdv_products')) || [];
+    let products = JSON.parse(localStorage.getItem('pdv_db')) || [];
     let cart = [];
 
-    // --- NAVEGAÇÃO ---
-    function showSection(id) {
-        document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-        if(id === 'retarguarda') updateProductTable();
-    }
+    // Relógio
+    setInterval(() => {
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+    }, 1000);
 
-    // --- LÓGICA DE PRODUTOS (RETAGUARDA) ---
+    // Salvar/Atualizar Produto
     function saveProduct() {
-        const code = document.getElementById('p-code').value;
-        const name = document.getElementById('p-name').value;
-        const price = parseFloat(document.getElementById('p-price').value);
+        const code = document.getElementById('reg-code').value;
+        const name = document.getElementById('reg-name').value;
+        const price = parseFloat(document.getElementById('reg-price').value);
 
-        if(!code || !price) return alert("Preencha os campos!");
+        if(!code || isNaN(price)) return alert("Dados inválidos");
 
-        const existingIndex = products.findIndex(p => p.code === code);
-
-        if(existingIndex > -1) {
-            products[existingIndex].price = price;
-            alert("Preço atualizado!");
+        let idx = products.findIndex(p => p.code === code);
+        if(idx >= 0) {
+            products[idx].price = price;
+            products[idx].name = name || products[idx].name;
         } else {
-            products.push({ code, name, price });
-            alert("Produto cadastrado!");
+            products.push({code, name, price});
         }
-
-        localStorage.setItem('pdv_products', JSON.stringify(products));
-        updateProductTable();
+        localStorage.setItem('pdv_db', JSON.stringify(products));
+        alert("Produto salvo!");
     }
 
-    function updateProductTable() {
-        const tbody = document.querySelector('#product-table tbody');
-        tbody.innerHTML = products.map(p => `<tr><td>${p.code}</td><td>${p.name}</td><td>R$ ${p.price.toFixed(2)}</td></tr>`).join('');
-    }
-
-    // --- FRENTE DE CAIXA ---
-    function handleBarcode(e) {
+    // Lógica do Caixa
+    function handleInput(e) {
         if(e.key === 'Enter') {
-            const val = e.target.value;
+            const input = e.target.value;
             const qty = parseFloat(document.getElementById('qty-input').value);
-            const product = products.find(p => p.code === val || p.name.toLowerCase().includes(val.toLowerCase()));
+            const product = products.find(p => p.code === input);
 
             if(product) {
-                addToCart(product, qty);
+                const item = {
+                    ...product,
+                    qty: qty,
+                    total: product.price * qty
+                };
+                cart.push(item);
+                updateDisplay(item);
+                renderCart();
                 e.target.value = '';
-                document.getElementById('qty-input').value = '1';
+                document.getElementById('qty-input').value = '1.000';
             } else {
-                alert("Produto não encontrado!");
+                alert("Produto não cadastrado!");
             }
         }
     }
 
-    function addToCart(product, qty) {
-        cart.push({ ...product, qty, subtotal: product.price * qty });
-        renderCart();
+    function updateDisplay(item) {
+        document.getElementById('unit-price').value = `R$ ${item.price.toFixed(2)}`;
+        document.getElementById('item-total').value = `R$ ${item.total.toFixed(2)}`;
     }
 
     function renderCart() {
-        const tbody = document.getElementById('cart-items');
-        tbody.innerHTML = cart.map(item => `
+        const tbody = document.querySelector('#cart-table tbody');
+        tbody.innerHTML = cart.map((item, i) => `
             <tr>
+                <td>${i+1}</td>
                 <td>${item.code}</td>
                 <td>${item.name}</td>
-                <td>${item.qty}</td>
+                <td>${item.qty.toFixed(3)}</td>
                 <td>${item.price.toFixed(2)}</td>
-                <td>${item.subtotal.toFixed(2)}</td>
+                <td>${item.total.toFixed(2)}</td>
             </tr>
         `).join('');
         
-        const total = cart.reduce((sum, item) => sum + item.subtotal, 0);
-        document.getElementById('total-val').innerText = `R$ ${total.toFixed(2)}`;
+        const total = cart.reduce((acc, curr) => acc + curr.total, 0);
+        document.getElementById('grand-total').innerText = `R$ ${total.toFixed(2)}`;
+        document.getElementById('volumes').innerText = `VOLUMES: ${cart.length}`;
     }
 
-    function togglePix() {
-        const method = document.getElementById('payment-method').value;
-        document.getElementById('pix-container').classList.toggle('hidden', method !== 'pix');
+    // Pagamento
+    function checkPayMethod() {
+        const method = document.getElementById('pay-method').value;
+        document.getElementById('cash-div').classList.toggle('hidden', method !== 'dinheiro');
+        document.getElementById('pix-div').classList.toggle('hidden', method !== 'pix');
+        
+        if(method === 'pix') {
+            const total = cart.reduce((acc, curr) => acc + curr.total, 0);
+            document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=pagar-${total}`;
+        }
     }
 
-    function openBalance() {
-        const weight = prompt("Peso da Balança (kg):", "0.500");
-        if(weight) document.getElementById('qty-input').value = weight;
+    function calcTroco() {
+        const total = cart.reduce((acc, curr) => acc + curr.total, 0);
+        const received = parseFloat(document.getElementById('cash-received').value) || 0;
+        const troco = received - total;
+        document.getElementById('change-display').innerText = `TROCO: R$ ${Math.max(0, troco).toFixed(2)}`;
     }
 
-    function finishSale() {
-        if(cart.length === 0) return;
-        
-        // Simulação Impressão 58mm
-        let cupom = `=== CUPOM NÃO FISCAL ===\n`;
-        cart.forEach(i => cupom += `${i.name} x${i.qty} - R$${i.subtotal.toFixed(2)}\n`);
-        cupom += `TOTAL: ${document.getElementById('total-val').innerText}\n`;
-        cupom += `PAGAMENTO: ${document.getElementById('payment-method').value.toUpperCase()}\n`;
-        
-        console.log(cupom);
-        alert(cupom + "\n\nImpressão enviada para 58mm!");
-        
+    function confirmFinalize() {
+        alert("Venda Finalizada com Sucesso!\nImprimindo Cupom 58mm...");
         cart = [];
         renderCart();
+        document.getElementById('payment-modal').style.display = 'none';
+        document.getElementById('unit-price').value = "R$ 0,00";
+        document.getElementById('item-total').value = "R$ 0,00";
     }
 
-    // Teclas de Atalho
-    window.addEventListener('keydown', (e) => {
-        if(e.key === 'F1') showSection('pdv');
-        if(e.key === 'F2') finishSale();
-    });
+    // Atalhos do Teclado
+    window.onkeydown = (e) => {
+        if(e.key === 'F3') {
+            const total = cart.reduce((acc, curr) => acc + curr.total, 0);
+            if(total <= 0) return;
+            document.getElementById('modal-total').innerText = `R$ ${total.toFixed(2)}`;
+            document.getElementById('payment-modal').style.display = 'flex';
+        }
+        if(e.key === 'Escape') {
+            document.getElementById('payment-modal').style.display = 'none';
+        }
+        if(e.key === 'F10') {
+            const peso = prompt("Peso da Balança (kg):", "0.500");
+            if(peso) document.getElementById('qty-input').value = peso;
+        }
+    };
+
+    function toggleRetaguarda() {
+        document.getElementById('retaguarda-div').classList.toggle('hidden');
+    }
 </script>
 
 </body>
