@@ -3,206 +3,317 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema PRO Hortifruti - Leandro</title>
+    <title>Hortifruti Pro - Gestão Leandro</title>
     <style>
-        :root { --primary: #2e7d32; --secondary: #1b5e20; --danger: #d32f2f; --info: #0277bd; --bg: #f0f2f5; }
-        body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 10px; font-size: 14px; }
-        .container { max-width: 1000px; margin: auto; }
-        .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        h2 { color: var(--primary); margin-top: 0; border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
-        
-        .grid-input { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
-        .full { grid-column: span 1; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        
-        button { cursor: pointer; border: none; border-radius: 4px; padding: 10px; font-weight: bold; color: white; }
-        .btn-add { background: var(--primary); width: 100%; margin-top: 10px; font-size: 16px; }
-        .btn-edit { background: var(--info); padding: 5px; margin-right: 5px; }
-        .btn-del { background: var(--danger); padding: 5px; }
+        :root {
+            --primary: #2e7d32;
+            --secondary: #388e3c;
+            --accent: #fbc02d;
+            --danger: #e53935;
+            --info: #1e88e5;
+            --bg: #eceff1;
+            --text: #263238;
+        }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background: #eee; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; }
+        
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
 
-        .relatorio-fornecedor { background: #fff; border-left: 6px solid var(--primary); padding: 10px; margin-bottom: 15px; }
-        .item-detalhe { background: #f9f9f9; padding: 8px; margin: 5px 0; border-radius: 4px; border: 1px solid #eee; }
-        .destaque { font-weight: bold; color: var(--secondary); }
-        .resumo-total { background: #333; color: #fff; padding: 15px; border-radius: 8px; }
+        /* Grid Principal para PC */
+        .main-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; align-items: start; }
+
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { font-size: 1.2rem; margin-top: 0; color: var(--secondary); border-bottom: 2px solid #eee; padding-bottom: 10px; }
+
+        /* Formulário Dinâmico */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; color: #546e7a; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #cfd8dc; border-radius: 8px; box-sizing: border-box; transition: 0.3s; font-size: 1rem; }
+        input:focus { border-color: var(--primary); outline: none; background: #f1f8e9; }
+
+        .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+        button { flex: 1; padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; color: white; text-transform: uppercase; }
+        
+        .btn-add { background: var(--primary); }
+        .btn-add:hover { background: var(--secondary); transform: translateY(-2px); }
+        .btn-clear { background: #78909c; }
+        .btn-edit-mode { background: var(--info) !important; }
+
+        /* Tabela e Relatórios */
+        .table-container { overflow-x: auto; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { background: #f8f9fa; color: #546e7a; padding: 12px; text-align: left; font-size: 0.8rem; text-transform: uppercase; border-bottom: 2px solid #dee2e6; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 0.95rem; }
+        tr:hover { background: #f1f8e9; }
+
+        .badge-margem { background: var(--primary); color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
+        .btn-icon { padding: 8px; font-size: 0.8rem; flex: none; width: auto; }
+
+        /* Relatório de Fornecedor Estilizado */
+        .fornecedor-block { margin-top: 20px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; background: #fafafa; }
+        .resumo-final { background: var(--text); color: white; padding: 25px; border-radius: 12px; margin-top: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .resumo-final h3 { margin: 0; color: var(--accent); font-size: 1.5rem; }
+
+        /* Responsividade Celular */
+        @media (max-width: 992px) {
+            .main-layout { grid-template-columns: 1fr; }
+            body { padding: 10px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="card">
-        <h2>📦 Entrada de Dados</h2>
-        <div class="grid-input">
-            <div><label>Fornecedor</label><input type="text" id="forn" placeholder="Ex: Tenente"></div>
-            <div><label>Produto</label><input type="text" id="prod" placeholder="Ex: Cará"></div>
-            <div><label>Custo Nota (R$)</label><input type="number" id="custo" placeholder="0.00"></div>
-            <div><label>Qtd Comprada</label><input type="number" id="qtdC" placeholder="Ex: 30"></div>
-            <div><label>Perda (%)</label><input type="number" id="perda" value="10"></div>
-            <div>
-                <label>Definir Venda por:</label>
-                <select id="tipoVenda" onchange="alternarModoVenda()">
-                    <option value="margem">Margem (%)</option>
-                    <option value="valor">Valor Fixo (R$)</option>
+    <header>
+        <h1>🍎 Sistema Hortifruti Leandro</h1>
+        <p>Gestão de Custos, Vendas e Projeção de Lucro</p>
+    </header>
+
+    <div class="main-layout">
+        <section class="card">
+            <h2 id="formTitle">➕ Novo Lançamento</h2>
+            <div class="form-group">
+                <label>Fornecedor</label>
+                <input type="text" id="forn" placeholder="Ex: TENENTE">
+            </div>
+            <div class="form-group">
+                <label>Produto</label>
+                <input type="text" id="prod" placeholder="Ex: CARÁ">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Custo Nota (R$)</label>
+                    <input type="number" id="custo" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Qtd na Nota</label>
+                    <input type="number" id="qtdC" placeholder="30">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Perda de Movimento (%)</label>
+                <input type="number" id="perda" value="10">
+            </div>
+            <div class="form-group">
+                <label>Definir Preço por:</label>
+                <select id="tipoVenda" onchange="toggleVendaLabel()">
+                    <option value="margem">Aplicar Margem (%)</option>
+                    <option value="valor">Valor de Venda Direto (R$)</option>
                 </select>
             </div>
-            <div><label id="labelVenda">Margem (%)</label><input type="number" id="valorVenda" value="91"></div>
-        </div>
-        <button onclick="salvarProduto()" class="btn-add" id="btnSalvar">ADICIONAR PRODUTO</button>
+            <div class="form-group">
+                <label id="labelVenda">Margem de Lucro (%)</label>
+                <input type="number" id="valorVenda" value="91" step="0.1">
+            </div>
+            
+            <div class="btn-row">
+                <button onclick="limpar()" class="btn-clear">Limpar</button>
+                <button onclick="salvar()" class="btn-add" id="btnAction">Salvar Produto</button>
+            </div>
+        </section>
+
+        <section>
+            <div class="card">
+                <h2>📋 Lista de Mercadorias</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fornecedor</th>
+                                <th>Produto</th>
+                                <th>Custo Real</th>
+                                <th>Venda</th>
+                                <th>Margem</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaItens"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="relatorioDinamico"></div>
+        </section>
     </div>
 
-    <div class="card">
-        <h2>📑 Itens na Lista</h2>
-        <div style="overflow-x:auto;">
-            <table id="tabela">
-                <thead>
-                    <tr>
-                        <th>Fornecedor</th>
-                        <th>Produto</th>
-                        <th>Qtd</th>
-                        <th>Custo Real</th>
-                        <th>Venda</th>
-                        <th>Margem</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="corpoTabela"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="areaRelatorio"></div>
+    <div id="resumoGeral"></div>
 </div>
 
 <script>
-    let produtos = [];
-    let idEdicao = null;
+    let db = JSON.parse(localStorage.getItem('hortifruti_db')) || [];
+    let editId = null;
 
-    function alternarModoVenda() {
+    // Inicializar
+    window.onload = () => atualizarInterface();
+
+    function toggleVendaLabel() {
         const tipo = document.getElementById('tipoVenda').value;
-        document.getElementById('labelVenda').innerText = tipo === 'margem' ? 'Margem (%)' : 'Valor de Venda (R$)';
+        document.getElementById('labelVenda').innerText = tipo === 'margem' ? 'Margem de Lucro (%)' : 'Valor de Venda Direto (R$)';
     }
 
-    function salvarProduto() {
-        const f = document.getElementById('forn').value.toUpperCase();
-        const p = document.getElementById('prod').value;
-        const c = parseFloat(document.getElementById('custo').value);
-        const qc = parseFloat(document.getElementById('qtdC').value);
-        const per = parseFloat(document.getElementById('perda').value) / 100;
+    function salvar() {
+        const forn = document.getElementById('forn').value.toUpperCase();
+        const prod = document.getElementById('prod').value.toUpperCase();
+        const custo = parseFloat(document.getElementById('custo').value);
+        const qtdC = parseFloat(document.getElementById('qtdC').value);
+        const perda = parseFloat(document.getElementById('perda').value) / 100;
         const tipoV = document.getElementById('tipoVenda').value;
-        const valV = parseFloat(document.getElementById('valorVenda').value);
+        const valorV = parseFloat(document.getElementById('valorVenda').value);
 
-        if(!f || !p || isNaN(c) || isNaN(qc)) return alert("Preencha os campos obrigatorios!");
+        if (!forn || !prod || isNaN(custo) || isNaN(qtdC)) {
+            alert("⚠️ Preencha os dados básicos de Fornecedor, Produto e Custo!");
+            return;
+        }
 
-        const vendavel = qc * (1 - per);
-        const custoReal = c / vendavel; // Custo dividido pelo que sobrou
+        // Cálculos Solicitados
+        const vendavel = qtdC * (1 - perda);
+        const custoReal = custo / vendavel; // Custo baseado no que sobra para vender
         
         let vendaFinal, margemFinal;
 
-        if(tipoV === 'margem') {
-            vendaFinal = Math.ceil(custoReal * (1 + (valV / 100))); // Arredondado
-            margemFinal = valV;
+        if (tipoV === 'margem') {
+            vendaFinal = Math.ceil(custoReal * (1 + (valorV / 100))); // Arredondado conforme solicitado
+            margemFinal = valorV;
         } else {
-            vendaFinal = valV;
+            vendaFinal = valorV;
             margemFinal = ((vendaFinal / custoReal) - 1) * 100;
         }
 
         const faturamento = vendavel * vendaFinal;
-        const lucro = faturamento - c;
+        const lucro = faturamento - custo;
 
-        const obj = { id: idEdicao || Date.now(), forn: f, prod: p, custo: c, qtdC: qc, vendavel, custoReal, vendaFinal, margemFinal, faturamento, lucro, perdaPc: per*100 };
+        const item = {
+            id: editId || Date.now(),
+            forn, prod, custo, qtdC, perdaPc: perda * 100,
+            vendavel, custoReal, vendaFinal, margemFinal, faturamento, lucro
+        };
 
-        if(idEdicao) {
-            produtos = produtos.map(item => item.id === idEdicao ? obj : item);
-            idEdicao = null;
-            document.getElementById('btnSalvar').innerText = "ADICIONAR PRODUTO";
+        if (editId) {
+            db = db.map(x => x.id === editId ? item : x);
+            editId = null;
+            document.getElementById('btnAction').classList.remove('btn-edit-mode');
+            document.getElementById('formTitle').innerText = "➕ Novo Lançamento";
         } else {
-            produtos.push(obj);
+            db.push(item);
         }
 
+        localStorage.setItem('hortifruti_db', JSON.stringify(db));
         limpar();
-        atualizar();
+        atualizarInterface();
     }
 
     function editar(id) {
-        const p = produtos.find(x => x.id === id);
-        document.getElementById('forn').value = p.forn;
-        document.getElementById('prod').value = p.prod;
-        document.getElementById('custo').value = p.custo;
-        document.getElementById('qtdC').value = p.qtdC;
-        document.getElementById('perda').value = p.perdaPc;
-        idEdicao = id;
-        document.getElementById('btnSalvar').innerText = "ATUALIZAR PRODUTO";
-        window.scrollTo(0,0);
+        const item = db.find(x => x.id === id);
+        document.getElementById('forn').value = item.forn;
+        document.getElementById('prod').value = item.prod;
+        document.getElementById('custo').value = item.custo;
+        document.getElementById('qtdC').value = item.qtdC;
+        document.getElementById('perda').value = item.perdaPc;
+        
+        editId = id;
+        document.getElementById('btnAction').innerText = "Atualizar Dados";
+        document.getElementById('btnAction').classList.add('btn-edit-mode');
+        document.getElementById('formTitle').innerText = "📝 Editando Produto";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function excluir(id) {
-        produtos = produtos.filter(x => x.id !== id);
-        atualizar();
+        if(confirm("Deseja remover este item?")) {
+            db = db.filter(x => x.id !== id);
+            localStorage.setItem('hortifruti_db', JSON.stringify(db));
+            atualizarInterface();
+        }
     }
 
     function limpar() {
         document.getElementById('prod').value = '';
         document.getElementById('custo').value = '';
         document.getElementById('qtdC').value = '';
+        editId = null;
+        document.getElementById('btnAction').innerText = "Salvar Produto";
+        document.getElementById('btnAction').classList.remove('btn-edit-mode');
+        document.getElementById('formTitle').innerText = "➕ Novo Lançamento";
     }
 
-    function atualizar() {
-        const corpo = document.getElementById('corpoTabela');
-        corpo.innerHTML = '';
-        produtos.forEach(p => {
-            corpo.innerHTML += `<tr>
-                <td>${p.forn}</td>
-                <td>${p.prod}</td>
-                <td>${p.qtdC}</td>
-                <td>R$ ${p.custoReal.toFixed(2)}</td>
-                <td>R$ ${p.vendaFinal.toFixed(2)}</td>
-                <td>${p.margemFinal.toFixed(0)}%</td>
-                <td>
-                    <button class="btn-edit" onclick="editar(${p.id})">Edit</button>
-                    <button class="btn-del" onclick="excluir(${p.id})">X</button>
-                </td>
-            </tr>`;
+    function atualizarInterface() {
+        const lista = document.getElementById('listaItens');
+        const relArea = document.getElementById('relatorioDinamico');
+        const resumoArea = document.getElementById('resumoGeral');
+        
+        lista.innerHTML = '';
+        let totalInv = 0;
+        let totalFat = 0;
+
+        // Tabela Principal
+        db.forEach(p => {
+            lista.innerHTML += `
+                <tr>
+                    <td><strong>${p.forn}</strong></td>
+                    <td>${p.prod}</td>
+                    <td>R$ ${p.custoReal.toFixed(2)}</td>
+                    <td>R$ ${p.vendaFinal.toFixed(2)}</td>
+                    <td><span class="badge-margem">${p.margemFinal.toFixed(0)}%</span></td>
+                    <td>
+                        <button class="btn-icon btn-edit" onclick="editar(${p.id})">✏️</button>
+                        <button class="btn-icon btn-del" onclick="excluir(${p.id})">🗑️</button>
+                    </td>
+                </tr>
+            `;
         });
 
-        renderRelatorio();
-    }
+        // Relatório por Fornecedor
+        const fornecedores = [...new Set(db.map(p => p.forn))];
+        let relHtml = '';
 
-    function renderRelatorio() {
-        const area = document.getElementById('areaRelatorio');
-        if(produtos.length === 0) { area.innerHTML = ''; return; }
-
-        const forns = [...new Set(produtos.map(p => p.forn))];
-        let html = '<h2>📊 RELATÓRIO DE VENDAS</h2>';
-        let totalInv = 0, totalFat = 0;
-
-        forns.forEach(f => {
-            const itens = produtos.filter(p => p.forn === f);
-            let subCusto = 0;
-            html += `<div class="relatorio-fornecedor"><h3>🧾 Fornecedor: ${f}</h3>`;
+        fornecedores.forEach(f => {
+            const itens = db.filter(p => p.forn === f);
+            let totalForn = 0;
+            relHtml += `<div class="card fornecedor-block">
+                <h3>🧾 NOTA: ${f}</h3>`;
+            
             itens.forEach(i => {
-                subCusto += i.custo;
+                totalForn += i.custo;
                 totalInv += i.custo;
                 totalFat += i.faturamento;
-                html += `<div class="item-detalhe">
-                    <strong>${i.prod}</strong> | Compra: ${i.qtdC} | <span class="destaque">Vendável: ${i.vendavel.toFixed(1)}</span><br>
-                    Custo Real: R$ ${i.custoReal.toFixed(2)} | Venda: <span class="destaque">R$ ${i.vendaFinal.toFixed(2)}</span> (${i.margemFinal.toFixed(0)}% margem)<br>
-                    Fat. Estimado: R$ ${i.faturamento.toFixed(2)} | Lucro: R$ ${i.lucro.toFixed(2)}
-                </div>`;
+                relHtml += `
+                    <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
+                        <strong>${i.prod}</strong> | Compra: ${i.qtdC}kg/un | <span style="color:var(--danger)">Vendável (-${i.perdaPc}%): ${i.vendavel.toFixed(1)}</span><br>
+                        <small>Custo Real: R$ ${i.custoReal.toFixed(2)} | Venda: <strong>R$ ${i.vendaFinal.toFixed(2)}</strong> | Lucro Item: R$ ${i.lucro.toFixed(2)}</small>
+                    </div>
+                `;
             });
-            html += `<strong>Total da Nota: R$ ${subCusto.toFixed(2)}</strong></div>`;
+            relHtml += `<p style="text-align:right; font-weight:bold; margin-top:10px;">Total Pago ao Fornecedor: R$ ${totalForn.toFixed(2)}</p></div>`;
         });
+        relArea.innerHTML = relHtml;
 
-        html += `<div class="resumo-total">
-            <h3>📈 RESUMO GERAL</h3>
-            <p>Investimento: R$ ${totalInv.toFixed(2)}</p>
-            <p>Venda Total: R$ ${totalFat.toFixed(2)}</p>
-            <p style="font-size:20px">LUCRO ESTIMADO: R$ ${(totalFat - totalInv).toFixed(2)}</p>
-        </div>`;
+        // Resumo Geral
+        if(db.length > 0) {
+            resumoArea.innerHTML = `
+                <div class="resumo-final">
+                    <div>
+                        <p style="margin:0; opacity:0.8;">Investimento Total</p>
+                        <h3>R$ ${totalInv.toFixed(2)}</h3>
+                    </div>
+                    <div>
+                        <p style="margin:0; opacity:0.8;">Faturamento Estimado</p>
+                        <h3>R$ ${totalFat.toFixed(2)}</h3>
+                    </div>
+                    <div style="text-align:right">
+                        <p style="margin:0; opacity:0.8;">LUCRO LÍQUIDO PROJETADO</p>
+                        <h3 style="color:#00e676">R$ ${(totalFat - totalInv).toFixed(2)}</h3>
+                    </div>
+                </div>
+                <button onclick="exportarRelatorio()" style="margin-top:20px; background:#546e7a; width:100%">Imprimir / Gerar PDF</button>
+            `;
+        } else {
+            resumoArea.innerHTML = '';
+        }
+    }
 
-        area.innerHTML = html;
+    function exportarRelatorio() {
+        window.print();
     }
 </script>
 
