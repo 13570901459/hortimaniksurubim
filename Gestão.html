@@ -3,90 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hortifruti Leandro - Mobile Pro</title>
+    <title>Hortifruti Pro - Gestão Leandro</title>
     <style>
         :root {
             --primary: #2e7d32;
             --secondary: #4caf50;
-            --danger: #ef5350;
-            --info: #29b6f6;
-            --dark: #1b5e20;
-            --bg: #f5f5f5;
+            --danger: #d32f2f;
+            --info: #0288d1;
+            --bg: #f0f2f5;
+            --dark: #263238;
         }
 
-        /* Reset para Mobile */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; line-height: 1.5; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
+        .container { max-width: 1200px; margin: auto; }
 
-        .container { max-width: 1100px; margin: auto; }
-        
-        header { text-align: center; padding: 15px 0; background: var(--primary); color: white; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        header h1 { margin: 0; font-size: 1.4rem; }
+        header { background: var(--primary); color: white; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { margin: 0; font-size: 1.5rem; }
 
-        .card { background: white; padding: 18px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 15px; border: 1px solid #eee; }
-        h2 { font-size: 1.1rem; color: var(--dark); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        h2 { font-size: 1.1rem; color: var(--primary); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; display: flex; justify-content: space-between; }
 
-        /* Formulário de Toque Fácil */
-        label { display: block; font-size: 0.85rem; font-weight: 700; color: #666; margin-bottom: 6px; margin-top: 12px; }
-        input, select { 
-            width: 100%; 
-            padding: 14px; 
-            border: 2px solid #e0e0e0; 
-            border-radius: 10px; 
-            font-size: 1rem; 
-            background: #fff;
-            transition: 0.2s;
-        }
+        /* Formulário */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        label { display: block; font-size: 0.8rem; font-weight: bold; color: #666; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; transition: 0.2s; }
         input:focus { border-color: var(--primary); outline: none; background: #f1f8e9; }
 
-        .row { display: flex; gap: 10px; }
-        .row > div { flex: 1; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        .btn-save { background: var(--primary); color: white; }
+        .btn-edit-mode { background: var(--info) !important; color: white; }
+        .btn-clear { background: #90a4ae; color: white; font-size: 0.8rem; padding: 10px; }
 
-        /* Botões de Ação */
-        .btn { 
-            width: 100%; 
-            padding: 16px; 
-            border: none; 
-            border-radius: 12px; 
-            font-size: 1rem; 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            cursor: pointer; 
-            transition: 0.3s;
-            margin-top: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-        .btn-add { background: var(--primary); color: white; }
-        .btn-add:active { transform: scale(0.96); background: var(--dark); }
-        .btn-clear { background: #9e9e9e; color: white; margin-top: 5px; }
-        .btn-edit-mode { background: var(--info) !important; }
+        /* Estilo da Nota do Fornecedor */
+        .nota-fornecedor { border-left: 5px solid var(--primary); background: #fff; margin-bottom: 15px; padding: 10px; border-radius: 0 15px 15px 0; border: 1px solid #eee; border-left-width: 6px; }
+        .nota-header { display: flex; justify-content: space-between; align-items: center; background: #f1f8e9; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; }
+        .nota-header span { font-weight: bold; color: var(--dark); }
 
-        /* Lista de Produtos (Visual de Card no Mobile) */
-        .item-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; margin-bottom: 10px; position: relative; }
-        .item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-        .item-forn { font-size: 0.75rem; background: #eee; padding: 2px 8px; border-radius: 4px; color: #666; font-weight: bold; }
-        .item-name { font-size: 1.1rem; font-weight: bold; color: var(--dark); }
+        .produto-item { padding: 10px; border-bottom: 1px solid #f0f0f0; position: relative; }
+        .produto-item:last-child { border-bottom: none; }
         
-        .item-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9rem; margin-bottom: 10px; }
-        .val { color: var(--primary); font-weight: bold; }
+        .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.85rem; margin-top: 5px; }
+        .valor-liquido { color: var(--primary); font-weight: bold; font-size: 0.95rem; }
         
-        .actions { display: flex; gap: 8px; border-top: 1px solid #f0f0f0; padding-top: 10px; }
-        .btn-small { padding: 10px; flex: 1; border-radius: 8px; font-size: 0.85rem; color: white; text-align: center; text-decoration: none; }
-        .b-edit { background: var(--info); }
-        .b-del { background: var(--danger); }
+        .item-actions { display: flex; gap: 10px; margin-top: 10px; }
+        .act-btn { flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 0.75rem; font-weight: bold; color: white; }
+        .act-edit { background: var(--info); }
+        .act-del { background: var(--danger); }
 
-        /* Resumo Geral fixo no fundo (Opcional) */
-        .resumo-total { background: #263238; color: white; padding: 20px; border-radius: 15px; margin-top: 20px; }
-        .resumo-line { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 1rem; }
-        .resumo-destaque { font-size: 1.4rem; color: #00e676; font-weight: bold; border-top: 1px solid #455a64; padding-top: 10px; margin-top: 10px; }
+        /* Resumo Fixo */
+        .resumo-fixo { background: var(--dark); color: white; padding: 20px; border-radius: 20px; margin-top: 20px; }
+        .resumo-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .resumo-destaque { font-size: 1.3rem; border-top: 1px solid #455a64; padding-top: 10px; margin-top: 10px; color: #64ffda; font-weight: bold; }
 
-        /* Ajustes para PC */
         @media (min-width: 768px) {
-            .main-content { display: grid; grid-template-columns: 380px 1fr; gap: 20px; }
-            .items-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+            .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
         }
     </style>
 </head>
@@ -94,53 +65,59 @@
 
 <div class="container">
     <header>
-        <h1>🍏 Hortifruti Leandro</h1>
+        <h1>🍎 Hortifruti Leandro - Gestão</h1>
     </header>
 
-    <div class="main-content">
+    <div class="main-grid">
         <section class="card">
-            <h2 id="formTitle">📝 Novo Produto</h2>
-            <label>Fornecedor</label>
-            <input type="text" id="forn" placeholder="Ex: TENENTE" autocomplete="off">
-            
-            <label>Nome do Produto</label>
-            <input type="text" id="prod" placeholder="Ex: CARÁ" autocomplete="off">
-            
-            <div class="row">
+            <h2 id="formTitle">Novo Lançamento</h2>
+            <div class="form-row">
+                <div style="grid-column: span 2;">
+                    <label>Fornecedor</label>
+                    <input type="text" id="forn" placeholder="Ex: TENENTE">
+                </div>
+            </div>
+            <div class="form-row">
+                <div style="grid-column: span 2;">
+                    <label>Produto</label>
+                    <input type="text" id="prod" placeholder="Ex: CARÁ">
+                </div>
+            </div>
+            <div class="form-row">
                 <div>
                     <label>Custo Nota (R$)</label>
-                    <input type="number" id="custo" placeholder="0.00" step="0.01" inputmode="decimal">
+                    <input type="number" id="custo" step="0.01" inputmode="decimal">
                 </div>
                 <div>
                     <label>Qtd na Nota</label>
-                    <input type="number" id="qtdC" placeholder="30" inputmode="numeric">
+                    <input type="number" id="qtdC" inputmode="numeric">
                 </div>
             </div>
-
-            <div class="row">
+            <div class="form-row">
                 <div>
-                    <label>Perda (%)</label>
-                    <input type="number" id="perda" value="10" inputmode="numeric">
+                    <label>Perda Movimento %</label>
+                    <input type="number" id="perda" value="10">
                 </div>
                 <div>
-                    <label>Venda por:</label>
-                    <select id="tipoVenda" onchange="mudarLabel()">
+                    <label>Definir por:</label>
+                    <select id="tipoVenda" onchange="toggleLabel()">
                         <option value="margem">Margem %</option>
                         <option value="valor">Preço R$</option>
                     </select>
                 </div>
             </div>
+            <div>
+                <label id="labelVenda">Margem de Lucro (%)</label>
+                <input type="number" id="valorVenda" value="91" step="0.1">
+            </div>
 
-            <label id="labelVenda">Margem de Lucro (%)</label>
-            <input type="number" id="valorVenda" value="91" step="0.1" inputmode="decimal">
-
-            <button onclick="salvar()" class="btn btn-add" id="btnSalvar">🚀 Salvar Produto</button>
-            <button onclick="limpar()" class="btn btn-clear">Limpar</button>
+            <button onclick="salvar()" class="btn btn-save" id="btnSalvar">Salvar na Lista</button>
+            <button onclick="limpar()" class="btn btn-clear">Limpar Campos</button>
         </section>
 
         <section>
-            <h2 style="padding-left: 10px;">📦 Mercadorias Lançadas</h2>
-            <div id="listaProdutos" class="items-list">
+            <h2 style="padding: 0 10px;">Notas e Produtos</h2>
+            <div id="areaNotas">
                 </div>
 
             <div id="resumoGeral"></div>
@@ -149,19 +126,19 @@
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('leandro_horti_db')) || [];
+    let db = JSON.parse(localStorage.getItem('leandro_horti_db_v2')) || [];
     let editId = null;
 
-    window.onload = atualizarTela;
+    window.onload = atualizar;
 
-    function mudarLabel() {
+    function toggleLabel() {
         const tipo = document.getElementById('tipoVenda').value;
         document.getElementById('labelVenda').innerText = tipo === 'margem' ? 'Margem de Lucro (%)' : 'Valor de Venda Direto (R$)';
     }
 
     function salvar() {
-        const forn = document.getElementById('forn').value.toUpperCase();
-        const prod = document.getElementById('prod').value.toUpperCase();
+        const forn = document.getElementById('forn').value.toUpperCase().trim();
+        const prod = document.getElementById('prod').value.toUpperCase().trim();
         const custo = parseFloat(document.getElementById('custo').value);
         const qtdC = parseFloat(document.getElementById('qtdC').value);
         const perda = parseFloat(document.getElementById('perda').value) / 100;
@@ -169,7 +146,7 @@
         const valorV = parseFloat(document.getElementById('valorVenda').value);
 
         if (!forn || !prod || isNaN(custo) || isNaN(qtdC)) {
-            alert("Preencha os campos obrigatórios!");
+            alert("Preencha Fornecedor, Produto, Custo e Quantidade!");
             return;
         }
 
@@ -177,7 +154,6 @@
         const custoReal = custo / vendavel;
         
         let vendaFinal, margemFinal;
-
         if (tipoV === 'margem') {
             vendaFinal = Math.ceil(custoReal * (1 + (valorV / 100)));
             margemFinal = valorV;
@@ -186,48 +162,45 @@
             margemFinal = ((vendaFinal / custoReal) - 1) * 100;
         }
 
-        const faturamento = vendavel * vendaFinal;
-        const lucro = faturamento - custo;
+        const fatBruto = vendavel * vendaFinal;
+        const fatLiquido = fatBruto - custo; // Isso é o lucro real do item
 
         const item = {
             id: editId || Date.now(),
             forn, prod, custo, qtdC, perdaPc: perda * 100,
-            vendavel, custoReal, vendaFinal, margemFinal, faturamento, lucro
+            vendavel, custoReal, vendaFinal, margemFinal, fatBruto, fatLiquido
         };
 
         if (editId) {
             db = db.map(x => x.id === editId ? item : x);
             editId = null;
-            document.getElementById('btnSalvar').classList.remove('btn-edit-mode');
-            document.getElementById('formTitle').innerText = "📝 Novo Produto";
         } else {
             db.push(item);
         }
 
-        localStorage.setItem('leandro_horti_db', JSON.stringify(db));
+        localStorage.setItem('leandro_horti_db_v2', JSON.stringify(db));
         limpar();
-        atualizarTela();
+        atualizar();
     }
 
     function editar(id) {
-        const item = db.find(x => x.id === id);
-        document.getElementById('forn').value = item.forn;
-        document.getElementById('prod').value = item.prod;
-        document.getElementById('custo').value = item.custo;
-        document.getElementById('qtdC').value = item.qtdC;
-        document.getElementById('perda').value = item.perdaPc;
+        const i = db.find(x => x.id === id);
+        document.getElementById('forn').value = i.forn;
+        document.getElementById('prod').value = i.prod;
+        document.getElementById('custo').value = i.custo;
+        document.getElementById('qtdC').value = i.qtdC;
+        document.getElementById('perda').value = i.perdaPc;
         editId = id;
-        document.getElementById('btnSalvar').innerText = "🔄 Atualizar Produto";
+        document.getElementById('btnSalvar').innerText = "Atualizar Produto";
         document.getElementById('btnSalvar').classList.add('btn-edit-mode');
-        document.getElementById('formTitle').innerText = "✏️ Editando Produto";
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function excluir(id) {
-        if(confirm("Excluir este item?")) {
+        if(confirm("Remover este produto?")) {
             db = db.filter(x => x.id !== id);
-            localStorage.setItem('leandro_horti_db', JSON.stringify(db));
-            atualizarTela();
+            localStorage.setItem('leandro_horti_db_v2', JSON.stringify(db));
+            atualizar();
         }
     }
 
@@ -236,49 +209,67 @@
         document.getElementById('custo').value = '';
         document.getElementById('qtdC').value = '';
         editId = null;
-        document.getElementById('btnSalvar').innerText = "🚀 Salvar Produto";
+        document.getElementById('btnSalvar').innerText = "Salvar na Lista";
         document.getElementById('btnSalvar').classList.remove('btn-edit-mode');
-        document.getElementById('formTitle').innerText = "📝 Novo Produto";
     }
 
-    function atualizarTela() {
-        const container = document.getElementById('listaProdutos');
+    function atualizar() {
+        const area = document.getElementById('areaNotas');
         const resumo = document.getElementById('resumoGeral');
-        container.innerHTML = '';
+        area.innerHTML = '';
         
-        let invTotal = 0;
-        let fatTotal = 0;
+        let totalCustoGeral = 0;
+        let totalLucroGeral = 0;
 
-        db.forEach(p => {
-            invTotal += p.custo;
-            fatTotal += p.faturamento;
-            container.innerHTML += `
-                <div class="item-card">
-                    <div class="item-header">
-                        <span class="item-name">${p.prod}</span>
-                        <span class="item-forn">${p.forn}</span>
+        const fornecedores = [...new Set(db.map(x => x.forn))];
+
+        fornecedores.forEach(f => {
+            const itens = db.filter(x => x.forn === f);
+            let custoNota = 0;
+            
+            let notaHtml = `<div class="nota-fornecedor">
+                <div class="nota-header">
+                    <span>FORNECEDOR: ${f}</span>
+                    <span id="total-${f}"></span>
+                </div>`;
+            
+            itens.forEach(i => {
+                custoNota += i.custo;
+                totalCustoGeral += i.custo;
+                totalLucroGeral += i.fatLiquido;
+                
+                notaHtml += `
+                    <div class="produto-item">
+                        <div style="font-weight:bold; color:var(--dark)">${i.prod}</div>
+                        <div class="grid-info">
+                            <div>Caixa: ${i.qtdC} | Vend: ${i.vendavel.toFixed(1)}</div>
+                            <div>Custo Real: R$ ${i.custoReal.toFixed(2)}</div>
+                            <div>Venda: <b>R$ ${i.vendaFinal.toFixed(2)}</b></div>
+                            <div>Margem: ${i.margemFinal.toFixed(0)}%</div>
+                        </div>
+                        <div class="valor-liquido">Lucro Líquido: R$ ${i.fatLiquido.toFixed(2)}</div>
+                        <div class="item-actions">
+                            <button class="act-btn act-edit" onclick="editar(${i.id})">EDITAR</button>
+                            <button class="act-btn act-del" onclick="excluir(${i.id})">EXCLUIR</button>
+                        </div>
                     </div>
-                    <div class="item-grid">
-                        <div>Custo Real: <span class="val">R$ ${p.custoReal.toFixed(2)}</span></div>
-                        <div>Venda: <span class="val">R$ ${p.vendaFinal.toFixed(2)}</span></div>
-                        <div>Vendável: <b>${p.vendavel.toFixed(1)}</b></div>
-                        <div>Margem: <b>${p.margemFinal.toFixed(0)}%</b></div>
-                    </div>
-                    <div class="actions">
-                        <div class="btn-small b-edit" onclick="editar(${p.id})">Editar</div>
-                        <div class="btn-small b-del" onclick="excluir(${p.id})">Excluir</div>
-                    </div>
-                </div>
-            `;
+                `;
+            });
+
+            notaHtml += `</div>`;
+            area.innerHTML += notaHtml;
+            document.getElementById(`total-${f}`).innerText = `TOTAL NOTA: R$ ${custoNota.toFixed(2)}`;
         });
 
         if(db.length > 0) {
             resumo.innerHTML = `
-                <div class="resumo-total">
-                    <div class="resumo-line"><span>Investimento:</span> <span>R$ ${invTotal.toFixed(2)}</span></div>
-                    <div class="resumo-line"><span>Faturamento:</span> <span>R$ ${fatTotal.toFixed(2)}</span></div>
-                    <div class="resumo-line resumo-destaque"><span>LUCRO:</span> <span>R$ ${(fatTotal - invTotal).toFixed(2)}</span></div>
-                    <button class="btn" style="background:#546e7a; margin-top:20px;" onclick="window.print()">🖨️ Imprimir Relatório</button>
+                <div class="resumo-fixo">
+                    <div class="resumo-row"><span>Total Investido:</span> <span>R$ ${totalCustoGeral.toFixed(2)}</span></div>
+                    <div class="resumo-row resumo-destaque">
+                        <span>LUCRO LÍQUIDO TOTAL:</span> 
+                        <span>R$ ${totalLucroGeral.toFixed(2)}</span>
+                    </div>
+                    <p style="font-size: 0.7rem; color: #90a4ae; margin-top:10px; text-align:center;">*Lucro já calculado com 10% de perda e custos pagos.</p>
                 </div>
             `;
         } else {
