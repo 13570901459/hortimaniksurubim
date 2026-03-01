@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão de Hortifruti - Leandro</title>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --secondary: #1b5e20;
+            --accent: #fbc02d;
+            --danger: #d32f2f;
+            --bg: #f4f4f9;
+            --card: #ffffff;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #333; }
+        .container { max-width: 900px; margin: auto; }
+        h1, h2 { text-align: center; color: var(--primary); }
+
+        .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        
+        /* Formulário */
+        .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .full-width { grid-column: span 2; }
+        input, select, button { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; outline: none; }
+        input:focus { border-color: var(--primary); }
+        
+        button { cursor: pointer; border: none; font-weight: bold; transition: 0.3s; }
+        .btn-add { background: var(--primary); color: white; margin-top: 10px; }
+        .btn-add:hover { background: var(--secondary); }
+        .btn-del { background: var(--danger); color: white; padding: 5px 10px; font-size: 12px; }
+
+        /* Tabela Responsiva */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background: var(--primary); color: white; }
+
+        /* Relatórios */
+        .relatorio-sessao { border-left: 5px solid var(--primary); padding-left: 15px; margin-bottom: 30px; }
+        .resumo-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #ccc; }
+        .destaque-lucro { color: var(--primary); font-weight: bold; font-size: 1.2em; }
+
+        @media (max-width: 600px) {
+            .grid-form { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📈 Gestor de Vendas & Lucro</h1>
+
+    <div class="card">
+        <h2>📦 Entrada de Mercadoria</h2>
+        <div class="grid-form">
+            <input type="text" id="fornecedor" placeholder="Nome do Fornecedor" class="full-width">
+            <input type="text" id="produto" placeholder="Produto (ex: Cará)">
+            <input type="number" id="custoTotal" placeholder="Custo Total da Nota (R$)">
+            <input type="number" id="qtdCaixa" placeholder="Qtd na Caixa (kg ou un)">
+            <input type="number" id="margemLucro" placeholder="Margem Lucro % (ex: 91)" value="91">
+            <input type="number" id="margemPerda" placeholder="Margem Perda % (ex: 10)" value="10">
+            <button onclick="adicionarProduto()" class="btn-add full-width">ADICIONAR À LISTA</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📑 Itens Lançados</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fornecedor</th>
+                        <th>Produto</th>
+                        <th>Custo</th>
+                        <th>Venda Sug.</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="listaProdutos"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card" id="relatorioFinal">
+        <h2>📊 RELATÓRIO PADRÃO EMPRESA</h2>
+        <div id="notasPorFornecedor"></div>
+        <hr>
+        <div id="resumoGeral"></div>
+    </div>
+</div>
+
+<script>
+    let produtos = [];
+
+    function adicionarProduto() {
+        const fornecedor = document.getElementById('fornecedor').value.toUpperCase();
+        const nome = document.getElementById('produto').value;
+        const custo = parseFloat(document.getElementById('custoTotal').value);
+        const qtd = parseFloat(document.getElementById('qtdCaixa').value);
+        const margemL = parseFloat(document.getElementById('margemLucro').value) / 100;
+        const margemP = parseFloat(document.getElementById('margemPerda').value) / 100;
+
+        if (!fornecedor || !nome || isNaN(custo) || isNaN(qtd)) {
+            alert("Preencha todos os campos corretamente!");
+            return;
+        }
+
+        const custoUnit = custo / qtd;
+        const precoVenda = Math.ceil(custoUnit * (1 + margemL)); // Arredondando para cima
+        const vendavel = qtd * (1 - margemP);
+        const faturamento = vendavel * precoVenda;
+        const lucro = faturamento - custo;
+
+        const p = { fornecedor, nome, custo, qtd, precoVenda, vendavel, faturamento, lucro, id: Date.now() };
+        produtos.push(p);
+        atualizarTudo();
+        limparCampos();
+    }
+
+    function excluirProduto(id) {
+        produtos = produtos.filter(p => p.id !== id);
+        atualizarTudo();
+    }
+
+    function limparCampos() {
+        document.getElementById('produto').value = '';
+        document.getElementById('custoTotal').value = '';
+        document.getElementById('qtdCaixa').value = '';
+    }
+
+    function atualizarTudo() {
+        renderTabela();
+        renderRelatorio();
+    }
+
+    function renderTabela() {
+        const tbody = document.getElementById('listaProdutos');
+        tbody.innerHTML = '';
+        produtos.forEach(p => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${p.fornecedor}</td>
+                    <td>${p.nome}</td>
+                    <td>R$ ${p.custo.toFixed(2)}</td>
+                    <td>R$ ${p.precoVenda.toFixed(2)}</td>
+                    <td><button class="btn-del" onclick="excluirProduto(${p.id})">Remover</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    function renderRelatorio() {
+        const notasDiv = document.getElementById('notasPorFornecedor');
+        const resumoDiv = document.getElementById('resumoGeral');
+        
+        // Agrupar por fornecedor
+        const fornecedores = [...new Set(produtos.map(p => p.fornecedor))];
+        let htmlNotas = '';
+        let totalInvestimento = 0;
+        let totalFaturamento = 0;
+
+        fornecedores.forEach(f => {
+            const itens = produtos.filter(p => p.fornecedor === f);
+            let totalNota = 0;
+            htmlNotas += `<div class="relatorio-sessao"><h3>🧾 Fornecedor: ${f}</h3>`;
+            itens.forEach(i => {
+                totalNota += i.custo;
+                totalInvestimento += i.custo;
+                totalFaturamento += i.faturamento;
+                htmlNotas += `
+                    <p><strong>${i.nome}</strong> | Caixa: ${i.qtd} | Vendável: ${i.vendavel.toFixed(1)} | Venda: R$ ${i.precoVenda.toFixed(2)}<br>
+                    <small>Faturamento: R$ ${i.faturamento.toFixed(2)} | Lucro: R$ ${i.lucro.toFixed(2)}</small></p>
+                `;
+            });
+            htmlNotas += `<p><strong>✅ Total Nota ${f}: R$ ${totalNota.toFixed(2)}</strong></p></div>`;
+        });
+
+        const totalLucro = totalFaturamento - totalInvestimento;
+
+        notasDiv.innerHTML = htmlNotas;
+        resumoDiv.innerHTML = `
+            <h3>📈 RESUMO GERAL (MOVIMENTO FRACO)</h3>
+            <div class="resumo-item"><span>Investimento Total:</span> <span>R$ ${totalInvestimento.toFixed(2)}</span></div>
+            <div class="resumo-item"><span>Faturamento Estimado:</span> <span>R$ ${totalFaturamento.toFixed(2)}</span></div>
+            <div class="resumo-item"><span class="destaque-lucro">LUCRO LÍQUIDO ESTIMADO:</span> <span class="destaque-lucro">R$ ${totalLucro.toFixed(2)}</span></div>
+        `;
+    }
+</script>
+
+</body>
+</html>
