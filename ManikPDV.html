@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema PDV Gemini</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #27ae60;
+            --danger: #e74c3c;
+            --bg: url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1920');
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background: var(--bg) no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+        }
+
+        .overlay { background: rgba(0,0,0,0.7); height: 100%; display: flex; flex-direction: column; }
+
+        nav { background: var(--primary); padding: 10px; display: flex; gap: 10px; color: white; }
+        button { cursor: pointer; padding: 10px; border: none; border-radius: 4px; font-weight: bold; }
+        .btn-nav { background: #34495e; color: white; }
+        .btn-success { background: var(--accent); color: white; }
+
+        .container { flex: 1; padding: 20px; display: flex; gap: 20px; overflow: hidden; }
+        
+        /* Layout Caixa */
+        .caixa-main { flex: 2; background: white; border-radius: 8px; display: flex; flex-direction: column; padding: 15px; }
+        .caixa-sidebar { flex: 1; background: #ecf0f1; border-radius: 8px; padding: 15px; }
+
+        .item-list { flex: 1; border: 1px solid #ccc; overflow-y: auto; margin-bottom: 10px; }
+        .total-display { font-size: 3rem; text-align: right; color: var(--accent); font-weight: bold; }
+
+        .hidden { display: none !important; }
+        input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+
+<div class="overlay">
+    <nav>
+        <button class="btn-nav" onclick="showSection('pdv')">Frente de Caixa (F1)</button>
+        <button class="btn-nav" onclick="showSection('retarguarda')">Retaguarda / Estoque</button>
+        <button class="btn-nav" onclick="showSection('clientes')">Clientes</button>
+    </nav>
+
+    <div id="pdv" class="container section">
+        <div class="caixa-main">
+            <h2>Ponto de Venda</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <input type="text" id="barcode-input" placeholder="Código de Barras ou Nome" onkeypress="handleBarcode(event)">
+                <input type="number" id="qty-input" value="1" style="width: 80px;" placeholder="Qtd">
+            </div>
+            <div class="item-list" id="cart-list">
+                <table>
+                    <thead><tr><th>Cód</th><th>Produto</th><th>Qtd</th><th>Preço</th><th>Subtotal</th></tr></thead>
+                    <tbody id="cart-items"></tbody>
+                </table>
+            </div>
+            <div class="total-display" id="total-val">R$ 0,00</div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-success" style="flex: 1; height: 50px;" onclick="finishSale()">FINALIZAR VENDA (F2)</button>
+                <button class="btn-nav" onclick="openBalance()">BALANÇA (B)</button>
+            </div>
+        </div>
+
+        <div class="caixa-sidebar">
+            <h3>Pagamento</h3>
+            <select id="payment-method" onchange="togglePix()">
+                <option value="dinheiro">Dinheiro</option>
+                <option value="cartao">Cartão</option>
+                <option value="pix">PIX</option>
+            </select>
+            <div id="pix-container" class="hidden" style="text-align: center; margin-top: 20px;">
+                <p>Escaneie o QR Code:</p>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PagamentoSimulado" alt="QR Code PIX">
+            </div>
+        </div>
+    </div>
+
+    <div id="retarguarda" class="container section hidden">
+        <div class="caixa-main" style="overflow-y: auto;">
+            <h2>Cadastro de Produtos (JSON)</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="text" id="p-code" placeholder="Código de Barras">
+                <input type="text" id="p-name" placeholder="Nome do Produto">
+                <input type="number" id="p-price" placeholder="Preço">
+                <button class="btn-success" onclick="saveProduct()">Salvar Produto</button>
+            </div>
+            <table id="product-table">
+                <thead><tr><th>Cód</th><th>Nome</th><th>Preço</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- DATABASE EM LOCALSTORAGE ---
+    let products = JSON.parse(localStorage.getItem('pdv_products')) || [];
+    let cart = [];
+
+    // --- NAVEGAÇÃO ---
+    function showSection(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        if(id === 'retarguarda') updateProductTable();
+    }
+
+    // --- LÓGICA DE PRODUTOS (RETAGUARDA) ---
+    function saveProduct() {
+        const code = document.getElementById('p-code').value;
+        const name = document.getElementById('p-name').value;
+        const price = parseFloat(document.getElementById('p-price').value);
+
+        if(!code || !price) return alert("Preencha os campos!");
+
+        const existingIndex = products.findIndex(p => p.code === code);
+
+        if(existingIndex > -1) {
+            products[existingIndex].price = price;
+            alert("Preço atualizado!");
+        } else {
+            products.push({ code, name, price });
+            alert("Produto cadastrado!");
+        }
+
+        localStorage.setItem('pdv_products', JSON.stringify(products));
+        updateProductTable();
+    }
+
+    function updateProductTable() {
+        const tbody = document.querySelector('#product-table tbody');
+        tbody.innerHTML = products.map(p => `<tr><td>${p.code}</td><td>${p.name}</td><td>R$ ${p.price.toFixed(2)}</td></tr>`).join('');
+    }
+
+    // --- FRENTE DE CAIXA ---
+    function handleBarcode(e) {
+        if(e.key === 'Enter') {
+            const val = e.target.value;
+            const qty = parseFloat(document.getElementById('qty-input').value);
+            const product = products.find(p => p.code === val || p.name.toLowerCase().includes(val.toLowerCase()));
+
+            if(product) {
+                addToCart(product, qty);
+                e.target.value = '';
+                document.getElementById('qty-input').value = '1';
+            } else {
+                alert("Produto não encontrado!");
+            }
+        }
+    }
+
+    function addToCart(product, qty) {
+        cart.push({ ...product, qty, subtotal: product.price * qty });
+        renderCart();
+    }
+
+    function renderCart() {
+        const tbody = document.getElementById('cart-items');
+        tbody.innerHTML = cart.map(item => `
+            <tr>
+                <td>${item.code}</td>
+                <td>${item.name}</td>
+                <td>${item.qty}</td>
+                <td>${item.price.toFixed(2)}</td>
+                <td>${item.subtotal.toFixed(2)}</td>
+            </tr>
+        `).join('');
+        
+        const total = cart.reduce((sum, item) => sum + item.subtotal, 0);
+        document.getElementById('total-val').innerText = `R$ ${total.toFixed(2)}`;
+    }
+
+    function togglePix() {
+        const method = document.getElementById('payment-method').value;
+        document.getElementById('pix-container').classList.toggle('hidden', method !== 'pix');
+    }
+
+    function openBalance() {
+        const weight = prompt("Peso da Balança (kg):", "0.500");
+        if(weight) document.getElementById('qty-input').value = weight;
+    }
+
+    function finishSale() {
+        if(cart.length === 0) return;
+        
+        // Simulação Impressão 58mm
+        let cupom = `=== CUPOM NÃO FISCAL ===\n`;
+        cart.forEach(i => cupom += `${i.name} x${i.qty} - R$${i.subtotal.toFixed(2)}\n`);
+        cupom += `TOTAL: ${document.getElementById('total-val').innerText}\n`;
+        cupom += `PAGAMENTO: ${document.getElementById('payment-method').value.toUpperCase()}\n`;
+        
+        console.log(cupom);
+        alert(cupom + "\n\nImpressão enviada para 58mm!");
+        
+        cart = [];
+        renderCart();
+    }
+
+    // Teclas de Atalho
+    window.addEventListener('keydown', (e) => {
+        if(e.key === 'F1') showSection('pdv');
+        if(e.key === 'F2') finishSale();
+    });
+</script>
+
+</body>
+</html>
