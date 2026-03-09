@@ -2099,8 +2099,8 @@ function finalizarPedido() {
   });
 
   let totalComDesconto = totalSemDesconto;
-  if (cupom === 'HORTI10') {
-    totalComDesconto *= 0.9;
+  if (cupom === 'Andreza15') {
+    totalComDesconto *= 0.85;
   }
 
   const mensagem = 
@@ -2108,7 +2108,7 @@ function finalizarPedido() {
     `Gostaria de fazer um pedido para entrega em: ${endereco}.\n\n` +
     `Itens:\n${textoItens}\n` +
     `Total sem desconto: R$ ${totalSemDesconto.toFixed(2)}\n` +
-    (cupom === 'HORTI10' ? `Desconto aplicado (HORTI10): 10%\n` : '') +
+    (cupom === 'Andreza15' ? `Desconto aplicado (Andreza15): 15%\n` : '') +
     `Total final: R$ ${totalComDesconto.toFixed(2)}\n` +
     `Forma de pagamento: ${pagamento}`;
 
@@ -2152,6 +2152,7 @@ function finalizarPedido() {
   </footer>
 </body>
 </html>
+
 
 
 
